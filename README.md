@@ -13,8 +13,7 @@
 |   +-- src         // Source code for the Node server
 |   |   +-- routes      // Route handlers for the server API
 +-- notes
-|   +-- // Notes regarding choices made in terms of frameworks used,
-|   +-- // as well as issues / learnings that took place.
+|   +-- // Notes from the course of this project will be stored here
 +-- .gitignore
 +-- README.md
 ```
