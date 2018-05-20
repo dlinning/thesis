@@ -1,8 +1,8 @@
 var express = require("express"),
     router = express.Router();
 
-router.get("/", function(req, res) {
-    res.send("You have connected to the server.");
+router.get("/:groupid", (req, res) => {
+    res.send(`Reading from GROUP: ${req.params.groupid}`);
 });
 
 module.exports = router;
