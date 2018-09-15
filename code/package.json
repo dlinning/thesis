@@ -4,8 +4,15 @@
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
     "main": "../code/server/server.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "nodemon server.js"
     },
     "author": "Doug Linning, douglinning@gmail.com",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "sequelize": "4.38.1",
+        "sqlite3": "4.0.2"
+    },
+    "devDependencies": {
+        "nodemon": "^1.18.4"
+    }
 }

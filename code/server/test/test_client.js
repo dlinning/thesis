@@ -4,7 +4,7 @@
 //This is waaaay easier than it will be in C/C++.
 //
 
-const config = require("../../config/server.json");
+const config = require("../../configs/server.json");
 
 const dgram = require("dgram");
 const client = dgram.createSocket("udp4");
