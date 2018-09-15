@@ -1,0 +1,11 @@
+{
+    "name": "doug_linning_thesis",
+    "version": "1.0.0",
+    "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
+    "main": "../code/server/server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Doug Linning, douglinning@gmail.com",
+    "license": "ISC"
+}
