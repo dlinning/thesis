@@ -23,12 +23,52 @@ module.exports = class DBHelper {
         // not have a bunch of random objects coming off
         // of `this`.
         this.dbObjects = {};
+
+        // Setup the necessary DB Objects
+        this._addDbDefinition("Sensor", {
+            id: {
+                type: Sequelize.UUID,
+                primaryKey: true,
+                defaultValue: Sequelize.UUIDV4
+            },
+            friendlyName: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
+            dataType: {
+                type: Sequelize.STRING,
+                allowNull: false
+            }
+        });
+
+        this._addDbDefinition("LogEntry", {
+            id: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
+            sensorUUID: {
+                type: Sequelize.UUID,
+                allowNull: false
+            },
+            timestamp: {
+                type: Sequelize.DATE,
+                allowNull: false
+            },
+            //All data will be stored as a string,
+            //which can be parsed accordingly
+            //when reading the logs.
+            value: {
+                type: Sequelize.STRING,
+                allowNull: false
+            }
+        });
     }
 
     // A wrapper around `sequelize.define`
     // See http://docs.sequelizejs.com/manual/tutorial/models-definition.html
     //
-    addDbDefinition(name, properties) {
+    _addDbDefinition(name, properties) {
         if (this.dbObjects[name] === undefined) {
             this.dbObjects[name] = this.sequlize.define(name, properties);
         } else {
@@ -57,33 +97,60 @@ module.exports = class DBHelper {
     /////
     /////
 
-    // Store a sensor in the DB. Should take place after inital connect
+    // Store a sensor in the DB. Should take place after inital connect.
+    // Will return the new Sensor's UUID that was just created.
     //
-    // The only necessary field for `config` is `dataType`.
-    // `id` is auto-generated.
-    // `friendlyName` will be "AUTO_" + `name` if empty.
-    //
-    addSensor(name, config) {
-        if (this.dbObjects["Sensor"] === undefined) {
-            this.addDbDefinition("Sensor", {
-                id: {
-                    type: Sequelize.UUID,
-                    primaryKey: true,
-                    defaultValue: Sequelize.UUIDV4
-                },
-                friendlyName: Sequelize.STRING,
-                dataType: Sequelize.STRING
-            });
+    registerSensor(name, dataType, uuid) {
+        if (uuid != undefined) {
+            return this.sequlize
+                .sync()
+                .then(() => this.dbObjects["Sensor"].findById(uuid))
+                .then(res => {
+                    console.log(`Found Sensor's UUID is ${res.id}`);
+                    return res.id;
+                })
+                .catch(err => {
+                    console.error(err);
+                    return null;
+                });
+        } else {
+            return this.sequlize
+                .sync()
+                .then(() =>
+                    this.dbObjects["Sensor"].create({
+                        friendlyName: name,
+                        dataType: dataType
+                    })
+                )
+                .then(res => {
+                    console.log(`New Sensor's UUID is ${res.id}`);
+                    return res.id;
+                })
+                .catch(err => {
+                    console.error(err);
+                    return null;
+                });
         }
+    }
 
-        if (config.friendlyName === undefined) {
-            config.friendlyName = "AUTO_" + name;
-        }
+    // Store a log entry for a given sensor.
+    // Does not return anything.
+    //
+    logData(value, sensorUUID, timestamp) {
         this.sequlize
             .sync()
-            .then(() => this.dbObjects["Sensor"].create(config))
+            .then(() =>
+                this.dbObjects["LogEntry"].create({
+                    value: value.toString(),
+                    timestamp: timestamp,
+                    sensorUUID: sensorUUID
+                })
+            )
             .then(newSensor => {
-                console.log(`New Sensor's UUID is ${newSensor.id}`);
+                console.log(`Logged ${value} for sensor ${sensorUUID} @ ${timestamp}`);
+            })
+            .catch(err => {
+                console.error(err);
             });
     }
 };
