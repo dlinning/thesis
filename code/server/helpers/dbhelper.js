@@ -100,6 +100,9 @@ module.exports = class DBHelper {
     // Store a sensor in the DB. Should take place after inital connect.
     // Will return the new Sensor's UUID that was just created.
     //
+    // If given a `uuid`, this will instead lookup that Sensor,
+    // and still return the UUID if it exists.
+    //
     registerSensor(name, dataType, uuid) {
         if (uuid != undefined) {
             return this.sequlize
