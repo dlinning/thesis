@@ -1,0 +1,53 @@
+<h1>List of All Groups</h1>
+<span id="stats"></span>
+<ul id="groups"></ul>
+
+<br>
+
+<form onsubmit="return addNewGroup();" id="form">
+    <input type="text" name="groupName" placeholder="Name">
+    <input type="text" name="uuid" placeholder="UUID (Optional)">
+    <input type="submit" value="Add / Update Group">
+</form>
+
+<script>
+    function addNewGroup() {
+        var form = document.getElementById('form');
+        fetch("/api/groups/createorupdate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            body: JSON.stringify({
+                groupName: form.groupName.value,
+                uuid: form.uuid.value
+            })
+        }).then(() => {
+            updateList();
+        });
+
+        return false;
+    }
+    function updateList() {
+
+        fetch('/api/groups/list')
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                document.getElementById('stats').innerText = `Total Groups: ${json.total} | Limit: ${json.limit}`;
+
+                var target = document.getElementById('groups');
+                target.innerHTML = "";
+
+                json.groups.forEach(g => {
+                    var x = document.createElement('li');
+                    x.innerText = `${g.name} : ${g.id.split('-')[0]}...`;
+                    target.appendChild(x);
+                });
+            });
+    }
+    (() => {
+        updateList();
+    })();
+</script>

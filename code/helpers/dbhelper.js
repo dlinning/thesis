@@ -171,13 +171,14 @@ module.exports = class DBHelper {
 	// Will update the name if given `uuid`.
 	//
 	createOrUpdateGroup(name, uuid) {
-		return this.sequlize
-			.then(() =>
-				this.dbObjects["Group"].upsert({
-					id: uuid,
-					name: name
-				})
-			)
+		if (uuid.length == 0) {
+			uuid = undefined;
+		}
+		return this.dbObjects["Group"]
+			.upsert({
+				id: uuid,
+				name: name
+			})
 			.then(res => {
 				return `Group created/updated with name ${name}`;
 			})
