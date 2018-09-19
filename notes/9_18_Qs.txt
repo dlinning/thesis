@@ -1,0 +1,8 @@
+- What problem are you solving?
+How to build a clean, simple to use interface/system for managing many IoT Devices/sensors.
+
+- What is you technical approach/stack? (Diagram)
+A Node.js server (so it can be hosted anywhere), using sockets to communicate with multiple low-level sensors/remote devices.
+
+- Why is this a great project for you?
+I want to work in Web Applications, and this would be a great project to show for a full-stack job interview.
