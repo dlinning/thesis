@@ -2,13 +2,16 @@
     "name": "doug_linning_thesis",
     "version": "1.0.0",
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
-    "main": "../code/server/server.js",
+    "main": "ERROR",
     "scripts": {
-        "start": "nodemon server.js"
+        "start": "exit(1)"
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",
     "dependencies": {
+        "express": "^4.16.3",
+        "react": "^16.5.2",
+        "react-dom": "^16.5.2",
         "sequelize": "4.38.1",
         "sqlite3": "4.0.2"
     },

@@ -1,3 +1,4 @@
 /code/node_modules
 /code/package-lock.json
 /code/server/db_path.sqlite
+/code/yarn.lock
