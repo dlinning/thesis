@@ -84,6 +84,10 @@ module.exports = class DBHelper {
 				allowNull: false
 			}
 		});
+
+		// Finally, sync the model definitions after adding
+		// them all.
+		this.sequlize.sync();
 	}
 
 	// A wrapper around `sequelize.define`
@@ -134,7 +138,6 @@ module.exports = class DBHelper {
 		//TODO: Rethink this, possibly Upsert?
 		if (uuid != undefined) {
 			return this.sequlize
-				.sync()
 				.then(() => this.dbObjects["Sensor"].findById(uuid))
 				.then(res => {
 					console.log(`Found Sensor's UUID is ${res.id}`);
@@ -146,7 +149,6 @@ module.exports = class DBHelper {
 				});
 		} else {
 			return this.sequlize
-				.sync()
 				.then(() =>
 					this.dbObjects["Sensor"].create({
 						friendlyName: name,
@@ -170,7 +172,6 @@ module.exports = class DBHelper {
 	//
 	createOrUpdateGroup(name, uuid) {
 		return this.sequlize
-			.sync()
 			.then(() =>
 				this.dbObjects["Group"].upsert({
 					id: uuid,
@@ -186,12 +187,37 @@ module.exports = class DBHelper {
 			});
 	}
 
+	// Will return a paginated list of all
+	// groups that are created, along
+	// will a count of the total groups.
+	// (This can be used to pull the ones
+	// not on the first page if necessary.)
+	//
+	listGroups(_page = 0, _limit = 10) {
+		var startIndex = _page * _limit;
+		return this.dbObjects["Group"]
+			.findAndCountAll({
+				offset: startIndex,
+				limit: _limit
+			})
+			.then(result => {
+				let count = result.count;
+				let rows = result.rows;
+
+				return {
+					total: count,
+					startIndex: startIndex,
+					limit: _limit,
+					groups: rows
+				};
+			});
+	}
+
 	// Store a log entry for a given sensor.
 	// Does not return anything.
 	//
 	logData(value, sensorUUID, timestamp) {
 		this.sequlize
-			.sync()
 			.then(() =>
 				this.dbObjects["LogEntry"].create({
 					value: value.toString(),

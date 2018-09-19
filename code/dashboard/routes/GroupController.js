@@ -28,4 +28,18 @@ router.post("/createorupdate", (req, res) => {
 	}
 });
 
+// Will return a paginated list of Groups
+// (UUID, Name).
+// By default, will get the first page.
+//
+router.get("/list/:page?/:limit?", (req, res) => {
+	DBHelper.listGroups(req.params.page || 0, req.params.limit || 10)
+		.then(dbResp => {
+			res.status(200).send(dbResp);
+		})
+		.catch(err => {
+			res.status(500).send({ error: "Error getting all groups." });
+		});
+});
+
 module.exports = router;
