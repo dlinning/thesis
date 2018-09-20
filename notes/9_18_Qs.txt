@@ -6,3 +6,20 @@ A Node.js server (so it can be hosted anywhere), using sockets to communicate wi
 
 - Why is this a great project for you?
 I want to work in Web Applications, and this would be a great project to show for a full-stack job interview.
+
+
+---
+Proposal:
+- Clear/Concise retelling of 3 questions, with more detail.
+- Sequence of steps that will lead to MVP
+    - Dependencies, "I will do XXX so then I can work on YYY, etc."
+    - Not a bullet list
+- MVP must list features (in detail) that you are committing to demo at end of term (aim for technical work done by start of Spring Sem.)
+- Identify "escape valves": "If I can't get XX done by YY, I will do ZZ"
+    - How could you abstract data source?
+    - How could a dependency be worked around?
+    - How will possible obstacles be overcome?
+    - If you *must* wait for something, what will you do in the meantime?
+- List types of hardware required, doesn't have to be fine-grained.
+    - During the next week, put together a shopping list (URLS, Serial #, Component Name)
+- 10-20 pages
