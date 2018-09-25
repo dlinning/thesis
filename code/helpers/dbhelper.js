@@ -137,9 +137,13 @@ module.exports = class DBHelper {
 	registerSensor(name, dataType, uuid) {
 		//TODO: Rethink this, possibly Upsert?
 		if (uuid != undefined) {
-			return this.sequlize
-				.then(() => this.dbObjects["Sensor"].findById(uuid))
+			return this.dbObjects["Sensor"]
+				.findById(uuid)
 				.then(res => {
+					if (res == null) {
+						console.log("Sensor not found in DB.");
+						return null;
+					}
 					console.log(`Found Sensor's UUID is ${res.id}`);
 					return res.id;
 				})
@@ -148,13 +152,11 @@ module.exports = class DBHelper {
 					return null;
 				});
 		} else {
-			return this.sequlize
-				.then(() =>
-					this.dbObjects["Sensor"].create({
-						friendlyName: name,
-						dataType: dataType
-					})
-				)
+			return this.dbObjects["Sensor"]
+				.create({
+					friendlyName: name,
+					dataType: dataType
+				})
 				.then(res => {
 					console.log(`New Sensor's UUID is ${res.id}`);
 					return res.id;
@@ -218,14 +220,12 @@ module.exports = class DBHelper {
 	// Does not return anything.
 	//
 	logData(value, sensorUUID, timestamp) {
-		this.sequlize
-			.then(() =>
-				this.dbObjects["LogEntry"].create({
-					value: value.toString(),
-					timestamp: timestamp,
-					sensorUUID: sensorUUID
-				})
-			)
+		this.dbObjects["LogEntry"]
+			.create({
+				value: value.toString(),
+				timestamp: timestamp,
+				sensorUUID: sensorUUID
+			})
 			.then(newSensor => {
 				console.log(`Logged ${value} for sensor ${sensorUUID} @ ${timestamp}`);
 			})
