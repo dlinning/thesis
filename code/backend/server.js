@@ -1,4 +1,5 @@
 const config = require("../configs/server.json");
+const debug = process.env.NODE_ENV != 'production';
 
 const DBHelperBuilder = require("../helpers/dbhelper"),
 	DBHelper = new DBHelperBuilder(config.db);
@@ -19,7 +20,7 @@ server.on("message", (rawMessage, rinfo) => {
 	//Run whenever a message is received
 	var msg = JSON.parse(rawMessage);
 
-	console.log(msg);
+	debug && console.log(msg);
 
     // Auth check, `authKey` must be provided for all messages.
 	if (msg.authKey !== config.sensorAuthKey) {
@@ -31,8 +32,6 @@ server.on("message", (rawMessage, rinfo) => {
 	}
 
 	if (msg.type === "connect") {
-		//console.log("Connect message recvd with payload:");
-		//console.log(msg);
 
 		DBHelper.registerSensor(msg.name, msg.dataType, msg.id).then(res => {
 			if (res === null) {
@@ -57,10 +56,7 @@ server.on("message", (rawMessage, rinfo) => {
 server.on("listening", () => {
 	//Will run when the server initially starts up
 	const address = server.address();
-	console.log(`UDP server listening ${address.address}:${address.port}`);
+	console.log(`UDP server listening at ${address.address}:${address.port}`);
 });
 
 server.bind(config.port);
-
-// Testing the DB
-//DBHelper.addSensor('TEST_SENSOR', { dataType: 'INTEGER' });

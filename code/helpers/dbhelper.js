@@ -2,8 +2,13 @@
 //If using a DB engine besides SQLite, you will
 //have to change this file accordingly.
 //
+const debug = process.env.NODE_ENV != 'production';
+console.log('in debug', debug);
 
-const sqlite3 = require("sqlite3").verbose();
+const sqlite3 = require("sqlite3");
+if (debug == true) {
+	sqlite3.verbose();
+}
 
 const Sequelize = require("sequelize");
 
@@ -166,10 +171,10 @@ module.exports = class DBHelper {
 				.findById(uuid)
 				.then(res => {
 					if (res == null) {
-						console.log("Sensor not found in DB.");
+						console.log(`Sensor not found in DB with id ${uuid}`);
 						return null;
 					}
-					console.log(`Found Sensor's UUID is ${res.id}`);
+					debug && console.log(`Found Sensor's UUID is ${res.id}`);
 					return res.id;
 				})
 				.catch(err => {
@@ -183,7 +188,7 @@ module.exports = class DBHelper {
 					dataType: dataType
 				})
 				.then(res => {
-					console.log(`New Sensor's UUID is ${res.id}`);
+					debug && console.log(`New Sensor's UUID is ${res.id}`);
 					return res.id;
 				})
 				.catch(err => {
@@ -248,7 +253,6 @@ module.exports = class DBHelper {
 	// Puts that sensor in the group.
 	//
 	addSensorToGroup(sensorID, groupID) {
-		console.log("GROUP_ID:::", groupID);
 		return this.dbObjects["Sensor"]
 			.findOne({ where: { id: sensorID } })
 			.then(sensor => {

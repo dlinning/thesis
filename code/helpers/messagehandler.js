@@ -1,6 +1,8 @@
 //
-//Handles all incoming messages
+// Can send out UDP messages
 //
+
+const debug = process.env.NODE_ENV != 'production';
 
 module.exports = class MessageSender {
     constructor() {}
@@ -13,8 +15,7 @@ module.exports = class MessageSender {
                 throw err;
             }
 
-            console.log(`UDP message sent to ${to_ip}:${to_port} of length ${bytes} bytes.`);
-
+            debug && console.log(`UDP message sent to ${to_ip}:${to_port} of length ${bytes} bytes.`);
         });
     }
 };

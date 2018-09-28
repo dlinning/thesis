@@ -8,8 +8,6 @@ const DBHelperBuilder = require("../../helpers/dbhelper"),
 // Only provide `uuid` if updating `groupName`
 //
 router.post("/createorupdate", (req, res) => {
-	console.log(req.body.groupName);
-
 	var groupName = req.body.groupName;
 
 	if (groupName) {

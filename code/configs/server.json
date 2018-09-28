@@ -1,27 +1,26 @@
 {
-    "port": 3000,
-    "server_ip": "localhost",
+	"port": 3000,
+	"server_ip": "localhost",
 
-    "sensorAuthKey": "1234AUTHKEY4321",
+	"sensorAuthKey": "1234AUTHKEY4321",
 
-    "db": {
-        "host": "localhost",
-        "username": "DB_USER",
-        "password": "DB_PASS",
+	"db": {
+		"host": "localhost",
+		"username": "DB_USER",
+		"password": "DB_PASS",
 
+		"sequelizeOpts": {
+			"dialect": "sqlite",
+			"storage": "./db_path.sqlite",
 
-        "sequelizeOpts": {
-            "dialect": "sqlite",
-            "storage": "./db_path.sqlite",
+			"pool": {
+				"max": 5,
+				"min": 0,
+				"acquire": 30000,
+				"idle": 10000
+			}
+		},
 
-            "pool": {
-                "max": 5,
-                "min": 0,
-                "acquire": 30000,
-                "idle": 10000
-            }
-        },
-
-        "operatorsAliases": false
-    }
+		"operatorsAliases": false
+	}
 }
