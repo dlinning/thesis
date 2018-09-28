@@ -1,18 +1,30 @@
-<h1>List of All Groups</h1>
-<span id="stats"></span>
-<ul id="groups"></ul>
+<div class="flex-row">
+    <div class="flex-col">
+        <h1>List of All Groups</h1>
+        <span id="group_stats"></span>
+        <ul id="groups"></ul>
 
-<br>
+        <form onsubmit="return addNewGroup();" id="groupAddForm" class="flex-col">
+            <input type="text" name="groupName" placeholder="Name">
+            <input type="text" name="uuid" placeholder="UUID (Optional)">
+            <input type="submit" value="Add / Update Group">
+        </form>
+    </div>
+    <div class="flex-col">
+        <h1>List of All Sensors</h1>
+        <span id="sensor_stats"></span>
+        <form onsubmit="return addSensorToGroup();" id="sensorGroupForm">
+            <ul id="sensors"></ul>
 
-<form onsubmit="return addNewGroup();" id="form">
-    <input type="text" name="groupName" placeholder="Name">
-    <input type="text" name="uuid" placeholder="UUID (Optional)">
-    <input type="submit" value="Add / Update Group">
-</form>
+            <input type="text" name="groupID" placeholder="Group UUID">
+            <input type="submit" value="Set Sensor's Group">
+        </form>
+    </div>
+</div>
 
 <script>
     function addNewGroup() {
-        var form = document.getElementById('form');
+        var form = document.getElementById('groupAddForm');
         fetch("/api/groups/createorupdate", {
             method: "POST",
             headers: {
@@ -23,31 +35,81 @@
                 uuid: form.uuid.value
             })
         }).then(() => {
-            updateList();
+            updateGroupList();
         });
 
         return false;
     }
-    function updateList() {
-
+    function updateGroupList() {
         fetch('/api/groups/list')
             .then((response) => {
                 return response.json();
             })
             .then((json) => {
-                document.getElementById('stats').innerText = `Total Groups: ${json.total} | Limit: ${json.limit}`;
+                document.getElementById('group_stats').innerText = `Total Groups: ${json.total} | Limit: ${json.limit}`;
 
                 var target = document.getElementById('groups');
                 target.innerHTML = "";
 
-                json.groups.forEach(g => {
+                json.list.forEach(g => {
                     var x = document.createElement('li');
-                    x.innerText = `${g.name} : ${g.id.split('-')[0]}...`;
+                    x.innerText = `${g.name} | ${g.id}`;
+                    target.appendChild(x);
+                });
+            });
+    }
+
+    function addSensorToGroup() {
+        var form = document.getElementById('sensorGroupForm');
+        fetch("/api/sensors/setGroup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            body: JSON.stringify({
+                sensorID: form.sensorID.value,
+                groupID: form.groupID.value
+            })
+        }).then(() => {
+            updateSensorList();
+        });
+
+        return false;
+    }
+    function updateSensorList() {
+
+        fetch('/api/sensors/list')
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                document.getElementById('sensor_stats').innerText = `Total Sensors: ${json.total} | Limit: ${json.limit}`;
+
+                var target = document.getElementById('sensors');
+                target.innerHTML = "";
+
+                json.list.forEach(s => {
+                    var groups = "|";
+                    if(s.Groups.length > 0){
+                        s.Groups.forEach(g => {
+                            groups += `${g.id.split('-')[0]}|`;
+                        });
+                    }
+                    var x = document.createElement('li');
+                    var cb = document.createElement('input');
+                    cb.type = "radio";
+                    cb.name = "sensorID";
+                    cb.value = s.id;
+                    var label = document.createElement('span');
+                    label.innerText = `${s.friendlyName} | ${s.id.split('-')[0]} | Group: ${groups}`;
+                    x.appendChild(cb);
+                    x.appendChild(label);
                     target.appendChild(x);
                 });
             });
     }
     (() => {
-        updateList();
+        updateGroupList();
+        updateSensorList();
     })();
 </script>

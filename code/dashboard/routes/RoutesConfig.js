@@ -7,4 +7,6 @@ router.use("/api", require("./ApiController"));
 
 router.use("/api/groups", require("./GroupController"));
 
+router.use("/api/sensors", require("./SensorController"));
+
 module.exports = router;

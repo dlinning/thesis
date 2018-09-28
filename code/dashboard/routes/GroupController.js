@@ -33,7 +33,7 @@ router.post("/createorupdate", (req, res) => {
 // By default, will get the first page.
 //
 router.get("/list/:page?/:limit?", (req, res) => {
-	DBHelper.listGroups(req.params.page || 0, req.params.limit || 10)
+	DBHelper.listByType("Group", req.params.page || 0, req.params.limit || 10)
 		.then(dbResp => {
 			res.status(200).send(dbResp);
 		})

@@ -60,7 +60,13 @@ module.exports = class DBHelper {
 			}
 		});
 
-		this._addHasMany("Group", "Sensor", "Sensors");
+		// Setup relationship between Sensors and Groups
+		this.dbObjects["Sensor"].belongsToMany(this.dbObjects["Group"], {
+			through: "SensorGroup"
+		});
+		this.dbObjects["Group"].belongsToMany(this.dbObjects["Sensor"], {
+			through: "SensorGroup"
+		});
 
 		this._addDbDefinition("LogEntry", {
 			id: {
@@ -128,6 +134,25 @@ module.exports = class DBHelper {
 	/////
 	/////
 
+	// `toCheck` is an array of {type:STRING,id:PRIMARYKEY}
+	// that will return true or false if either all exist
+	// or not all exist, respectively. All entries MUST
+	// be unique.
+	//
+	checkExists(toCheck) {
+		var promises = toCheck.map(check => {
+			return this.dbObjects[check.type].count({ where: { id: check.id } });
+		});
+		return Promise.all(promises)
+			.then(values => {
+				return values.reduce((a, b) => a + b) === values.length;
+			})
+			.catch(err => {
+				console.error(err);
+				return false;
+			});
+	}
+
 	// Store a sensor in the DB. Should take place after inital connect.
 	// Will return the new Sensor's UUID that was just created.
 	//
@@ -190,18 +215,21 @@ module.exports = class DBHelper {
 			});
 	}
 
+
 	// Will return a paginated list of all
-	// groups that are created, along
-	// will a count of the total groups.
-	// (This can be used to pull the ones
-	// not on the first page if necessary.)
+	// dbObjects[type] that are created, along
+	// with extra data for pagination.
 	//
-	listGroups(_page = 0, _limit = 10) {
+	// If `include` is defined, then that will be passed
+	// down to the `findAndCountAll()`.
+	//
+	listByType(type, _page = 0, _limit = 10, include) {
 		var startIndex = _page * _limit;
-		return this.dbObjects["Group"]
+		return this.dbObjects[type]
 			.findAndCountAll({
 				offset: startIndex,
-				limit: _limit
+				limit: _limit,
+				include : include
 			})
 			.then(result => {
 				let count = result.count;
@@ -211,8 +239,30 @@ module.exports = class DBHelper {
 					total: count,
 					startIndex: startIndex,
 					limit: _limit,
-					groups: rows
+					list: rows
 				};
+			});
+	}
+
+	// Sets the groupID for a sensor with id = sensorID.
+	// Puts that sensor in the group.
+	//
+	addSensorToGroup(sensorID, groupID) {
+		console.log("GROUP_ID:::", groupID);
+		return this.dbObjects["Sensor"]
+			.findOne({ where: { id: sensorID } })
+			.then(sensor => {
+				return this.dbObjects["Group"]
+					.findOne({ where: { id: groupID } })
+					.then(group => {
+						return group.addSensor(sensor);
+					}).catch(groupErr => {
+						console.log(groupErr);
+						return groupErr;
+					});
+			}).catch(sensorErr => {
+				console.log(sensorErr);
+				return sensorErr;
 			});
 	}
 
