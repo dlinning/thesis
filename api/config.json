@@ -9,7 +9,7 @@
 
         "sequelizeOpts": {
             "dialect": "sqlite",
-            "storage": "../backend/db_path.sqlite",
+            "storage": "../database.sqlite",
 
             "pool": {
                 "max": 5,

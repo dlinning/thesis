@@ -1,3 +1,1 @@
 # Senior Thesis
-
-## Repo Structure

@@ -4,15 +4,13 @@
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
     "main": "ERROR",
     "scripts": {
-        "start": "exit(1)"
+        "start": "exit(1)",
+        "dashboard": "node dashboard/dashboard.js"
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",
     "dependencies": {
         "express": "^4.16.3",
-        "express-handlebars": "^3.0.0",
-        "react": "^16.5.2",
-        "react-dom": "^16.5.2",
         "sequelize": "4.38.1",
         "sqlite3": "4.0.2"
     },

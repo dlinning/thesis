@@ -3,7 +3,7 @@
 //Useful for testing the server.
 //
 
-const config = require("../configs/client.json");
+const config = require("./config.json");
 
 const Sensor = require("./Sensor");
 

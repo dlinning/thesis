@@ -11,7 +11,7 @@
 
 		"sequelizeOpts": {
 			"dialect": "sqlite",
-			"storage": "./db_path.sqlite",
+			"storage": "../database.sqlite",
 
 			"pool": {
 				"max": 5,

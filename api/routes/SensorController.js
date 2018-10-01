@@ -1,8 +1,8 @@
 const express = require("express"),
 	router = express.Router();
 
-const DBHelperBuilder = require("../../helpers/dbhelper"),
-	DBHelper = new DBHelperBuilder(require("../../configs/server.json").db);
+const DBHelperBuilder = require("../../common/helpers/dbhelper"),
+	DBHelper = new DBHelperBuilder(require("../config.json").db);
 
 // Will return a paginated list of Sensors
 // By default, will get the first page.

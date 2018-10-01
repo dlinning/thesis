@@ -12,8 +12,14 @@ if (debug == true) {
 
 const Sequelize = require("sequelize");
 
+//
+//TODO: Refactor to Singleton,
+//as multiple instances shouldn't be touching DB.
+//
+
 module.exports = class DBHelper {
 	constructor(config) {
+		console.log('!!!!!!INIT DBHELPER!!!!!!');
 		this.config = config;
 
 		// Create the DB defined in `config`

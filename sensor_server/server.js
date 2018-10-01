@@ -1,10 +1,10 @@
-const config = require("../configs/server.json");
+const config = require("./config.json");
 const debug = process.env.NODE_ENV != 'production';
 
-const DBHelperBuilder = require("../helpers/dbhelper"),
+const DBHelperBuilder = require("../common/helpers/dbhelper"),
 	DBHelper = new DBHelperBuilder(config.db);
 
-const MessageSenderBuilder = require("../helpers/messagehandler"),
+const MessageSenderBuilder = require("../common/helpers/messagehandler"),
 	MessageSender = new MessageSenderBuilder();
 
 const dgram = require("dgram");
