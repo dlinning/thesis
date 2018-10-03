@@ -1,18 +1,16 @@
 const express = require("express"),
 	router = express.Router();
 
-const DBHelperBuilder = require("../../common/helpers/dbhelper"),
-	DBHelper = new DBHelperBuilder(require("../config.json").db);
+var DBHelper = require("../../common/helpers/dbhelper");
+DBHelper.init(require("../config.json"));
 
 // Will return a paginated list of Sensors
 // By default, will get the first page.
 //
 router.get("/list/:page?/:limit?", (req, res) => {
-    DBHelper.listByType(
-        "Sensor",
-        req.params.page || 0,
-        req.params.limit || 10,
-        [{model:DBHelper.dbObjects["Group"], required:false}])
+	DBHelper.listByType("Sensor", req.params.page || 0, req.params.limit || 10, [
+		{ model: DBHelper.dbObjects["Group"], required: false }
+	])
 		.then(dbResp => {
 			res.status(200).send(dbResp);
 		})
@@ -37,11 +35,11 @@ router.post("/setGroup", (req, res) => {
 		{ type: "Sensor", id: body.sensorID },
 		{ type: "Group", id: body.groupID }
 	])
-        .then(bothExist => {
+		.then(bothExist => {
 			if (bothExist) {
 				DBHelper.addSensorToGroup(body.sensorID, body.groupID)
 					.then(didUpdate => {
-						res.status(200).send({ response: 'ok' });
+						res.status(200).send({ response: "ok" });
 					})
 					.catch(setErr => {
 						res.status(500).send({
