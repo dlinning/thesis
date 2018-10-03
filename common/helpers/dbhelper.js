@@ -9,8 +9,8 @@
 const debug = process.env.NODE_ENV != "production";
 console.log("in debug", debug);
 
-var fs = require('fs');
-var path = require('path');
+var fs = require("fs");
+var path = require("path");
 
 const sqlite3 = require("sqlite3");
 if (debug == true) {
@@ -141,7 +141,7 @@ function addHasMany(one, many, name) {
 	dbObjects[one].hasMany(dbObjects[many], { as: name });
 }
 
-/* General DB Helper Functions */
+/* BEGIN General DB Helper Functions */
 
 // `toCheck` is an array of {type:STRING,id:PRIMARYKEY}
 // that will return true or false if either all exist
@@ -238,6 +238,25 @@ function registerSensor(name, dataType, uuid) {
 	}
 }
 
+// Allows modification of a pre-existing sensor.
+// sensorID must be set.
+// Opts has all optional fields of 
+//{ dataType: "STRING"|"INT"|"FLOAT"|"BLOB", friendlyName: <STRING> }
+//
+function updateSensor(sensorID, opts) {
+	var query = Object.assign({ id: sensorID }, opts);
+
+	return dbObjects["Sensor"]
+		.update(opts, { where: { id: sensorID } })
+		.then(res => {
+			return `Sensor ${sensorID} modified`;
+		})
+		.catch(err => {
+			console.error(err);
+			return null;
+		});
+}
+
 // Store a log entry for a given sensor.
 // Does not return anything.
 //
@@ -320,6 +339,7 @@ module.exports = {
 
 	registerSensor: registerSensor,
 	logData: logData,
+	updateSensor: updateSensor,
 
 	createOrUpdateGroup: createOrUpdateGroup,
 	addSensorToGroup: addSensorToGroup

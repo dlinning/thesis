@@ -60,4 +60,25 @@ router.post("/setGroup", (req, res) => {
 		});
 });
 
+// Allows modification of Sensors.
+//
+router.post("/modify", (req, res) => {
+	let body = req.body;
+	var sensorID = body.sensorID;
+
+	if (sensorID == undefined) {
+		res.status(400).send({ error: "Must send sensorID on body." });
+	}
+
+	var opts = body.opts;
+
+	DBHelper.updateSensor(sensorID, opts)
+		.then(dbResp => {
+			res.status(200).send("Modified sensor successfully");
+		})
+		.catch(dbErr => {
+			res.status(500).send(`Error modifying sensor: ${dbErr}`);
+		});
+});
+
 module.exports = router;
