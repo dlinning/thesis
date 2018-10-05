@@ -263,27 +263,6 @@ function logData(value, sensorUUID, timestamp) {
 		});
 }
 
-// Loads log data for a given sensor
-// from startTime to endTime
-function getReadings(sensorID, startTime, endTime) {
-	return dbObjects["LogEntry"]
-		.findAndCountAll({
-			where: {
-				sensorUUID: { [Op.eq]: sensorID },
-				timestamp: { [Op.gte]: startTime, [Op.lte]: endTime }
-			}
-		})
-		.then(result => {
-			let count = result.count;
-			let rows = result.rows;
-
-			return {
-				total: count,
-				list: rows
-			};
-		});
-}
-
 // Creates/Updates a group with the given name.
 // Only creates it, and returns a success or failure.
 // Will update the name if given `uuid`.
@@ -348,7 +327,6 @@ module.exports = {
 
 	registerSensor: registerSensor,
 	logData: logData,
-	getReadings: getReadings,
 	updateSensor: updateSensor,
 
 	createOrUpdateGroup: createOrUpdateGroup,

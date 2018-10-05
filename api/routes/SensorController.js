@@ -4,6 +4,8 @@ const express = require("express"),
 var DBHelper = require("../../common/helpers/dbhelper");
 DBHelper.init(require("../config.json"));
 
+const Op = require("sequelize").Op;
+
 // Will return a paginated list of Sensors
 // By default, will get the first page.
 //
@@ -84,23 +86,46 @@ router.post("/modify", (req, res) => {
 		});
 });
 
-router.get("/logs/:sensorID/:startTime?/:endTime?", (req, res) => {
-	let p = req.params;
+router.get(
+	"/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?",
+	(req, res) => {
+		let p = req.params;
 
-	DBHelper.getReadings(
-		p.sensorID,
-		p.startTime || Date.UTC(1970, 01, 01),
-		p.endTime || Date.now()
-	)
-		.then(dbResp => {
-			res.status(200).send(dbResp);
-		})
-		.catch(err => {
-			console.log(err);
-			res
-				.status(500)
-				.send({ error: `Error getting logs for sensor ${p.sensorID}.` });
-		});
-});
+		DBHelper.FindAndCountPaginated(
+			DBHelper.dbObjects["LogEntry"],
+			{
+				attributes: ["timestamp", "value"],
+				where: {
+					timestamp: {
+						[Op.and]: {
+							[Op.lte]: p.endTime || Date.now(),
+							[Op.gte]: p.startTime || Date.UTC(1970, 0, 1)
+						}
+					}
+				},
+				include: [
+					{
+						model: DBHelper.dbObjects["Sensor"],
+						attributes: [],
+						where: {
+							id: { [Op.eq]: p.sensorID }
+						}
+					}
+				]
+			},
+			p.page || 0,
+			p.limit || 100
+		)
+			.then(dbResp => {
+				res.status(200).send(dbResp);
+			})
+			.catch(err => {
+				console.log(err);
+				res
+					.status(500)
+					.send({ error: `Error getting logs for sensor ${p.sensorID}.` });
+			});
+	}
+);
 
 module.exports = router;
