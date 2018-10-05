@@ -249,6 +249,10 @@ function updateSensor(sensorID, opts) {
 // Does not return anything.
 //
 function logData(value, sensorUUID, timestamp) {
+	if (timestamp === undefined) {
+		console.error("Error: Timestamp was not provided for LogEntry.");
+		return;
+	}
 	dbObjects["LogEntry"]
 		.create({
 			value: value.toString(),

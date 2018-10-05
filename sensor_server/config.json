@@ -3,6 +3,7 @@
 	"server_ip": "localhost",
 
 	"sensorAuthKey": "1234AUTHKEY4321",
+	"requireRemoteTimestamp": true,
 
 	"db": {
 		"host": "localhost",

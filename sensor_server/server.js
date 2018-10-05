@@ -46,6 +46,11 @@ server.on("message", (rawMessage, rinfo) => {
 			}
 		});
 	} else if (msg.type === "log") {
+		// If the server does not require a timestamp && a timestamp was not
+		// provided, set it server-side.
+		if (!config.requireRemoteTimestamp && msg.timestamp === undefined) {
+			msg.timestamp = Date.now();
+		}
 		DBHelper.logData(msg.value, msg.sensorUUID, msg.timestamp);
 	}
 });
