@@ -81,4 +81,23 @@ router.post("/modify", (req, res) => {
 		});
 });
 
+router.get("/logs/:sensorID/:startTime?/:endTime?", (req, res) => {
+	let p = req.params;
+
+	DBHelper.getReadings(
+		p.sensorID,
+		p.startTime || Date.UTC(1970, 01, 01),
+		p.endTime || Date.now()
+	)
+		.then(dbResp => {
+			res.status(200).send(dbResp);
+		})
+		.catch(err => {
+			console.log(err);
+			res
+				.status(500)
+				.send({ error: `Error getting logs for sensor ${p.sensorID}.` });
+		});
+});
+
 module.exports = router;

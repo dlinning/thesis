@@ -240,7 +240,7 @@ function registerSensor(name, dataType, uuid) {
 
 // Allows modification of a pre-existing sensor.
 // sensorID must be set.
-// Opts has all optional fields of 
+// Opts has all optional fields of
 //{ dataType: "STRING"|"INT"|"FLOAT"|"BLOB", friendlyName: <STRING> }
 //
 function updateSensor(sensorID, opts) {
@@ -272,6 +272,27 @@ function logData(value, sensorUUID, timestamp) {
 		})
 		.catch(err => {
 			console.error(err);
+		});
+}
+
+// Loads log data for a given sensor
+// from startTime to endTime
+function getReadings(sensorID, startTime, endTime) {
+	return dbObjects["LogEntry"]
+		.findAndCountAll({
+			where: {
+				sensorUUID: { [Op.eq]: sensorID },
+				timestamp: { [Op.gte]: startTime, [Op.lte]: endTime }
+			}
+		})
+		.then(result => {
+			let count = result.count;
+			let rows = result.rows;
+
+			return {
+				total: count,
+				list: rows
+			};
 		});
 }
 
@@ -339,6 +360,7 @@ module.exports = {
 
 	registerSensor: registerSensor,
 	logData: logData,
+	getReadings: getReadings,
 	updateSensor: updateSensor,
 
 	createOrUpdateGroup: createOrUpdateGroup,
