@@ -101,10 +101,6 @@ function setupDatabase() {
 			primaryKey: true,
 			autoIncrement: true
 		},
-		sensorUUID: {
-			type: Sequelize.UUID,
-			allowNull: false
-		},
 		timestamp: {
 			type: Sequelize.DATE,
 			allowNull: false
@@ -117,6 +113,7 @@ function setupDatabase() {
 			allowNull: false
 		}
 	});
+	dbObjects["LogEntry"].belongsTo(dbObjects["Sensor"]);
 
 	// Finally, sync the models to the DB.
 	//
@@ -163,25 +160,16 @@ function checkExists(toCheck) {
 }
 
 // Will return a paginated list of all
-// dbObjects[type] that are created, along
+// dbOject that are created, along
 // with extra data for pagination.
 //
-// If `include` is defined, then that will be passed
-// down to the `findAndCountAll()`.
-//
-function listByType(type, _page = 0, _limit = 10, include = null) {
+function FindAndCountPaginated(dbOject, query = {}, _page = 0, _limit = 10) {
 	var startIndex = _page * _limit;
 
-	var query = {
-		offset: startIndex,
-		limit: _limit
-	};
+	query.offset = startIndex;
+	query.limit = _limit;
 
-	if (include !== null) {
-		query.include = include;
-	}
-
-	return dbObjects[type].findAndCountAll(query).then(result => {
+	return dbOject.findAndCountAll(query).then(result => {
 		let count = result.count;
 		let rows = result.rows;
 
@@ -265,7 +253,7 @@ function logData(value, sensorUUID, timestamp) {
 		.create({
 			value: value.toString(),
 			timestamp: timestamp,
-			sensorUUID: sensorUUID
+			SensorId: sensorUUID
 		})
 		.then(newSensor => {
 			console.log(`Logged ${value} for sensor ${sensorUUID} @ ${timestamp}`);
@@ -356,7 +344,7 @@ module.exports = {
 	dbObjects: dbObjects,
 
 	checkExists: checkExists,
-	listByType: listByType,
+	FindAndCountPaginated: FindAndCountPaginated,
 
 	registerSensor: registerSensor,
 	logData: logData,

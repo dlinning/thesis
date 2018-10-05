@@ -1,8 +1,8 @@
 const config = require("./config.json");
-const debug = process.env.NODE_ENV != 'production';
+const debug = process.env.NODE_ENV != "production";
 
-const DBHelperBuilder = require("../common/helpers/dbhelper"),
-	DBHelper = new DBHelperBuilder(config.db);
+var DBHelper = require("../common/helpers/dbhelper");
+DBHelper.init(require("./config.json"));
 
 const MessageSenderBuilder = require("../common/helpers/messagehandler"),
 	MessageSender = new MessageSenderBuilder();
@@ -22,17 +22,16 @@ server.on("message", (rawMessage, rinfo) => {
 
 	debug && console.log(msg);
 
-    // Auth check, `authKey` must be provided for all messages.
+	// Auth check, `authKey` must be provided for all messages.
 	if (msg.authKey !== config.sensorAuthKey) {
 		MessageSender.sendMessage(server, rinfo.address, rinfo.port, {
 			status: 403,
 			error: `Bad auth key: ${msg.authKey}`
-        });
-        return;
+		});
+		return;
 	}
 
 	if (msg.type === "connect") {
-
 		DBHelper.registerSensor(msg.name, msg.dataType, msg.id).then(res => {
 			if (res === null) {
 				//Error adding to DB. See console.

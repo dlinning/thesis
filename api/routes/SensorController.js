@@ -8,9 +8,12 @@ DBHelper.init(require("../config.json"));
 // By default, will get the first page.
 //
 router.get("/list/:page?/:limit?", (req, res) => {
-	DBHelper.listByType("Sensor", req.params.page || 0, req.params.limit || 10, [
-		{ model: DBHelper.dbObjects["Group"], required: false }
-	])
+	DBHelper.FindAndCountPaginated(
+		DBHelper.dbObjects["Sensor"],
+		{ include: [{ model: DBHelper.dbObjects["Group"], required: false }] },
+		req.params.page || 0,
+		req.params.limit || 10
+	)
 		.then(dbResp => {
 			res.status(200).send(dbResp);
 		})

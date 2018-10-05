@@ -17,4 +17,4 @@ setInterval(() => {
     var val = Math.random();
     console.log(`Logging ${val}.`);
     testSensor.logData(val);
-}, 2000);
+}, 1000);
