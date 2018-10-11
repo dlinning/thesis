@@ -1,0 +1,35 @@
+- C/C++ Library
+    - Connect
+        - Storing / retrieving sensor UUID
+    - Logging
+- Dashboard
+    - Simple auth
+    - Views
+        - No chart.js, just simply pulling to a table
+    - Dashboard management
+        - Saving
+        - Multiple views?
+- Server
+    - Changes needed to facilitate other work
+    - Cleanup
+
+Final Due:
+- Server
+    - Management via Dashboard
+    - API Authentication
+- Dashboard
+    - Chart.js implemented
+    - Server configuration/management
+- C/C++ Library
+    - Possibly sending data to sensors
+
+"Maybe"s:
+- Server
+    - IFTTT
+        - Logging these events
+- Dashboard
+    - IFTTT configuration
+        - View logs of event fired
+    - "Smart" visualization suggestions
+        - Suggest what chart type / how to display based on input
+- C/C++ Library
