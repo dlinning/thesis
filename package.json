@@ -27,6 +27,7 @@
         "gulp-plumber": "^1.2.0",
         "gulp-rename": "^1.4.0",
         "gulp-uglify-es": "^1.0.4",
-        "nodemon": "^1.18.4"
+        "nodemon": "^1.18.4",
+        "react": "^16.5.2"
     }
 }
