@@ -1,5 +1,3 @@
-const config = require("./config.json");
-
 const path = require("path");
 
 const express = require("express"),
@@ -23,10 +21,9 @@ server.set("views", path.join(__dirname, "./views"));
 server.use("/dist", express.static(path.join(__dirname, "./dist")));
 
 server.get("/", (req, res) => {
-    res.render("home");
+    res.render("home", { title: "Dashboard" });
 });
 
-// Start the server listening
-server.listen(config.port, () => {
-    console.log(`Server Running on port ${config.port}`);
-});
+module.exports = {
+    server: server
+};

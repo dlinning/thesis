@@ -4,8 +4,7 @@
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
     "main": "ERROR",
     "scripts": {
-        "start": "node ./dashboard/dashboard_server.js",
-        "pack": "webpack --config webpack.config.js"
+        "start": "node ./web_server/web_server.js"
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",
@@ -13,13 +12,12 @@
         "express": "^4.16.3",
         "express-handlebars": "^3.0.0",
         "sequelize": "4.38.1",
-        "sqlite3": "^4.0.2",
-        "vue": "^2.5.17"
+        "sqlite3": "^4.0.2"
     },
     "devDependencies": {
         "@babel/core": "7.1.2",
         "@babel/preset-env": "7.1.0",
-        "css-loader": "^1.0.0",
+        "@babel/preset-react": "^7.0.0",
         "gulp": "^3.9.1",
         "gulp-babel": "^8.0.0",
         "gulp-concat": "^2.6.1",
@@ -28,11 +26,6 @@
         "gulp-plumber": "^1.2.0",
         "gulp-rename": "^1.4.0",
         "gulp-uglify-es": "^1.0.4",
-        "nodemon": "^1.18.4",
-        "react": "^16.5.2",
-        "vue-loader": "^15.4.2",
-        "vue-style-loader": "^4.1.2",
-        "vue-template-compiler": "^2.5.17",
-        "webpack": "^4.20.2"
+        "nodemon": "^1.18.4"
     }
 }

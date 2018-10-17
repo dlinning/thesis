@@ -12,12 +12,16 @@ const minifycss = require("gulp-minify-css"),
 
 const paths = {
     styles: {
-        in: path.join(__dirname, "./dashboard/src/styles/**/*.less"),
-        out: path.join(__dirname, "./dashboard/dist/styles/")
+        in: path.join(__dirname, "./web_server/dashboard/src/styles/**/*.less"),
+        out: path.join(__dirname, "./web_server/dashboard/dist/styles/")
     },
     scripts: {
-        in: path.join(__dirname, "./dashboard/src/scripts/**/*.js"),
-        out: path.join(__dirname, "./dashboard/dist/scripts/")
+        in: path.join(__dirname, "./web_server/dashboard/src/scripts/**/*.js"),
+        out: path.join(__dirname, "./web_server/dashboard/dist/scripts/")
+    },
+    react: {
+        in: path.join(__dirname, "./web_server/dashboard/src/react/**/*.jsx"),
+        out: path.join(__dirname, "./web_server/dashboard/dist/react/")
     }
 };
 
@@ -64,8 +68,28 @@ gulp.task("scripts", function() {
         .pipe(uglify())
         .pipe(gulp.dest(paths.scripts.out));
 });
+gulp.task("react", function() {
+    return gulp
+        .src(paths.react.in)
+        .pipe(
+            plumber({
+                errorHandler: errorHander
+            })
+        )
+        .pipe(concat("bundle.js"))
+        .pipe(
+            babel({
+                presets: [["@babel/preset-react", babelPresetOptions]]
+            })
+        )
+        .pipe(gulp.dest(paths.react.out))
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(uglify())
+        .pipe(gulp.dest(paths.react.out));
+});
 
-gulp.task("watcher", function() {
+gulp.task("watch-all", function() {
     gulp.watch(paths.styles.in, ["styles"]);
     gulp.watch(paths.scripts.in, ["scripts"]);
+    gulp.watch(paths.react.in, ["react"]);
 });
