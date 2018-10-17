@@ -36,7 +36,7 @@ const babelPresetOptions = {
 };
 
 const errorHander = function(err) {
-	console.log(err.message);
+	console.error(err.message);
 };
 
 gulp.task("styles", function() {
@@ -69,6 +69,7 @@ gulp.task("scripts", function() {
 		.pipe(uglify())
 		.pipe(gulp.dest(paths.scripts.out));
 });
+
 gulp.task("react", function() {
 	return gulp
 		.src(paths.react.in)
