@@ -18,10 +18,6 @@ const paths = {
     scripts: {
         in: path.join(__dirname, "./dashboard/src/scripts/**/*.js"),
         out: path.join(__dirname, "./dashboard/dist/scripts/")
-    },
-    react: {
-        in: path.join(__dirname, "./dashboard/src/react/**/*.jsx"),
-        out: path.join(__dirname, "./dashboard/dist/react/")
     }
 };
 
@@ -68,27 +64,8 @@ gulp.task("scripts", function() {
         .pipe(uglify())
         .pipe(gulp.dest(paths.scripts.out));
 });
-gulp.task("react", function() {
-    return gulp
-        .src(paths.react.in)
-        .pipe(
-            plumber({
-                errorHandler: errorHander
-            })
-        )
-        .pipe(concat("bundle.js"))
-        .pipe(
-            babel({
-                presets: [["@babel/preset-react", babelPresetOptions]]
-            })
-        )
-        .pipe(gulp.dest(paths.react.out))
-        .pipe(rename({ suffix: ".min" }))
-        .pipe(uglify())
-        .pipe(gulp.dest(paths.react.out));
-});
 
-gulp.task("default", function() {
+gulp.task("watcher", function() {
     gulp.watch(paths.styles.in, ["styles"]);
     gulp.watch(paths.scripts.in, ["scripts"]);
 });
