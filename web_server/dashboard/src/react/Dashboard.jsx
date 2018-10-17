@@ -8,15 +8,12 @@ class Dashboard extends React.Component {
     render() {
         var s = this.state;
         return (
-            <>
-                <h1>Dashboard</h1>
-                <span>
-                    {s.sensors &&
-                        s.sensors.list.map(sensor => {
-                            return <Tile sensor={sensor} />;
-                        })}
-                </span>
-            </>
+            <div className="dashboard">
+                {s.sensors &&
+                    s.sensors.list.map((sensor, idx) => {
+                        return <SensorTile key={idx} sensor={sensor} />;
+                    })}
+            </div>
         );
     }
 
