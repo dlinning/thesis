@@ -28,7 +28,6 @@ class Dashboard extends React.Component {
     }
 
     saveView(data) {
-
         var viewData = {};
         fetch("api/dashboard/saveView", {
             method: "POST",
