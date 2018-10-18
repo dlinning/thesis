@@ -14,12 +14,12 @@ class LogList extends React.Component {
     render() {
         let p = this.props;
         return (
-            <List>
+            <DataTable>
                 {p.title && <span className="title">{p.title}</span>}
                 <div className="table">
                     <div className="tr">
-                        <div class="th">Time</div>
-                        <div class="th">Value</div>
+                        <div className="th">Time</div>
+                        <div className="th">Value</div>
                     </div>
                     {p.entries &&
                         p.entries.list.map((entry, idx) => {
@@ -34,7 +34,7 @@ class LogList extends React.Component {
                             );
                         })}
                 </div>
-            </List>
+            </DataTable>
         );
     }
 }

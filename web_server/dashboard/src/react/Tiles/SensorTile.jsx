@@ -9,7 +9,7 @@ class SensorTile extends React.Component {
         let s = this.props.sensor;
         let sid = s.id.substr(0, 7);
         return (
-            <Tile>
+            <Tile rowSpan={this.props.rowSpan} colSpan={this.props.colSpan}>
                 <h2>{s.friendlyName}</h2>
                 <div className="flex-row sb">
                     <b>ID:</b> <span>{sid}</span>
@@ -38,8 +38,7 @@ class SensorTile extends React.Component {
                         })}
                     </div>
                 )}
-                {this.state.logEntries === undefined && <button onClick={() => this.loadLogEntries()}>Display Logs</button>}
-                {this.state.logEntries && <LogList entries={this.state.logEntries} title={"Log For Sensor: " + sid} />}
+                <button onClick={() => this.loadLogEntries()}>Display Logs</button>
             </Tile>
         );
     }
@@ -50,7 +49,10 @@ class SensorTile extends React.Component {
                 return res.json();
             })
             .then(asJson => {
-                this.setState({ logEntries: asJson });
+                messenger.notify("OpenModal", {
+                    title: `Logs For Sensor: ${this.props.sensor.id.substr(0, 7)}`,
+                    content: <LogList entries={asJson} />
+                });
             })
             .catch(err => {
                 console.error(err);
