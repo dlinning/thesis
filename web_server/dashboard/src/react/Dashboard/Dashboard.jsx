@@ -11,19 +11,6 @@ class Dashboard extends React.Component {
         this.saveView = this.saveView.bind(this);
     }
 
-    componentDidMount() {
-        fetch("/api/sensors/list")
-            .then(res => {
-                return res.json();
-            })
-            .then(asJson => {
-                this.setState({ sensors: asJson });
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }
-
     setPage(pageName) {
         this.setState({ changing: true }, () => {
             setTimeout(() => {

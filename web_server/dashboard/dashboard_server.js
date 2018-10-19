@@ -16,7 +16,7 @@ server.engine(
 server.set("view engine", "hbs");
 server.set("views", path.join(__dirname, "./views"));
 
-//server.enable("view cache");
+process.env.NODE_ENV === "production" && server.enable("view cache");
 
 server.use("/dist", express.static(path.join(__dirname, "./dist")));
 

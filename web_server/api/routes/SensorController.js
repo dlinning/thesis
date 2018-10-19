@@ -1,5 +1,6 @@
 const express = require("express"),
-    router = express.Router();
+    router = express.Router(),
+    cache = require("../../../common/middleware/memorycache");
 
 var DBHelper = require("../../../common/helpers/dbhelper");
 DBHelper.init(require("../../config.json"));
@@ -9,6 +10,8 @@ const Op = require("sequelize").Op;
 // Will return a paginated list of Sensors
 // By default, will get the first page.
 //
+// Below will cache output for 30 seconds
+//router.get("/list/:page?/:limit?", cache(30), (req, res) => { 
 router.get("/list/:page?/:limit?", (req, res) => {
     DBHelper.FindAndCountPaginated(
         DBHelper.dbObjects["Sensor"],
