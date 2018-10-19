@@ -14,7 +14,7 @@
 				table.childNodes.forEach(row => {
 					var rowCsv = "";
 					row.childNodes.forEach(cell => {
-						let val = cell.getAttribute("alt") || cell.innerText;
+						let val = cell.getAttribute("title") || cell.innerText;
 						rowCsv += val.toString().trim() + ",";
 					});
 

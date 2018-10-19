@@ -3,7 +3,8 @@ class Dashboard extends React.Component {
         super(p);
 
         this.state = {
-            page: "home"
+            page: "home",
+            changing: false
         };
 
         this.setPage = this.setPage.bind(this);
@@ -24,7 +25,15 @@ class Dashboard extends React.Component {
     }
 
     setPage(pageName) {
-        this.setState({ page: pageName });
+        this.setState({ changing: true }, () => {
+            setTimeout(() => {
+                this.setState({ page: pageName }, () => {
+                    setTimeout(() => {
+                        this.setState({ changing: false });
+                    }, 110);
+                });
+            }, 110);
+        });
     }
 
     saveView(data) {
@@ -50,15 +59,13 @@ class Dashboard extends React.Component {
     render() {
         var s = this.state;
         return (
-            <div className="dashboard">
+            <div id="dashboard" className={this.state.changing === true ? " changing" : ""} data-current-page={this.state.page}>
                 <DashboardControls saveFunc={this.saveView} />
                 <DashboardNav current={s.page} pageChangeFunc={this.setPage} />
-                <DashboardTiles>
-                    {s.sensors &&
-                        s.sensors.list.map((sensor, idx) => {
-                            return <SensorTile rowSpan={idx + 2} colSpan={idx + 1} key={idx} sensor={sensor} />;
-                        })}
-                </DashboardTiles>
+                <div id="dashboard-content">
+                    {s.page === "home" && <HomePage />}
+                    {s.page === "sensors" && <SensorPage />}
+                </div>
             </div>
         );
     }

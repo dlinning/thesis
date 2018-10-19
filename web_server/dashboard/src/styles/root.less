@@ -16,7 +16,7 @@ html {
 
 button {
     min-height: 36px;
-    line-height: 35px;
+    line-height: 32px; // min-height - (2*border-width)
     padding: 0 16px;
     min-width: 36px;
     max-width: 250px;
@@ -42,6 +42,53 @@ button {
     &.floating {
         background-color: @darkPrimaryColor;
         color: @textPrimaryColor;
+        border-width: 0;
+
+        transition: box-shadow 75ms @stopToStopEase;
+
+        &:hover{
+            .md-2();
+        }
+    }
+
+    &.small {
+        font-size: 11px;
+        text-transform: uppercase;
+        line-height: 26px;
+        min-height: 30px;
+    }
+
+    &.danger {
+        background-color: fadeout(@dangerColor, 80);
+        border-color: darken(@dangerColor, 10);
+
+        &:hover {
+            background-color: fadeout(darken(@dangerColor, 10), 80);
+        }
+        &.floating {
+            background-color: @dangerColor;
+        }
+
+        &.overlay {
+            &:hover {
+                background-color: fadeout(@dangerColor, 80);
+            }
+            &:active {
+                background-color: fadeout(darken(@dangerColor, 10), 80);
+            }
+        }
+    }
+
+    &.overlay {
+        background: transparent;
+        border-color: transparent;
+
+        &:hover {
+            background-color: fadeout(@lightPrimaryColor, 80);
+        }
+        &:active {
+            background-color: fadeout(@darkPrimaryColor, 80);
+        }
     }
 
     i + span {
@@ -70,7 +117,37 @@ button {
 
     .td,
     .th {
-        padding: 0.25rem;
         display: table-cell;
+    }
+
+    .td {
+        padding: 0.25rem;
+    }
+
+    .th {
+        font-weight: 700;
+        padding: 0.5rem 0.25rem;
+        border-bottom: 2px solid @dividerColor;
+    }
+}
+
+.list {
+    display: flex;
+    flex-flow: column;
+
+    .item {
+        display: flex;
+        align-items: center;
+
+        background: lighten(@bgColor, 5);
+        padding: 1rem;
+        border-radius: 3px;
+        .md-1();
+
+        margin-bottom: 0.25rem;
+
+        > * + * {
+            margin-left: 1rem;
+        }
     }
 }

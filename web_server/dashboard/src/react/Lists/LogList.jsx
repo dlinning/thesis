@@ -14,7 +14,7 @@ class LogList extends React.Component {
     render() {
         let p = this.props;
         return (
-            <DataTable>
+            <DataTable canExport={true}>
                 {p.title && <span className="title">{p.title}</span>}
                 <div className="table">
                     <div className="tr">
@@ -27,7 +27,7 @@ class LogList extends React.Component {
                             return (
                                 <div className="tr" key={idx}>
                                     <div className="td">{this.dateFormat(entry.timestamp)}</div>
-                                    <div className="td" alt={l ? entry.value : ""}>
+                                    <div className="td" title={l ? entry.value : ""}>
                                         {l ? entry.value.substr(0, 10) : entry.value}
                                     </div>
                                 </div>

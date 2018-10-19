@@ -8,11 +8,13 @@ class DataTable extends React.Component {
         return (
             <div className="datatable flex-col">
                 <div id={`datatable_${this.tableID}`}>{this.props.children}</div>
-                <div className="controls">
-                    <button title="Export as .csv" onClick={() => this.export()}>
-                        <i className="fas fa-file-export" />
-                    </button>
-                </div>
+                {this.props.canExport === true && (
+                    <div className="controls">
+                        <button title="Export as .csv" onClick={() => this.export()}>
+                            <i className="fas fa-file-export" />
+                        </button>
+                    </div>
+                )}
             </div>
         );
     }
