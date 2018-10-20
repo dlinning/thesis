@@ -1,10 +1,6 @@
-class App extends React.Component {
-    render() {
-        return (
-            <>
-                <Dashboard />
-                <Modal />
-            </>
-        );
-    }
-}
+const App = props => (
+    <>
+        <Dashboard />
+        <Modal />
+    </>
+);

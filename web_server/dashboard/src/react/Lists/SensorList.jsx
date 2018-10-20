@@ -24,11 +24,11 @@ class SensorList extends React.Component {
                                     <div className="sl-gc">Groups: {sensor.Groups && sensor.Groups.length}</div>
                                     <div className="sl-controls flex-row fe">
                                         <button className="small overlay">
-                                            <i class="fas fa-cog" />
+                                            <i className="fas fa-cog" />
                                             <span>Manage</span>
                                         </button>
                                         <button className="small overlay danger">
-                                            <i class="fas fa-trash-alt" />
+                                            <i className="fas fa-trash-alt" />
                                             <span>Remove</span>
                                         </button>
                                     </div>

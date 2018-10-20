@@ -12,15 +12,17 @@ class Dashboard extends React.Component {
     }
 
     setPage(pageName) {
-        this.setState({ changing: true }, () => {
-            setTimeout(() => {
-                this.setState({ page: pageName }, () => {
-                    setTimeout(() => {
-                        this.setState({ changing: false });
-                    }, 110);
-                });
-            }, 110);
-        });
+        if (pageName !== this.state.page) {
+            this.setState({ changing: true }, () => {
+                setTimeout(() => {
+                    this.setState({ page: pageName }, () => {
+                        setTimeout(() => {
+                            this.setState({ changing: false });
+                        }, 110);
+                    });
+                }, 110);
+            });
+        }
     }
 
     saveView(data) {
