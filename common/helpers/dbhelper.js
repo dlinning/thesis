@@ -63,7 +63,7 @@ function setupDatabase() {
 			primaryKey: true,
 			defaultValue: Sequelize.UUIDV4
 		},
-		friendlyName: {
+		name: {
 			type: Sequelize.STRING,
 			allowNull: false
 		},
@@ -114,6 +114,7 @@ function setupDatabase() {
 		}
 	});
 	dbObjects["LogEntry"].belongsTo(dbObjects["Sensor"]);
+	dbObjects["Sensor"].hasMany(dbObjects["LogEntry"]);
 
 	// Finally, sync the models to the DB.
 	//
@@ -130,12 +131,6 @@ function addDBDefinition(name, opts) {
 		console.error(`Error: Database definition already exits for ${name}.`);
 		process.exit(1);
 	}
-}
-
-// A wrapper around `sequelize.hasMany`
-//
-function addHasMany(one, many, name) {
-	dbObjects[one].hasMany(dbObjects[many], { as: name });
 }
 
 /* BEGIN General DB Helper Functions */
@@ -163,6 +158,8 @@ function checkExists(toCheck) {
 // dbOject that are created, along
 // with extra data for pagination.
 //
+// Most commonly used for the API.
+//
 function FindAndCountPaginated(dbOject, query = {}, _page = 0, _limit = 10) {
 	var startIndex = _page * _limit;
 
@@ -170,15 +167,29 @@ function FindAndCountPaginated(dbOject, query = {}, _page = 0, _limit = 10) {
 	query.limit = _limit;
 
 	return dbOject.findAndCountAll(query).then(result => {
-		let count = result.count;
-		let rows = result.rows;
-
 		return {
-			total: count,
+			total: result.count,
 			startIndex: startIndex,
 			limit: _limit,
-			list: rows
+			list: result.rows
 		};
+	});
+}
+
+// Will return a paginated list of all
+// dbOject that are created, along
+// with extra data for pagination.
+//
+// Most commonly used for the API.
+//
+function FindAll(dbOject, query = {}, _page = 0, _limit = 100) {
+	var startIndex = _page * _limit;
+
+	query.offset = startIndex;
+	query.limit = _limit;
+
+	return dbOject.findAll(query).then(result => {
+		return result;
 	});
 }
 
@@ -212,7 +223,7 @@ function registerSensor(name, dataType, uuid) {
 	} else {
 		return dbObjects["Sensor"]
 			.create({
-				friendlyName: name,
+				name: name,
 				dataType: dataType
 			})
 			.then(res => {
@@ -229,7 +240,7 @@ function registerSensor(name, dataType, uuid) {
 // Allows modification of a pre-existing sensor.
 // sensorID must be set.
 // Opts has all optional fields of
-//{ dataType: "STRING"|"INT"|"FLOAT"|"BLOB", friendlyName: <STRING> }
+//{ dataType: "STRING"|"INT"|"FLOAT"|"BLOB", name: <STRING> }
 //
 function updateSensor(sensorID, opts) {
 	var query = Object.assign({ id: sensorID }, opts);
@@ -324,10 +335,14 @@ module.exports = {
 		}
 	},
 
+	Op: Op,
+	Sequelize: Sequelize,
+
 	dbObjects: dbObjects,
 
 	checkExists: checkExists,
 	FindAndCountPaginated: FindAndCountPaginated,
+	FindAll: FindAll,
 
 	registerSensor: registerSensor,
 	logData: logData,

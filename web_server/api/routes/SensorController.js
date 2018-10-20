@@ -5,34 +5,54 @@ const express = require("express"),
 var DBHelper = require("../../../common/helpers/dbhelper");
 DBHelper.init(require("../../config.json"));
 
-const Op = require("sequelize").Op;
-
 // Will return a paginated list of Sensors
 // By default, will get the first page.
 //
 // Below will cache output for 30 seconds
-//router.get("/list/:page?/:limit?", cache(30), (req, res) => { 
+//router.get("/list/:page?/:limit?", cache(30), (req, res) => {
 router.get("/list/:page?/:limit?", (req, res) => {
+
+    //
+    //
+    //BIG TODO: Get this to return a count of LogEntries
+    // for each sensor.
+    //
+    // Good luck, lol.
+    //
+    //
+
     DBHelper.FindAndCountPaginated(
         DBHelper.dbObjects["Sensor"],
         {
-            attributes: ["friendlyName", "id", "dataType", "updatedAt"],
+            attributes: ["name", "id", "dataType", "updatedAt"],
             include: [
                 {
                     model: DBHelper.dbObjects["Group"],
-                    attributes: ["name", "id"],
-                    required: false,
-                    through: { attributes: [] }
+                    attributes: ["id", "name"],
+
+                    // Giving  no associations to the `through` table
+                    // reduces data sent back to client.
+                    through: { attributes: [] },
+
+                    // "Include sensors not in any groups"
+                    required: false
+                },
+                {
+                    model: DBHelper.dbObjects["LogEntry"],
+                    attributes: []
                 }
-            ]
+            ],
+            group: ["Sensor.id"],
+            distinct: true
         },
         req.params.page || 0,
-        req.params.limit || 10
+        req.params.limit || 100
     )
-        .then(dbResp => {
-            res.status(200).send(dbResp);
+        .then(resp => {
+            res.status(200).send(resp);
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send({ error: "Error getting sensors." });
         });
 });
@@ -99,9 +119,9 @@ router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) =>
             attributes: ["timestamp", "value"],
             where: {
                 timestamp: {
-                    [Op.and]: {
-                        [Op.lte]: p.endTime || Date.now(),
-                        [Op.gte]: p.startTime || Date.UTC(1970, 0, 1)
+                    [DBHelper.Op.and]: {
+                        [DBHelper.Op.lte]: p.endTime || Date.now(),
+                        [DBHelper.Op.gte]: p.startTime || Date.UTC(1970, 0, 1)
                     }
                 }
             },
@@ -110,7 +130,7 @@ router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) =>
                     model: DBHelper.dbObjects["Sensor"],
                     attributes: [],
                     where: {
-                        id: { [Op.eq]: p.sensorID }
+                        id: { [DBHelper.Op.eq]: p.sensorID }
                     }
                 }
             ]

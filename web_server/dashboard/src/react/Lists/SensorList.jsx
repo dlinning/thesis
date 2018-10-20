@@ -13,7 +13,7 @@ class SensorList extends React.Component {
                             return (
                                 <div className="item" key={idx}>
                                     <div className="flex-col sl-nid">
-                                        <div className="sl-n">{sensor.friendlyName}</div>
+                                        <div className="sl-n">{sensor.name}</div>
                                         <div className="sl-details flex-row">
                                             <div className="sl-id" title={sensor.id}>
                                                 ({sensor.id.substr(0, 7)})

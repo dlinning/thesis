@@ -61,7 +61,7 @@ router.get("/logs/:groupID/:page?/:limit?/:startTime?/:endTime?", (req, res) => 
             include: [
                 {
                     model: DBHelper.dbObjects["Sensor"],
-                    attributes: ["friendlyName", "id", "dataType"],
+                    attributes: ["name", "id", "dataType"],
                     include: [
                         {
                             model: DBHelper.dbObjects["Group"],

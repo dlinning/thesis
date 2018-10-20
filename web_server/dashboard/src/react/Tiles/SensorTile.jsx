@@ -10,7 +10,7 @@ class SensorTile extends React.Component {
         let sid = s.id.substr(0, 7);
         return (
             <Tile rowSpan={this.props.rowSpan} colSpan={this.props.colSpan}>
-                <h2>{s.friendlyName}</h2>
+                <h2>{s.name}</h2>
                 <div className="flex-row sb">
                     <b>ID:</b> <span>{sid}</span>
                 </div>
