@@ -1,4 +1,21 @@
 class SensorList extends React.Component {
+
+    openSensorSettingsModal(sensorId) {
+        fetch("/api/sensors/settings/" + sensorId)
+            .then(res => {
+                return res.json();
+            })
+            .then(asJson => {
+                messenger.notify("OpenModal", {
+                    title: `Settings for Sensor ${sensorId.substr(0, 7)}`,
+                    content: <SensorEditModal data={asJson} />
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
     render() {
         let sensors = this.props.sensors;
         if (sensors === undefined || sensors.list.length === 0) {
@@ -25,7 +42,7 @@ class SensorList extends React.Component {
                                     <div className="sl-controls flex-row fe">
                                         <button className="small overlay">
                                             <i className="fas fa-cog" />
-                                            <span>Manage</span>
+                                            <span onClick={() => this.openSensorSettingsModal(sensor.id)}>Manage</span>
                                         </button>
                                         <button className="small overlay danger">
                                             <i className="fas fa-trash-alt" />

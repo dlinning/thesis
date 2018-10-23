@@ -237,6 +237,14 @@ function registerSensor(name, dataType, uuid) {
 	}
 }
 
+function getSensorSettings(sensorID) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			resolve({ settings: `settings data for sensor: ${sensorID}` });
+		}, 300);
+	});
+}
+
 // Allows modification of a pre-existing sensor.
 // sensorID must be set.
 // Opts has all optional fields of
@@ -347,6 +355,7 @@ module.exports = {
 	registerSensor: registerSensor,
 	logData: logData,
 	updateSensor: updateSensor,
+	getSensorSettings: getSensorSettings,
 
 	createOrUpdateGroup: createOrUpdateGroup,
 	addSensorToGroup: addSensorToGroup

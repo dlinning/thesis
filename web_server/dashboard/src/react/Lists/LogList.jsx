@@ -26,7 +26,7 @@ class LogList extends React.Component {
                             let l = entry.value.length > 10;
                             return (
                                 <div className="tr" key={idx}>
-                                    <div className="td">{this.dateFormat(entry.timestamp)}</div>
+                                    <div className="td">{entry.timestamp}</div>
                                     <div className="td" title={l ? entry.value : ""}>
                                         {l ? entry.value.substr(0, 10) : entry.value}
                                     </div>

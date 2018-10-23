@@ -11,10 +11,11 @@ const Sensor = require("./Sensor");
 /////
 /////
 
-var testSensor = new Sensor("TEST_SENSOR", "string", config);
+var testSensor = new Sensor("Counting Sensor", "int", config);
 
+var idx = 0;
 setInterval(() => {
-    var val = Math.random();
-    console.log(`Logging ${val}.`);
-    testSensor.logData(val);
+    var val = ++idx;
+	console.log(`Logging ${val}.`);
+	testSensor.logData(val);
 }, 1000);
