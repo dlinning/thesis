@@ -18,17 +18,16 @@ if (debug == true) {
 }
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-
-/* 
-	These are used like `this.____`, but since
-	we're working in a singleton, they can be global
-	to the file.
-*/
+ 
+//	These are used like `this.____`, but since
+//	we're working in a singleton, they can be global
+//	to the file.
+//
 var config = null;
 var sequelizeInstance = null;
 var dbObjects = {};
 
-/* End */
+/* End this.____ declarations */
 
 function setupDatabase() {
 	// Following 2 lines are for SQLite only.
