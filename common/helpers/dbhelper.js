@@ -354,3 +354,14 @@ module.exports = {
 };
 
 /* END Node.js Export */
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+// New code
+//
+
+const uuidv4 = require("uuid/v4");
+function newUUID() {
+    return uuidv4();
+}
