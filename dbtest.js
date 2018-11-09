@@ -20,19 +20,25 @@ function propertiesAllNull(obj) {
 	return true;
 }
 
-function groupBy(rows, fieldName, skipNull = true, prebuilt = {}) {
+function groupBy(rows, fieldName, asKey, skipNull = true, prebuilt = {}) {
 	var res = prebuilt;
+
 	for (var n = 0, l = rows.length; n < l; n++) {
 		let group = rows[n][fieldName];
-		if (res[group] === undefined) {
-			res[group] = [];
-		}
 		var clone = Object.assign({}, rows[n]);
 		delete clone[fieldName];
+
+		if (res[group] === undefined) {
+			res[group] = {};
+		}
+		if (res[group][asKey] === undefined) {
+			res[group][asKey] = [];
+		}
+
 		if (skipNull && propertiesAllNull(clone)) {
 			// Skip
 		} else {
-			res[group].push(clone);
+			res[group][asKey].push(clone);
 		}
 	}
 	return res;
@@ -154,35 +160,60 @@ const listAllSensorsGroups = db.prepare(
 //// Get logs for all sensors
 ////
 
-// const getLogsForSensor = db.prepare(
-//     `SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries`
-// );
-// var logsForAllSensors = groupBy(getLogsForSensor.all(),"SensorId");
+const getLogsForSensors = db.prepare(
+	`SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries`
+);
+// var logsForAllSensors = groupBy(getLogsForSensors.all(),"SensorId");
 // console.log(logsForAllSensors);
 
 ////
 //// List all sensors
 ////
 
-const getLogCountForAllSensors = db.prepare(
-    `SELECT Sensors.id as SensorId, count(LogEntries.id) as LogCount
-    FROM Sensors
-    LEFT JOIN LogEntries ON LogEntries.SensorId = Sensors.id
-    GROUP BY Sensors.id`
-);
+// const getLogCountForAllSensors = db.prepare(
+// 	`SELECT Sensors.id as SensorId, count(LogEntries.id) as LogCount
+//     FROM Sensors
+//     LEFT JOIN LogEntries ON LogEntries.SensorId = Sensors.id
+//     GROUP BY Sensors.id`
+// );
 //var logCountForAllSensors = getLogCountForAllSensors.all();
 //console.log(logCountForAllSensors);
-
 
 ////
 //// Combine groups and log counts
 ////
 
-var logs = groupBy(getLogCountForAllSensors.all(), "SensorId");
-var groups = groupBy(listAllSensorsGroups.all(), "SensorId");
-console.log(groups);
-console.log('---------');
-console.log(logs);
-console.log('-----\n----');
-var combined = "UGH";
-console.log(combined);
+// var logs = groupBy(getLogsForSensors.all(), "SensorId", "logs");
+
+// var logsAndGroups = groupBy(
+// 	listAllSensorsGroups.all(),
+// 	"SensorId",
+// 	"groups",
+// 	true,
+// 	logs
+// );
+// console.log(logsAndGroups);
+
+const findAndCountPaginated = (table, columns, limit = 10, offset = 0) => {
+	var stmt = db.prepare(
+		`SELECT ${columns.join(",")} FROM ${table} LIMIT @limit OFFSET @offset`
+	);
+	var count = db.prepare(`SELECT COUNT(${columns[0]}) AS total FROM ${table}`);
+
+	var rows = stmt.all({
+		limit: limit,
+		offset: offset
+	});
+
+	var totalRows = count.get().total;
+	return {
+		rows: rows,
+		total: totalRows,
+		offset: offset,
+		limit: limit
+	}
+};
+
+var paginatedLogs = findAndCountPaginated("LogEntries", ["id", "value"]);
+
+console.log(paginatedLogs);
