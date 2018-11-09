@@ -194,7 +194,12 @@ const getLogsForSensors = db.prepare(
 // );
 // console.log(logsAndGroups);
 
-const findAndCountPaginated = (table, columns, limit = 10, offset = 0) => {
+// Pull `columns` (array) from `table`, with a limit of `limit` per page,
+// starting from page `page` (0-indexed).
+//
+// TODO: Be able to "WHERE" this.
+//
+const findAndCountPaginated = (table, columns, page = 0, limit = 10) => {
 	var stmt = db.prepare(
 		`SELECT ${columns.join(",")} FROM ${table} LIMIT @limit OFFSET @offset`
 	);
@@ -202,16 +207,17 @@ const findAndCountPaginated = (table, columns, limit = 10, offset = 0) => {
 
 	var rows = stmt.all({
 		limit: limit,
-		offset: offset
+		offset: page * limit
 	});
 
 	var totalRows = count.get().total;
 	return {
 		rows: rows,
 		total: totalRows,
-		offset: offset,
+		totalPages: Math.ceil(totalRows / limit) - 1,
+		page: page,
 		limit: limit
-	}
+	};
 };
 
 var paginatedLogs = findAndCountPaginated("LogEntries", ["id", "value"]);
