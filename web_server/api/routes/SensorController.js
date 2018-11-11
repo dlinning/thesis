@@ -2,8 +2,7 @@ const express = require("express"),
     router = express.Router(),
     cache = require("../../../common/middleware/memorycache");
 
-var DBHelper = require("../../../common/helpers/dbhelper");
-DBHelper.init(require("../../config.json"));
+var DBHelper = require("../../../common/helpers/new_dbhelper");
 
 // Will return a paginated list of Sensors
 // By default, will get the first page.
@@ -20,40 +19,16 @@ router.get("/list/:page?/:limit?", (req, res) => {
     //
     //
 
-    DBHelper.FindAndCountPaginated(
-        DBHelper.dbObjects["Sensor"],
-        {
-            attributes: ["name", "id", "dataType", "updatedAt"],
-            include: [
-                {
-                    model: DBHelper.dbObjects["Group"],
-                    attributes: ["id", "name"],
-
-                    // Giving  no associations to the `through` table
-                    // reduces data sent back to client.
-                    through: { attributes: [] },
-
-                    // "Include sensors not in any groups"
-                    required: false
-                },
-                {
-                    model: DBHelper.dbObjects["LogEntry"],
-                    attributes: []
-                }
-            ],
-            group: ["Sensor.id"],
-            distinct: true
-        },
-        req.params.page || 0,
-        req.params.limit || 100
-    )
-        .then(resp => {
-            res.status(200).send(resp);
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).send({ error: "Error getting sensors." });
-        });
+    var data = DBHelper.logsAndGroupsForAllSensors();
+    console.log(data);
+    // .then(resp => {
+    //     res.status(200).send(resp);
+    // })
+    // .catch(err => {
+    //     console.error(err);
+    //     res.status(500).send({ error: "Error getting sensors." });
+    // });
+    res.status(200).send(data);
 });
 
 // Will set the groupID for the sensor with ID of sensorID.

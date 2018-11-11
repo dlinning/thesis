@@ -4,7 +4,8 @@
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
     "main": "ERROR",
     "scripts": {
-        "start": "node ./web_server/web_server.js"
+        "start": "node ./web_server/web_server.js",
+        "dev": "nodemon ./web_server/web_server.js"
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",

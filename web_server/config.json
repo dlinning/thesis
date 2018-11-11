@@ -3,5 +3,7 @@
 
     "db": {
         "filepath": "../database.sqlite"
-    }
+    },
+
+    "allowEmptyTimestamp": false
 }

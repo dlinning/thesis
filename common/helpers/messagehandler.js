@@ -2,13 +2,14 @@
 // Can send out UDP messages
 //
 
-const debug = process.env.NODE_ENV != 'production';
+const debug = process.env.NODE_ENV != "production";
 
 module.exports = class MessageSender {
     constructor() {}
 
     sendMessage(socket, to_ip, to_port, payload) {
-        const message_buffer = new Buffer(JSON.stringify(payload));
+        const payloadString = JSON.stringify(payload);
+        const message_buffer = new Buffer.alloc(payloadString.length, payloadString);
 
         socket.send(message_buffer, 0, message_buffer.length, to_port, to_ip, (err, bytes) => {
             if (err) {
