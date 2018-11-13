@@ -7,7 +7,7 @@ class SensorTile extends React.Component {
 
     render() {
         let s = this.props.sensor;
-        let sid = s.id.substr(0, 7);
+        let sid = this.props.sensor.meta.id.substr(0, 7);
         return (
             <Tile rowSpan={this.props.rowSpan} colSpan={this.props.colSpan}>
                 <h2>{s.name}</h2>
@@ -15,20 +15,20 @@ class SensorTile extends React.Component {
                     <b>ID:</b> <span>{sid}</span>
                 </div>
                 <div className="flex-row sb">
-                    <b>Data Type:</b> <span>{s.dataType}</span>
+                    <b>Data Type:</b> <span>{s.meta.dataType}</span>
                 </div>
-                {s.Groups.length > 0 && (
+                {s.groups.length > 0 && (
                     <div>
                         <hr />
                         <span>
                             <b>Groups: </b>
                         </span>
-                        {s.Groups.map(g => {
-                            let gid = g.id.substr(0, 7);
+                        {s.groups.map((g, idx) => {
+                            let gid = g.GroupId.substr(0, 7);
                             return (
-                                <div key={g.id} className="flex-col">
+                                <div key={idx} className="flex-col">
                                     <div className="flex-row sb">
-                                        <b>Name:</b> <span>{g.name}</span>
+                                        <b>Name:</b> <span>{g.Groupname}</span>
                                     </div>
                                     <div className="flex-row sb">
                                         <b>ID:</b> <span>{gid}</span>
@@ -44,13 +44,13 @@ class SensorTile extends React.Component {
     }
 
     loadLogEntries() {
-        fetch("/api/sensors/logs/" + this.props.sensor.id)
+        fetch("/api/sensors/logs/" + this.props.sensor.meta.id)
             .then(res => {
                 return res.json();
             })
             .then(asJson => {
                 messenger.notify("OpenModal", {
-                    title: `Logs For Sensor: ${this.props.sensor.id.substr(0, 7)}`,
+                    title: `Logs For Sensor: ${this.props.sensor.meta.id.substr(0, 7)}`,
                     content: <LogList entries={asJson} />
                 });
             })

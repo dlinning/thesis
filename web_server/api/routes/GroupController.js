@@ -1,10 +1,7 @@
 const express = require("express"),
     router = express.Router();
 
-var DBHelper = require("../../../common/helpers/dbhelper");
-DBHelper.init(require("../../config.json"));
-
-const Op = require("sequelize").Op;
+var DBHelper = require("../../../common/helpers/new_dbhelper");
 
 // Expects {groupName:STRING, [uuid:UUID]}
 // Only provide `uuid` if updating `groupName`
@@ -32,13 +29,8 @@ router.post("/createorupdate", (req, res) => {
 // By default, will get the first page.
 //
 router.get("/list/:page?/:limit?", (req, res) => {
-    DBHelper.FindAndCountPaginated(DBHelper.dbObjects["Group"], undefined, req.params.page || 0, req.params.limit || 10)
-        .then(dbResp => {
-            res.status(200).send(dbResp);
-        })
-        .catch(err => {
-            res.status(500).send({ error: "Error getting all groups." });
-        });
+    //TODO: Add proper pagination
+    res.status(200).send(DBHelper.listAllGroups());
 });
 
 // Returns logEntries for all sensors within

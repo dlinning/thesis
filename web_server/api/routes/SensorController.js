@@ -10,25 +10,7 @@ var DBHelper = require("../../../common/helpers/new_dbhelper");
 // Below will cache output for 30 seconds
 //router.get("/list/:page?/:limit?", cache(30), (req, res) => {
 router.get("/list/:page?/:limit?", (req, res) => {
-    //
-    //
-    //BIG TODO: Get this to return a count of LogEntries
-    // for each sensor.
-    //
-    // Good luck, lol.
-    //
-    //
-
-    var data = DBHelper.logsAndGroupsForAllSensors();
-    console.log(data);
-    // .then(resp => {
-    //     res.status(200).send(resp);
-    // })
-    // .catch(err => {
-    //     console.error(err);
-    //     res.status(500).send({ error: "Error getting sensors." });
-    // });
-    res.status(200).send(data);
+    res.status(200).send(DBHelper.logsAndGroupsForAllSensors());
 });
 
 // Will set the groupID for the sensor with ID of sensorID.
@@ -41,26 +23,13 @@ router.post("/setGroup", (req, res) => {
         res.status(400).send({ error: "Must send both sensorID and groupID fields." });
     }
 
-    DBHelper.checkExists([{ type: "Sensor", id: body.sensorID }, { type: "Group", id: body.groupID }])
-        .then(bothExist => {
-            if (bothExist) {
-                DBHelper.addSensorToGroup(body.sensorID, body.groupID)
-                    .then(didUpdate => {
-                        res.status(200).send({ response: "ok" });
-                    })
-                    .catch(setErr => {
-                        res.status(500).send({
-                            error: `Error setting groupID(${body.groupID}) for sensorID (${body.sensorID})`
-                        });
-                    });
-            } else {
-                res.status(400).send({ error: "Either groupID or sensorID does not exist" });
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).send({ error: "Error reading from database." });
-        });
+    var data = DBHelper.addSensorToGroup(body.sensorID, body.groupID);
+
+    if (data === 1) {
+        res.status(200).send("UPDATED");
+    } else {
+        res.status(500).send("ERROR::UNABLE_TO_ADD_SENSOR_TO_GROUP");
+    }
 });
 
 // Allows modification of Sensors.
@@ -87,38 +56,9 @@ router.post("/modify", (req, res) => {
 router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) => {
     let p = req.params;
 
-    DBHelper.FindAndCountPaginated(
-        DBHelper.dbObjects["LogEntry"],
-        {
-            attributes: ["timestamp", "value"],
-            where: {
-                timestamp: {
-                    [DBHelper.Op.and]: {
-                        [DBHelper.Op.lte]: p.endTime || Date.now(),
-                        [DBHelper.Op.gte]: p.startTime || Date.UTC(1970, 0, 1)
-                    }
-                }
-            },
-            include: [
-                {
-                    model: DBHelper.dbObjects["Sensor"],
-                    attributes: [],
-                    where: {
-                        id: { [DBHelper.Op.eq]: p.sensorID }
-                    }
-                }
-            ]
-        },
-        p.page || 0,
-        p.limit || 100
-    )
-        .then(dbResp => {
-            res.status(200).send(dbResp);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send({ error: `Error getting logs for sensor ${p.sensorID}.` });
-        });
+    // TODO: Add paging/limiting/startTime/EndTime
+
+    res.status(200).send(DBHelper.getLogsForSensor(p.sensorID));
 });
 
 // Used for modifying the sensors via dashboard.

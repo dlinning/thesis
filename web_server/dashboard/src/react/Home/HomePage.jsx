@@ -25,13 +25,13 @@ class HomePage extends React.Component {
 				<h1>Home</h1>
 				<DashboardTiles>
 					{s.sensors &&
-						s.sensors.list.map((sensor, idx) => {
+						Object.keys(s.sensors).map((id, idx) => {
 							return (
 								<SensorTile
 									rowSpan={3}
 									colSpan={(idx + 2) % 3}
 									key={idx}
-									sensor={sensor}
+									sensor={s.sensors[id]}
 								/>
 							);
 						})}

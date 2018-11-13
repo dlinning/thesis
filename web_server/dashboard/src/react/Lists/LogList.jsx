@@ -22,7 +22,7 @@ class LogList extends React.Component {
                         <div className="th">Value</div>
                     </div>
                     {p.entries &&
-                        p.entries.list.map((entry, idx) => {
+                        p.entries.map((entry, idx) => {
                             let l = entry.value.length > 10;
                             return (
                                 <div className="tr" key={idx}>

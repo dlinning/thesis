@@ -6,6 +6,7 @@ const path = require("path");
 const uuidv4 = require("uuid/v4");
 const newUUID = () => uuidv4().toString();
 const dateAsUnixTimestamp = (d = new Date()) => Math.round(d.getTime() / 1000);
+module.exports.dateAsUnixTimestamp = dateAsUnixTimestamp;
 
 // Setup DB requires / exit handling
 const Database = require("better-sqlite3");
@@ -25,7 +26,7 @@ const createLogEntries = db.prepare(
     `CREATE TABLE IF NOT EXISTS "LogEntries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "timestamp" DATETIME NOT NULL, "value" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "SensorId" UUID REFERENCES "Sensors" ("id") ON DELETE SET NULL ON UPDATE CASCADE)`
 );
 const createSensorsGroups = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
+    `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
 const createSettings = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
 
@@ -39,6 +40,22 @@ const setupTransaction = db.transaction(() => {
 setupTransaction();
 
 ///////
+
+// Checks to see if all entries in `toCheck` exist in the DB.
+//
+// `toCheck` is an array with the format of [{table: TABLE_NAME,id: PRIMARY_KEY_VALUE},...]
+//
+function checkExists(toCheck) {
+    console.log(toCheck);
+    for (var i = 0, l = toCheck.length; i < l; i++) {
+        var t = toCheck[i];
+        if (db.prepare(`SELECT id from ${t.table} WHERE id = '${t.id}'`).get() === undefined) {
+            return false;
+        }
+    }
+    return true;
+}
+module.exports.checkExists = checkExists;
 
 // Checks an object (or returned DB row) to
 // see if all of its values are null.
@@ -63,8 +80,14 @@ function propertiesAllNull(obj) {
 //                      B: { C: false, PAYLOAD: [7, 8, 9] }
 //                  }`
 //
-function groupBy(rows, fieldName, asKey, skipNull = true, prebuilt = {}) {
-    var res = prebuilt;
+function groupBy(rows, fieldName, asKey, appendTo = {}, skipNull = true, breakOutSingleArray = false) {
+    var res = appendTo;
+
+    if (breakOutSingleArray && rows.length === 1) {
+        rows[0][fieldName];
+        res[rows[0][fieldName]][asKey] = rows[0];
+        return res;
+    }
 
     for (var n = 0, l = rows.length; n < l; n++) {
         let group = rows[n][fieldName];
@@ -92,14 +115,20 @@ function groupBy(rows, fieldName, asKey, skipNull = true, prebuilt = {}) {
 //
 // TODO: Be able to "WHERE" this.
 //
-module.exports.findAndCountPaginated = (table, columns, page = 0, limit = 10) => {
-    var stmt = db.prepare(`SELECT ${columns.join(",")} FROM ${table} LIMIT @limit OFFSET @offset`);
+module.exports.findAndCountPaginated = (table, columns, where = [], page = 0, limit = 10) => {
+    var toPrepare = `SELECT ${columns.join(",")} FROM ${table} `;
+    if (where.length !== 0) {
+        toPrepare += "WHERE ";
+        for (var i = 0, l = where.length; i < l; i++) {
+            toPrepare += `${i > 0 ? " AND" : ""} ${where[i]}`;
+        }
+    }
+    toPrepare += ` LIMIT ${limit} OFFSET ${page * limit}`;
+    console.log(toPrepare);
+    var stmt = db.prepare(toPrepare);
     var count = db.prepare(`SELECT COUNT(${columns[0]}) AS total FROM ${table}`);
 
-    var rows = stmt.all({
-        limit: limit,
-        offset: page * limit
-    });
+    var rows = stmt.all();
 
     var totalRows = count.get().total;
     return {
@@ -115,12 +144,15 @@ module.exports.findAndCountPaginated = (table, columns, page = 0, limit = 10) =>
 // in an object keyed by each sensor's ID.
 //
 module.exports.logsAndGroupsForAllSensors = () => {
-    var logs = groupBy(getLogsForSensors.all(), "SensorId", "logs");
+    var res = groupBy(getLogsForSensors.all(), "SensorId", "logs", {}, true);
 
-    var logsAndGroups = groupBy(listAllSensorsGroups.all(), "SensorId", "groups", true, logs);
+    groupBy(getAllSensorsMetadata.all(), "id", "meta", res, true, true);
 
-    return logsAndGroups;
+    groupBy(listAllSensorsGroups.all(), "SensorId", "groups", res);
+
+    return res;
 };
+const getAllSensorsMetadata = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors`);
 const getLogsForSensors = db.prepare(`SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries`);
 const listAllSensorsGroups = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
@@ -163,6 +195,14 @@ const getLogsForSensor = db.prepare(
 //
 module.exports.getGroupsForSensor = sensorId => {
     return getGroupsforSensor.all(sensorId);
+};
+
+// Simple wrapper around `getLogsForSensor` query above.
+// Returns data for all logs for the specific sensor
+// with ID `sensorId`
+//
+module.exports.getLogsForSensor = sensorId => {
+    return getLogsForSensor.all(sensorId);
 };
 
 // Creates a new Sensor with the given `name` (or "New Sensor")
@@ -228,6 +268,38 @@ const updateSensor = db.prepare(
     WHERE id = @id`
 );
 
+// Allows updating of a sensor's `name` and `dataType` columns.
+//
+// Will return an error (as a string) if the `sensorId` does
+// not exist, or a 1 if the changes were a success.
+//
+module.exports.addSensorToGroup = (sensorId, groupId) => {
+    var now = dateAsUnixTimestamp();
+
+    if (checkExists([{ table: "Sensors", id: sensorId }, { table: "Groups", id: groupId }])) {
+        var newLink = {
+            SensorId: sensorId,
+            GroupId: groupId,
+            createdAt: now
+        };
+        return addSensorToGroup.run(newLink).changes;
+    } else {
+        return "ERROR:SENSOR_OR_GROUP_DOES_NOT_EXIST";
+    }
+};
+const addSensorToGroup = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 // Creates a new Group with the given `name` (or "New Group").
 //
 // Will return 1 if the insert was a success.
@@ -248,6 +320,16 @@ const insertGroup = db.prepare(
     VALUES (@id,@name,@createdAt,@updatedAt)`
 );
 const getGroupById = db.prepare("SELECT * FROM Groups WHERE id = ?");
+
+// Creates a new Group with the given `name` (or "New Group").
+//
+//
+module.exports.listAllGroups = () => {
+    return listAllGroups.all();
+};
+const listAllGroups = db.prepare(
+    `SELECT * FROM Groups`
+);
 
 // Allows updating of a groups's `name`.
 //
