@@ -17,5 +17,5 @@ var idx = 0;
 setInterval(() => {
     var val = ++idx;
 	console.log(`Logging ${val}.`);
-	testSensor.logData(val);
-}, 1000);
+	testSensor.logData(val* 100);
+}, 2000);

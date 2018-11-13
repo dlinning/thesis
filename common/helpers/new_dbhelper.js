@@ -210,7 +210,7 @@ module.exports.getLogsForSensor = sensorId => {
 //
 // Will return the new sensor's ID if successful or already exists.
 //
-module.exports.addSensor = (name = "New Sensor", dataType, id) => {
+module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
     var d1 = dateAsUnixTimestamp();
 
     // Check to see if it already exists,

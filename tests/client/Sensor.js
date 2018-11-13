@@ -39,7 +39,7 @@ module.exports = class Sensor {
     //
     _connect(name, dataType) {
         var payload = {
-            id: "6e62e212-030a-4fe8-8243-a2ef71bffa92",
+            //id: "6e62e212-030a-4fe8-8243-a2ef71bffa92",
             type: "connect",
             name: name,
             dataType: dataType
