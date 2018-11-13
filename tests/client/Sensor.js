@@ -53,6 +53,14 @@ module.exports = class Sensor {
 
             //Clear the listener
             udp_client.removeListener("message", connectHandler);
+            //Add the new "logack" listener
+            udp_client.on("message", function logAckHandler(rawMessage, rinfo) {
+                var msg = JSON.parse(rawMessage);
+    
+                if (msg.type === "logack") {
+                    console.log(`Recv'd ACK for timestamp ${msg.for}`);
+                }
+            });
 
             if (msg.status === 200) {
                 console.log(`Sensor registered/already exists with UUID ${msg.uuid}`);

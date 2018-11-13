@@ -19,7 +19,7 @@ server.on("message", (rawMessage, rinfo) => {
     //Run whenever a message is received
     var msg = JSON.parse(rawMessage);
 
-    debug && console.log(msg);
+    //debug && console.log(msg);
 
     // Auth check, `authKey` must be provided for all messages.
     if (msg.authKey !== config.sensorAuthKey) {
@@ -49,7 +49,14 @@ server.on("message", (rawMessage, rinfo) => {
         if (!config.requireRemoteTimestamp && msg.timestamp === undefined) {
             msg.timestamp = Date.now();
         }
-        DBHelper.logData(msg.value, msg.sensorUUID, msg.timestamp);
+        var didChange = DBHelper.logData(msg.value, msg.sensorUUID, msg.timestamp) === 1;
+
+        if (didChange) {
+            MessageSender.sendMessage(server, rinfo.address, rinfo.port, {
+                type: "logack",
+                for: msg.timestamp
+            });
+        }
     }
 });
 

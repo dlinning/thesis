@@ -376,7 +376,7 @@ module.exports.logData = (value, sensorUUID, timestamp) => {
         createdAt: currentTime
     };
     // Will return 1 if the change was a success.
-    return insertLogEntry.run(logEntry);
+    return insertLogEntry.run(logEntry).changes;
 };
 const insertLogEntry = db.prepare(
     `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
