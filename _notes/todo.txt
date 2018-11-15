@@ -1,35 +1,48 @@
-- C/C++ Library
-    - Connect
-        - Storing / retrieving sensor UUID
-    - Logging
-- Dashboard
-    - Simple auth
-    - Views
-        - No chart.js, just simply pulling to a table
-    - Dashboard management
-        - Saving
-        - Multiple views?
-- Server
-    - Changes needed to facilitate other work
-    - Cleanup
+Due at end of term:
 
-Final Due:
-- Server
-    - Management via Dashboard
-    - API Authentication
-- Dashboard
-    - Chart.js implemented
-    - Server configuration/management
-- C/C++ Library
-    - Possibly sending data to sensors
+Server:
+- Manage sensors
+    - Register / Connect
+    - Rename
+    - Remove
+    - Add/Remove from groups
+- Retrieve data
+    - List all sensors
+        - Readings for specific sensors
+            - Range of readings by date
+    - List all groups
+        - List all sensors in a given groups
+    
+Dashboard:
+ - Pull simple data from API
+    - Sensors
+    - Groups
+    - Logs
+        - Visualize specific logs (table only, no charts)
+- Manage Sensors
+    - Rename
+    - Mange groups
+    - Remove
+- Manage Groups
+    - Rename
+    - Delete
 
-"Maybe"s:
-- Server
-    - IFTTT
-        - Logging these events
-- Dashboard
-    - IFTTT configuration
-        - View logs of event fired
-    - "Smart" visualization suggestions
-        - Suggest what chart type / how to display based on input
-- C/C++ Library
+Library:
+- Python
+    - Connect/handshake
+    - Log data
+
+--------------------------------------------------
+Final due:
+
+Server:
+- Manage settings from Dashboard
+- IFTTT functionality implementation
+
+Dashboard:
+- Chart.js implementation
+- IFTTT functionality configuration
+
+Library:
+- C/C++ version
+- Sending data back to sensors, listen and respond
