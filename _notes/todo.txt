@@ -2,21 +2,21 @@ Due at end of term:
 
 Server:
 - Manage sensors
-    - Register / Connect
+    - Register / Connect ✅
     - Rename
     - Remove
     - Add/Remove from groups
 - Retrieve data
-    - List all sensors
+    - List all sensors ✅
         - Readings for specific sensors
             - Range of readings by date
-    - List all groups
+    - List all groups ✅
         - List all sensors in a given groups
     
 Dashboard:
  - Pull simple data from API
-    - Sensors
-    - Groups
+    - Sensors ✅
+    - Groups ✅
     - Logs
         - Visualize specific logs (table only, no charts)
 - Manage Sensors
@@ -29,8 +29,8 @@ Dashboard:
 
 Library:
 - Python
-    - Connect/handshake
-    - Log data
+    - Connect/handshake ✅
+    - Log data ✅
 
 --------------------------------------------------
 Final due:
