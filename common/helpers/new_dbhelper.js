@@ -1,6 +1,7 @@
 // Import the config file
 const config = require("../../web_server/config.json");
 const path = require("path");
+const dataTypes = require("./dataTypeHelper");
 
 // Import and Setup helper functions
 const uuidv4 = require("uuid/v4");
@@ -31,6 +32,10 @@ const createSensorsGroups = db.prepare(
     `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
 const createSettings = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
+const createViews = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ("id" TEXT NOT NULL, "name" INTEGER, PRIMARY KEY("id") )`);
+const createViewTiles = db.prepare(
+    `CREATE TABLE IF NOT EXISTS "ViewTiles" ( "id" TEXT NOT NULL, "apiCall" TEXT NOT NULL, "chartType" TEXT NOT NULL, "viewId" INTEGER NOT NULL, PRIMARY KEY("id") )`
+);
 
 const setupTransaction = db.transaction(() => {
     createSensors.run();
@@ -38,6 +43,8 @@ const setupTransaction = db.transaction(() => {
     createLogEntries.run();
     createSensorsGroups.run();
     createSettings.run();
+    createViews.run();
+    createViewTiles.run();
 });
 setupTransaction();
 
@@ -178,12 +185,13 @@ module.exports.logsAndGroupsForSensorId = sensorId => {
     return data;
 };
 const getGroupsforSensor = db.prepare(
-    `SELECT Groups.id as GroupId, Groups.name as GroupName, Sensors.id as SensorId
+    `SELECT Groups.id as id, Groups.name as name, Sensors.id as SensorId
     FROM Sensors
     LEFT JOIN SensorGroups ON SensorGroups.SensorId = Sensors.id
     LEFT JOIN Groups ON Groups.id = SensorGroups.GroupId
     WHERE Sensors.id = ?`
 );
+const getMetadataForSensor = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensor = db.prepare(
     `SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries
     WHERE SensorId = ?`
@@ -213,6 +221,8 @@ module.exports.getLogsForSensor = sensorId => {
 module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
     var d1 = dateAsUnixTimestamp();
 
+    dataType = dataType.toLowerCase();
+
     // Check to see if it already exists,
     // return early.
     var current = getSensorById.get(id);
@@ -220,10 +230,15 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
         return id;
     }
 
+    // Validate data types
+    if (!dataTypes.possibleDataTypes.includes(dataType)) {
+        return `ERROR:: Invalid dataType field, must be one of: ${dataTypes.possibleDataTypes.join(",")}.`;
+    }
+
     const newSensor = {
         id: id || newUUID(),
         name: name,
-        dataType: dataType.toLowerCase(),
+        dataType: dataType,
         createdAt: d1,
         updatedAt: d1
     };
@@ -289,6 +304,18 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
 };
 const addSensorToGroup = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
 
+module.exports.getSensorMeta = sensorId => {
+    var res = getMetadataForSensor.get(sensorId);
+
+    var groups = getGroupsforSensor.all(sensorId);
+    
+    // Set `.groups` to an empty array if 
+    // sensor is not in any groups.
+    res.groups = groups[0].name === null ? [] : groups;
+
+    return res;
+};
+
 //
 //
 //
@@ -338,7 +365,7 @@ module.exports.updateGroup = (groupId, name) => {
     var d1 = dateAsUnixTimestamp();
 
     var currentGroup = getGroupById(groupId).get();
-    if (currentSensor !== undefined) {
+    if (currentGroup !== undefined) {
         currentGroup.name = name || currentGroup.name;
 
         // Change `updatedAt` always.

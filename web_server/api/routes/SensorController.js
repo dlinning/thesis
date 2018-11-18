@@ -68,14 +68,9 @@ router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) =>
 // simply provided for management purposes.
 //
 router.get("/settings/:sensorID", (req, res) => {
-    DBHelper.getSensorSettings(req.params.sensorID)
-        .then(dbResp => {
-            res.status(200).send(dbResp);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send({ error: `Error getting settings data for sensor ${req.params.sensorID}.` });
-        });
+    var dbResp = DBHelper.getSensorMeta(req.params.sensorID);
+
+    res.status(200).send(dbResp);
 });
 
 module.exports = router;

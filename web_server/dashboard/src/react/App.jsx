@@ -1,6 +1,6 @@
 const App = props => (
     <>
-        <Dashboard />
+        <Dashboard page={props.page}/>
         <Modal />
     </>
 );

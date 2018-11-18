@@ -46,7 +46,7 @@ button {
 
         transition: box-shadow 75ms @stopToStopEase;
 
-        &:hover{
+        &:hover {
             .md-2();
         }
     }
@@ -63,7 +63,7 @@ button {
         border-color: darken(@dangerColor, 10);
 
         &:hover {
-            background-color: fadeout(darken(@dangerColor, 10), 80);
+            background-color: fadeout(darken(@dangerColor, 10), 20);
         }
         &.floating {
             background-color: @dangerColor;
@@ -71,10 +71,10 @@ button {
 
         &.overlay {
             &:hover {
-                background-color: fadeout(@dangerColor, 80);
+                background-color: fadeout(@dangerColor, 55);
             }
             &:active {
-                background-color: fadeout(darken(@dangerColor, 10), 80);
+                background-color: fadeout(darken(@dangerColor, 10), 20);
             }
         }
     }
@@ -91,9 +91,34 @@ button {
         }
     }
 
+    i{
+        pointer-events: none;
+    }
+
     i + span {
         margin-left: 0.5rem;
     }
+}
+
+input,
+select {
+    background: transparent;
+    color: @primaryTextColor;
+    border: 0;
+    border-bottom: 1px solid @darkPrimaryColor;
+    line-height: 2;
+    height: 2rem;
+    margin: 0 1rem 0.5rem;
+    padding: 0.25rem 0.5rem 0;
+
+    &:valid,
+    &:focus {
+        outline: none;
+        border-bottom-color: @primaryColor;
+    }
+}
+option{
+    color:@bgColor;
 }
 
 .table {

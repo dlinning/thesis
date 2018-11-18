@@ -16,8 +16,6 @@
         font-size: 0.75rem;
         line-height: 1rem;
     }
-    .sl-id {
-    }
     .sl-dt {
         text-transform: capitalize;
         border-left: 1px solid @dividerColor;
@@ -32,6 +30,37 @@
     .sl-controls {
         button + button {
             margin-left: 0.5rem;
+        }
+    }
+}
+
+.editSensorModal {
+    text-align: left;
+
+    &-groups {
+        border-top: 1px solid @dividerColor;
+        margin-top: 1rem;
+        padding: 1rem;
+    }
+
+    .title {
+        .bold();
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .editSensorModal-g {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+
+        button {
+            margin: 0 0 0 1rem;
+        }
+
+        &:not(:first-of-type) {
+            border-top: 1px solid @dividerColor;
         }
     }
 }

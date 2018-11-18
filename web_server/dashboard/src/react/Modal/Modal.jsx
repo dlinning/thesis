@@ -24,8 +24,8 @@ class Modal extends React.Component {
 	render() {
 		let s = this.state;
 		return (
-			<div id="modal-scrim" className={s.open === true ? "open" : ""}>
-				<div id="modal">
+			<div id="modal-scrim" className={s.open === true ? "open" : ""} onClick={() => this.close()}>
+				<div id="modal" onClick={(e) => e.stopPropagation()}>
 					<div className="controls">
 						<span className="title">{s.title}</span>
 						<button title="Close Modal" onClick={() => this.close()}>

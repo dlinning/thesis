@@ -3,19 +3,29 @@ class Dashboard extends React.Component {
         super(p);
 
         this.state = {
-            page: "home",
+            page: this.props.page || "home",
             changing: false
         };
 
         this.setPage = this.setPage.bind(this);
         this.saveView = this.saveView.bind(this);
+
+        window.onpopstate = evt => {
+            var newPage = document.location.pathname.substring(1);
+            if (newPage.length === 0) {
+                newPage = "home";
+            }
+            this.setPage(newPage, false);
+        };
     }
 
-    setPage(pageName) {
+    setPage(pageName, pushHistory = true) {
         if (pageName !== this.state.page) {
             this.setState({ changing: true }, () => {
                 setTimeout(() => {
                     this.setState({ page: pageName }, () => {
+                        pushHistory && history.pushState({ page: pageName }, pageName, "/" + (pageName === "home" ? "" : pageName));
+
                         setTimeout(() => {
                             this.setState({ changing: false });
                         }, 110);

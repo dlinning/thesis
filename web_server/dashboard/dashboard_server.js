@@ -20,8 +20,9 @@ process.env.NODE_ENV === "production" && server.enable("view cache");
 
 server.use("/dist", express.static(path.join(__dirname, "./dist")));
 
-server.get("/", (req, res) => {
-    res.render("home", { title: "Dashboard" });
+server.get("/:page?", (req, res) => {
+    let page = req.params.page || "home";
+    res.render("home", { title: "Dashboard", page: page });
 });
 
 module.exports = {

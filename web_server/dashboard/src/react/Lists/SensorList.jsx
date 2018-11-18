@@ -39,9 +39,9 @@ class SensorList extends React.Component {
                             </div>
                             <div className="sl-gc">Groups: {sensor.groups && sensor.groups.length}</div>
                             <div className="sl-controls flex-row fe">
-                                <button className="small overlay">
+                                <button className="small overlay" onClick={() => this.openSensorSettingsModal(sensor.meta.id)}>
                                     <i className="fas fa-cog" />
-                                    <span onClick={() => this.openSensorSettingsModal(sensor.meta.id)}>Manage</span>
+                                    <span>Manage</span>
                                 </button>
                                 <button className="small overlay danger">
                                     <i className="fas fa-trash-alt" />
