@@ -55,7 +55,6 @@ setupTransaction();
 // `toCheck` is an array with the format of [{table: TABLE_NAME,id: PRIMARY_KEY_VALUE},...]
 //
 function checkExists(toCheck) {
-    console.log(toCheck);
     for (var i = 0, l = toCheck.length; i < l; i++) {
         var t = toCheck[i];
         if (db.prepare(`SELECT id from ${t.table} WHERE id = '${t.id}'`).get() === undefined) {
@@ -302,9 +301,14 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
             GroupId: groupId,
             createdAt: now
         };
-        return addSensorToGroup.run(newLink).changes;
+        if (addSensorToGroup.run(newLink).changes === 1) {
+            // Link was created
+            return { status: 200, groups: getGroupsforSensor.all(sensorId) };
+        } else {
+            return { status: 500, error: "Error adding sensor to group in DB" };
+        }
     } else {
-        return "ERROR:SENSOR_OR_GROUP_DOES_NOT_EXIST";
+        return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
     }
 };
 const addSensorToGroup = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);

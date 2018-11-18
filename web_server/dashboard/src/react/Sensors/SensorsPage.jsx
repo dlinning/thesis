@@ -18,6 +18,18 @@ class SensorsPage extends React.Component {
                 }
             }
         });
+        messenger.subscribe("SensorGroupsUpdated", obj => {
+            let sensors = this.state.sensors;
+            if (sensors) {
+                for (var id in sensors) {
+                    if (id === obj.id) {
+                        sensors[id].groups = obj.groups;
+                        this.setState({ sensors: sensors });
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     componentDidMount() {
@@ -31,6 +43,18 @@ class SensorsPage extends React.Component {
             .catch(err => {
                 console.error(err);
             });
+
+        fetch("/api/groups/list")
+            .then(resp => {
+                return resp.json();
+            })
+            .then(asJson => {
+                this.setState({ allGroups: asJson });
+            })
+            .catch(err => {
+                console.error(err);
+                return null;
+            });
     }
 
     render() {
@@ -38,7 +62,7 @@ class SensorsPage extends React.Component {
         return (
             <>
                 <h1>Manage Sensors</h1>
-                <SensorList sensors={s.sensors} />
+                <SensorList sensors={s.sensors} allGroups={s.allGroups} />
             </>
         );
     }

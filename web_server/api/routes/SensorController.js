@@ -16,20 +16,16 @@ router.get("/list/:page?/:limit?", (req, res) => {
 // Will set the groupID for the sensor with ID of sensorID.
 // If groupID is undefined, then it will clear the group.
 //
-router.post("/setGroup", (req, res) => {
+router.post("/addToGroup", (req, res) => {
     let body = req.body;
 
     if (body.sensorID == undefined || body.groupID == undefined) {
         res.status(400).send({ error: "Must send both sensorID and groupID fields." });
     }
 
-    var data = DBHelper.addSensorToGroup(body.sensorID, body.groupID);
+    var dbResp = DBHelper.addSensorToGroup(body.sensorID, body.groupID);
 
-    if (data === 1) {
-        res.status(200).send("UPDATED");
-    } else {
-        res.status(500).send("ERROR::UNABLE_TO_ADD_SENSOR_TO_GROUP");
-    }
+    res.status(dbResp.status).send(dbResp);
 });
 
 // Allows modification of Sensors.

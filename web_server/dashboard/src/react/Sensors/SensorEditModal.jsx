@@ -4,7 +4,8 @@ class SensorEditModal extends React.Component {
 
         this.state = {
             name: p.data.name,
-            dataType: p.data.dataType
+            dataType: p.data.dataType,
+            inGroups: p.data.groups
         };
 
         // Note: make sure this matches up with
@@ -12,6 +13,25 @@ class SensorEditModal extends React.Component {
         this.possibleDataTypes = ["string", "float", "int", "blob", "image", "json", "boolean", "list"];
 
         this.updateField = this.updateField.bind(this);
+    }
+
+    componentDidMount() {
+        this.updateGroups();
+    }
+
+    // Pass a `newGroups` to override what is in
+    // the current state.
+    updateGroups(newGroups = this.state.inGroups) {
+        var groupsIn = newGroups.map(g => {
+            return g.id;
+        });
+        var groupsNotIn = this.props.allGroups.filter(g => {
+            if (!groupsIn.includes(g.id)) {
+                return g;
+            }
+        });
+
+        this.setState({ groupsNotIn: groupsNotIn, inGroups: newGroups });
     }
 
     updateField(e) {
@@ -43,7 +63,7 @@ class SensorEditModal extends React.Component {
             body: JSON.stringify(payload)
         })
             .then(response => {
-                return response.json(); // .text();
+                return response.json();
             })
             .then(asJson => {
                 messenger.notify("SensorUpdated", {
@@ -60,12 +80,42 @@ class SensorEditModal extends React.Component {
         e.preventDefault();
     }
 
+    addToGroup(evt) {
+        evt.preventDefault();
+
+        const data = new FormData(evt.target);
+
+        var payload = {
+            sensorID: this.props.data.sensorId,
+            groupID: data.get("groupId")
+        };
+
+        fetch(`/api/sensors/addToGroup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(asJson => {
+                messenger.notify("SensorGroupsUpdated", {
+                    id: payload.sensorID,
+                    groups: asJson.groups
+                });
+                this.updateGroups(asJson.groups);
+            });
+    }
+
     render() {
+        let s = this.state;
         return (
             <div className="editSensorModal">
                 <div className="flex-col">
-                    <input name="name" type="text" value={this.state.name} onChange={this.updateField} />
-                    <select name="dataType" onChange={this.updateField} value={this.state.dataType}>
+                    <input name="name" type="text" value={s.name} onChange={this.updateField} />
+                    <select name="dataType" onChange={this.updateField} value={s.dataType}>
                         {this.possibleDataTypes.map((dt, idx) => {
                             return (
                                 <option value={dt} key={idx}>
@@ -80,8 +130,29 @@ class SensorEditModal extends React.Component {
                 </div>
                 <div className="editSensorModal-groups">
                     <span className="title">Groups</span>
-                    {this.props.data.groups &&
-                        this.props.data.groups.map((g, idx) => {
+
+                    <div className="editSensorModal-addToGroup flex-row aic se">
+                        {s.groupsNotIn && s.groupsNotIn.length > 0 && (
+                            <>
+                                <span>Add To Group:</span>
+                                <form onSubmit={this.addToGroup.bind(this)}>
+                                    <select name="groupId">
+                                        {s.groupsNotIn.map((g, idx) => {
+                                            return (
+                                                <option value={g.id} key={idx}>
+                                                    {g.name}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    <button>Add</button>
+                                </form>
+                            </>
+                        )}
+                    </div>
+
+                    {s.inGroups &&
+                        s.inGroups.map((g, idx) => {
                             return (
                                 <div className="editSensorModal-g" key={idx}>
                                     <span className="name">{g.name}</span>

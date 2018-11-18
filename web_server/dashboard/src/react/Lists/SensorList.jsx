@@ -8,7 +8,7 @@ class SensorList extends React.Component {
                 asJson.sensorId = sensorId;
                 messenger.notify("OpenModal", {
                     title: `Settings for Sensor ${sensorId.substr(0, 7)}`,
-                    content: <SensorEditModal data={asJson} />
+                    content: <SensorEditModal data={asJson} allGroups={this.props.allGroups} />
                 });
             })
             .catch(err => {
