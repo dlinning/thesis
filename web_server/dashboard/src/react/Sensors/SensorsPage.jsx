@@ -3,6 +3,21 @@ class SensorsPage extends React.Component {
         super(p);
 
         this.state = {};
+
+        // Handles updating the "background" list
+        // when using SensorEditModal component.
+        messenger.subscribe("SensorUpdated", obj => {
+            let sensors = this.state.sensors;
+            if (sensors) {
+                for (var id in sensors) {
+                    if (id === obj.id) {
+                        sensors[id].meta = obj.new.meta;
+                        this.setState({ sensors: sensors });
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     componentDidMount() {

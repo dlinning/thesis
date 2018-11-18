@@ -261,7 +261,8 @@ const getSensorById = db.prepare("SELECT * FROM Sensors WHERE id = ?");
 module.exports.updateSensor = (sensorId, name, dataType) => {
     var d1 = dateAsUnixTimestamp();
 
-    var currentSensor = getSensorById(sensorId).get();
+    var currentSensor = getSensorById.get(sensorId);
+    console.log("Current:", currentSensor);
     if (currentSensor !== undefined) {
         currentSensor.name = name || currentSensor.name;
         currentSensor.dataType = dataType || currentSensor.dataType;
@@ -269,8 +270,12 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
         // Change `updatedAt` always.
         currentSensor.updatedAt = d1;
 
-        // Will return 1 if the change was a success.
-        return updateSensor.run(currentSensor).changes;
+        // Will return a high-level `sensor` entry if the change was a success.
+        if (updateSensor.run(currentSensor).changes === 1) {
+            return { status: 200, meta: currentSensor };
+        } else {
+            return { status: 500, error: "Error updating sensor in DB" };
+        }
     } else {
         return "ERROR::SENSORID_DOES_NOT_EXIST";
     }
@@ -308,8 +313,8 @@ module.exports.getSensorMeta = sensorId => {
     var res = getMetadataForSensor.get(sensorId);
 
     var groups = getGroupsforSensor.all(sensorId);
-    
-    // Set `.groups` to an empty array if 
+
+    // Set `.groups` to an empty array if
     // sensor is not in any groups.
     res.groups = groups[0].name === null ? [] : groups;
 

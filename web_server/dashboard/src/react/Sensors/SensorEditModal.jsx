@@ -15,7 +15,7 @@ class SensorEditModal extends React.Component {
     }
 
     updateField(e) {
-        var newState = this.state.state;
+        var newState = this.state;
         let field = e.target.name;
 
         if (field === "dataType") {
@@ -30,11 +30,31 @@ class SensorEditModal extends React.Component {
     }
 
     sendUpdateToApi() {
-        console.log("Sending:", this.state);
+        var payload = {
+            sensorID: this.props.data.sensorId,
+            name: this.state.name,
+            dataType: this.state.dataType
+        };
+        fetch(`/api/sensors/modify`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                return response.json(); // .text();
+            })
+            .then(asJson => {
+                messenger.notify("SensorUpdated", {
+                    id: payload.sensorID,
+                    new: asJson
+                });
+            });
     }
 
-	removeFromGroup(e) {
-		console.log(e.target);
+    removeFromGroup(e) {
+        console.log(e.target);
         console.log(`Removing from ${e.target.datset.groupId}`);
 
         e.preventDefault();
@@ -56,7 +76,7 @@ class SensorEditModal extends React.Component {
                     </select>
                 </div>
                 <div className="flex-row">
-                    <button onClick={this.sendUpdateToApi}>Apply</button>
+                    <button onClick={() => this.sendUpdateToApi()}>Apply</button>
                 </div>
                 <div className="editSensorModal-groups">
                     <span className="title">Groups</span>

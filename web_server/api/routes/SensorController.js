@@ -42,15 +42,13 @@ router.post("/modify", (req, res) => {
         res.status(400).send({ error: "Must send sensorID on body." });
     }
 
-    var opts = body.opts;
-
-    DBHelper.updateSensor(sensorID, opts)
-        .then(dbResp => {
-            res.status(200).send("Modified sensor successfully");
-        })
-        .catch(dbErr => {
-            res.status(500).send(`Error modifying sensor: ${dbErr}`);
-        });
+    var dbResp = DBHelper.updateSensor(sensorID, body.name, body.dataType);
+    if (dbResp) {
+        res.status(dbResp.status).send(dbResp);
+        return;
+    } else {
+        res.status(500).send("ERROR");
+    }
 });
 
 router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) => {
