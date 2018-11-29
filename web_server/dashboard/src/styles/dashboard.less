@@ -1,152 +1,214 @@
 #dashboard {
-    display: grid;
-    height: 100vh;
+	display: grid;
+	height: 100vh;
 
-    grid-template-columns: 6rem 1fr;
-    grid-template-rows: 4rem 1fr;
+	grid-template-columns: 6rem 1fr;
+	grid-template-rows: 4rem 1fr;
 
-    &.changing {
-        #dashboard-content {
-            transition-timing-function: @entranceEase;
-            opacity: 0;
-        }
-    }
+	&.changing {
+		#dashboard-content {
+			transition-timing-function: @entranceEase;
+			opacity: 0;
+		}
+	}
 }
 
 .dashboard-nav {
-    grid-row: 1 / span 2;
-    grid-column: 1 / span 1;
+	@media screen and (min-width: 769px) {
+		grid-row: 1 / span 2;
+		grid-column: 1 / span 1;
+	}
 
-    display: flex;
-    flex-flow: column;
+	grid-area: nav;
 
-    border-right: 1px solid @dividerColor;
+	display: flex;
+	flex-flow: column;
 
-    padding-top: 2.5rem; //Half of the height of li
+	border-right: 1px solid @dividerColor;
 
-    ul {
-        list-style-type: none;
-    }
+	padding-top: 2.5rem; //Half of the height of li
 
-    li {
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
+	ul {
+		list-style-type: none;
+	}
 
-        height: 5rem;
+	li {
+		display: flex;
+		flex-flow: column;
+		align-items: center;
+		justify-content: center;
 
-        cursor: pointer;
+		height: 5rem;
 
-        border-left: 0.5rem solid transparent;
-        transition: border-color 350ms @stopToStopEase;
+		cursor: pointer;
 
-        span {
-            text-transform: uppercase;
-            font-weight: 700;
-            font-size: 11px;
+		border-left: 0.5rem solid transparent;
+		transition: border-color 350ms @stopToStopEase;
 
-            opacity: 0;
-            transform: translateY(0.25rem);
-            transition: all 100ms @exitEase;
+		span {
+			text-transform: uppercase;
+			font-weight: 700;
+			font-size: 11px;
 
-            user-select: none;
-            -webkit-user-select: none;
-        }
+			opacity: 0;
+			transform: translateY(0.25rem);
+			transition: all 100ms @exitEase;
 
-        &:hover {
-            background: fadeout(@lightPrimaryColor, 90);
+			user-select: none;
+			-webkit-user-select: none;
+		}
 
-            span {
-                opacity: 1;
-                transform: translateY(0);
-                transition: all 150ms 150ms @entranceEase;
-            }
+		&:hover {
+			background: fadeout(@lightPrimaryColor, 90);
 
-            &:not(.selected) i {
-                opacity: 0.8;
-            }
-        }
+			span {
+				opacity: 1;
+				transform: translateY(0);
+				transition: all 150ms 150ms @entranceEase;
+			}
 
-        i {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
+			&:not(.selected) i {
+				opacity: 0.8;
+			}
+		}
 
-            opacity: 0.6;
-        }
+		i {
+			font-size: 1.75rem;
+			margin-bottom: 0.5rem;
 
-        &.selected {
-            border-color: @primaryColor;
-            background: fadeout(@lightPrimaryColor, 95);
+			opacity: 0.6;
+		}
 
-            span {
-                opacity: 1;
-                transform: translateY(0);
-            }
+		&.selected {
+			border-color: @primaryColor;
+			background: fadeout(@lightPrimaryColor, 95);
 
-            i {
-                opacity: 1;
-            }
-        }
-    }
+			span {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			i {
+				opacity: 1;
+			}
+		}
+	}
 }
 
 .dashboard-controls {
-    grid-row: 1 / span 1;
-    grid-column: 2 / span 1;
+	@media screen and (min-width: 769px) {
+		grid-row: 1 / span 1;
+		grid-column: 2 / span 1;
+	}
 
-    border-bottom: 1px solid @dividerColor;
+	grid-area: controls;
 
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+	border-bottom: 1px solid @dividerColor;
 
-    padding: 0 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
 
-    button {
-        margin-left: 1rem;
-        margin-right: 0;
-    }
+	padding: 0 1rem;
+
+	button {
+		margin-left: 1rem;
+		margin-right: 0;
+	}
 }
 
 #dashboard-content {
-    grid-column: 2 / span 1;
-    grid-row: 2 / span 1;
+	@media screen and (min-width: 769px) {
+		grid-column: 2 / span 1;
+		grid-row: 2 / span 1;
+	}
 
-    max-width: 1200px;
-    width: 75vw;
-    margin: 0 auto;
+	grid-area: content;
 
-    display: flex;
-    flex-direction: column;
+	max-width: 1200px;
+	width: 75vw;
+	margin: 0 auto;
 
-    padding: 1rem;
+	display: flex;
+	flex-direction: column;
 
-    opacity: 1;
-    transition: opacity 100ms @exitEase;
+	padding: 1rem;
 
-    h1 {
-        text-align: left;
-        margin-bottom: 0.5rem;
-    }
+	opacity: 1;
+	transition: opacity 100ms @exitEase;
+
+	h1 {
+		text-align: left;
+		margin-bottom: 0.5rem;
+	}
 }
 
 .dashboard-tiles {
-    display: grid;
-    grid-auto-rows: 5rem;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 1rem;
+	display: grid;
+	grid-auto-rows: 5rem;
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 1rem;
 
-    max-height: 100vh;
-    overflow-y: auto;
+	max-height: 100vh;
+	overflow-y: auto;
 
-    .tile {
-        padding: 1rem;
-        border-radius: 0.25rem;
-        display: flex;
-        flex-flow: column;
-        background: @cardBg;
+	.tile {
+		padding: 1rem;
+		border-radius: 0.25rem;
+		display: flex;
+		flex-flow: column;
+		background: @cardBg;
 
-        .md-1();
-    }
+		.md-1();
+	}
+}
+
+@media screen and (max-width: 768px) {
+	#dashboard {
+		grid-template-areas:
+			"controls"
+			"content"
+			"nav";
+		grid-template-rows: 4rem auto 5rem;
+		grid-template-columns: 1fr;
+	}
+
+	#dashboard-content {
+		width: 98vw;
+		max-height: calc(100vh ~"-" 4rem);
+		overflow-y: auto;
+	}
+	.dashboard-tiles {
+		grid-template-columns: 1fr;
+	}
+
+	.dashboard-nav {
+		z-index: 1;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100vw;
+		flex-flow: row;
+		border-top: 1px solid @dividerColor;
+		border-right: none;
+		background: @bgColor;
+		padding-top: 0;
+
+		ul {
+			display: flex;
+			width: 100%;
+		}
+		li {
+			width: 25%;
+			height: 15vw;
+			min-height: 3rem;
+
+			border-left: none;
+			border-bottom: 0.25rem solid transparent;
+
+			i {
+				font-size: 5vw;
+			}
+		}
+	}
 }
