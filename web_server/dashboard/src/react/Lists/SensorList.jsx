@@ -1,14 +1,11 @@
 class SensorList extends React.Component {
     openSensorSettingsModal(sensorId) {
-        fetch("/api/sensors/settings/" + sensorId)
-            .then(res => {
-                return res.json();
-            })
-            .then(asJson => {
-                asJson.sensorId = sensorId;
+        jsonFetch("/api/sensors/settings/" + sensorId)
+            .then(resp => {
+                resp.sensorId = sensorId;
                 messenger.notify("OpenModal", {
                     title: `Settings for Sensor ${sensorId.substr(0, 7)}`,
-                    content: <SensorEditModal data={asJson} allGroups={this.props.allGroups} />
+                    content: <SensorEditModal data={resp} allGroups={this.props.allGroups} />
                 });
             })
             .catch(err => {
@@ -33,12 +30,19 @@ class SensorList extends React.Component {
                                 <div className="sl-n">{sensor.meta.name}</div>
                                 <div className="sl-details flex-row">
                                     <div className="sl-id" title={sensor.meta.id}>
-                                        ({sensor.meta.id.substr(0, 7)})
+                                        ({sensor.meta.id.substr(0, 7)}...)
                                     </div>
                                     <div className="sl-dt">{sensor.meta.dataType}</div>
                                 </div>
                             </div>
-                            <div className="sl-gc">Groups: {sensor.groups && sensor.groups.length}</div>
+                            <div className="sl-logcount">
+                                <span className="label">Logs: </span>
+                                <span>{sensor.logs ? sensor.logs.count : 0}</span>
+                            </div>
+                            <div className="sl-gc">
+                                <span className="label">Groups: </span>
+                                <span>{sensor.groups && sensor.groups.length}</span>
+                            </div>
                             <div className="sl-controls flex-row fe">
                                 <button className="small overlay" onClick={() => this.openSensorSettingsModal(sensor.meta.id)}>
                                     <i className="fas fa-cog" />

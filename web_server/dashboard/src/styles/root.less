@@ -155,24 +155,3 @@ option{
         border-bottom: 2px solid @dividerColor;
     }
 }
-
-.list {
-    display: flex;
-    flex-flow: column;
-
-    .item {
-        display: flex;
-        align-items: center;
-
-        background: @cardBg;
-        padding: 1rem;
-        border-radius: 3px;
-        .md-1();
-
-        margin-bottom: 0.25rem;
-
-        > * + * {
-            margin-left: 1rem;
-        }
-    }
-}

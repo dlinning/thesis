@@ -83,7 +83,7 @@ class SensorEditModal extends React.Component {
             groupID: data.get("groupId")
         };
 
-        jsonFetch("/api/sensors/addToGroup", "POST", payload)
+        jsonFetch("/api/sensors/addToGroup", payload, "POST")
             .then(resp => {
                 messenger.notify("SensorGroupsUpdated", {
                     id: payload.sensorID,
@@ -105,7 +105,7 @@ class SensorEditModal extends React.Component {
             groupID: groupId
         };
 
-        jsonFetch("/api/sensors/removeFromGroup", "POST", payload)
+        jsonFetch("/api/sensors/removeFromGroup", payload, "POST")
             .then(resp => {
                 messenger.notify("SensorGroupsUpdated", {
                     id: payload.sensorID,

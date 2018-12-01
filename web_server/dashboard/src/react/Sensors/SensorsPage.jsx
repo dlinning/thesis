@@ -33,27 +33,12 @@ class SensorsPage extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/sensors/list")
+        Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list")])
             .then(res => {
-                return res.json();
-            })
-            .then(asJson => {
-                this.setState({ sensors: asJson });
+                this.setState({ sensors: res[0], allGroups: res[1] });
             })
             .catch(err => {
                 console.error(err);
-            });
-
-        fetch("/api/groups/list")
-            .then(resp => {
-                return resp.json();
-            })
-            .then(asJson => {
-                this.setState({ allGroups: asJson });
-            })
-            .catch(err => {
-                console.error(err);
-                return null;
             });
     }
 

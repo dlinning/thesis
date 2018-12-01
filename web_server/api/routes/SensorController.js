@@ -11,7 +11,7 @@ var DBHelper = require("../../../common/helpers/new_dbhelper");
 //router.get("/list/:page?/:limit?", cache(30), (req, res) => {
 //
 router.get("/list/:page?/:limit?", (req, res) => {
-    res.status(200).send(DBHelper.logsAndGroupsForAllSensors());
+    res.status(200).send(DBHelper.logCountAndGroupsForAllSensors());
 });
 
 // Will set the groupID for the sensor with ID of sensorID.

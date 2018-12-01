@@ -1,0 +1,30 @@
+.list {
+    display: flex;
+    flex-flow: column;
+
+    .item {
+        display: flex;
+        align-items: center;
+
+        background: @cardBg;
+        padding: 1rem;
+        border-radius: 3px;
+        .md-1();
+
+        margin-bottom: 0.25rem;
+
+        > * + * {
+            margin-left: 0.5rem;
+        }
+
+        span.label {
+            text-align: left;
+            .bold();
+            margin-bottom: 0.5rem;
+            font-size: 0.6rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: fadeout(@textPrimaryColor, 20);
+        }
+    }
+}

@@ -1,13 +1,17 @@
 // Expose a wrapper around `fetch()` for JSON payloads
-window.jsonFetch = (route, method, payload) => {
+window.jsonFetch = (route, payload, method = "GET") => {
     return new Promise((resolve, reject) => {
-        fetch(route, {
-            method: method,
-            headers: {
+        method = method.toUpperCase();
+        var opts = {
+            method: method
+        };
+        if (method === "POST") {
+            opts.headers = {
                 "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        })
+            };
+            opts.body = JSON.stringify(payload);
+        }
+        fetch(route, opts)
             .then(response => {
                 return response.json();
             })

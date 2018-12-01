@@ -6,16 +6,12 @@ class GroupsPage extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/groups/list")
-            .then(res => {
-                return res.json();
-            })
-            .then(asJson => {
-                this.setState({ groups: asJson });
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        jsonFetch("/api/groups/list").then(resp => {
+            this.setState({ groups: resp });
+        })
+        .catch(err => {
+            console.error(err);
+        });
     }
 
     render() {

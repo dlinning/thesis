@@ -4,7 +4,7 @@
     // }
 
     .sl-nid {
-        flex-grow: 2;
+        width: 40%;
     }
     .sl-n {
         font-size: 1.2rem;
@@ -23,11 +23,23 @@
         padding: 0 0.5rem;
     }
 
+    .sl-logcount,
     .sl-gc {
-        flex-grow: 1;
+        display: flex;
+        flex-flow: column;
+        align-self: stretch;
+        text-align: left;
+    }
+    .sl-logcount {
+        width: 20%;
+    }
+    .sl-gc {
+        width: 10%;
     }
 
     .sl-controls {
+        width: 30%;
+        border-left: 1px solid @dividerColor;
         button + button {
             margin-left: 0.5rem;
         }

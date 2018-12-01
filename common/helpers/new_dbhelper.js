@@ -149,30 +149,32 @@ module.exports.findAndCountPaginated = (table, columns, where = [], page = 0, li
 // Returns all logs and groups for all sensors,
 // in an object keyed by each sensor's ID.
 //
-module.exports.logsAndGroupsForAllSensors = () => {
-    var res = groupBy(getLogsForSensors.all(), "SensorId", "logs", {}, true);
+module.exports.logCountAndGroupsForAllSensors = () => {
+    var res = groupBy(getLogCountsForSensors.all(), "SensorId", "logs", {}, true, true, true);
 
     groupBy(getAllSensorsMetadata.all(), "id", "meta", res, true, false, true);
 
-    groupBy(listAllSensorsGroups.all(), "SensorId", "groups", res);
+    groupBy(getSensorsForGroups.all(), "SensorId", "groups", res);
 
     return res;
 };
 const getAllSensorsMetadata = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors`);
-const getLogsForSensors = db.prepare(`SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries`);
-const listAllSensorsGroups = db.prepare(
+const getLogCountsForSensors = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
+const getSensorsForGroups = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
     FROM Sensors
     LEFT JOIN SensorGroups ON SensorGroups.SensorId = Sensors.id
     LEFT JOIN Groups ON Groups.id = SensorGroups.GroupId`
 );
 
-// Simple wrapper around `listAllSensorsGroups` query above.
+// Simple wrapper around `getSensorsForGroups` query above.
 // Split off as `getLogsForSensors` may result in a large
 // payload, when all data is not needed.
 //
 module.exports.groupsForAllSensors = () => {
-    return listAllSensorsGroups.all();
+    var data = listAllSensorsGroups.all();
+    groupBy(getSensorsForGroups.all(), "GroupId", "sensors", true, data);
+    return data;
 };
 
 // Given `sensorId`, will return all logs and groups
@@ -257,7 +259,6 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
     var d1 = dateAsUnixTimestamp();
 
     var currentSensor = getSensorById.get(sensorId);
-    console.log("Current:", currentSensor);
     if (currentSensor !== undefined) {
         currentSensor.name = name || currentSensor.name;
         currentSensor.dataType = dataType || currentSensor.dataType;
