@@ -9,16 +9,9 @@ var DBHelper = require("../../../common/helpers/new_dbhelper");
 router.post("/createorupdate", (req, res) => {
     var groupName = req.body.groupName;
 
-    console.log("REQUEST BODY::", req.body);
-
     if (groupName && groupName.length > 0) {
-        DBHelper.createOrUpdateGroup(groupName, req.body.uuid)
-            .then(dbResp => {
-                res.status(200).send(`Created/Updated Group: ${groupName}`);
-            })
-            .catch(dbErr => {
-                res.status(500).send("Error creating/updating group.");
-            });
+            var resp = DBHelper.createOrUpdateGroup(req.body.uuid, groupName);
+            res.status(resp.status).send(resp)
     } else {
         res.status(400).send("Must send `groupName` on body");
     }

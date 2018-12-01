@@ -158,7 +158,7 @@ module.exports.logCountAndGroupsForAllSensors = () => {
 
     return res;
 };
-const getAllSensorsMetadata = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors`);
+const getAllSensorsMetadata = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
 const getLogCountsForSensors = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
 const getSensorsForGroups = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
@@ -186,7 +186,7 @@ module.exports.logsAndGroupsForSensorId = sensorId => {
     return data;
 };
 const getGroupsforSensor = db.prepare(
-    `SELECT g.id, g.name FROM Sensors as s INNER JOIN SensorGroups as sg ON s.id = sg.SensorId INNER JOIN Groups as g ON g.id = sg.GroupId WHERE s.id = ?`
+    `SELECT g.id, g.name FROM Sensors as s INNER JOIN SensorGroups as sg ON s.id = sg.SensorId INNER JOIN Groups as g ON g.id = sg.GroupId WHERE s.id = ? ORDER BY g.createdAt`
 );
 const getMetadataForSensor = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensor = db.prepare(
@@ -354,52 +354,51 @@ module.exports.getSensorMeta = sensorId => {
 
 // Creates a new Group with the given `name` (or "New Group").
 //
-// Will return 1 if the insert was a success.
-//
-module.exports.addGroup = (name = "New Group") => {
-    var d1 = dateAsUnixTimestamp();
-    const newGroup = {
-        id: newUUID(),
-        name: name,
-        createdAt: d1,
-        updatedAt: d1
-    };
-    // Will return 1 if the change was a success.
-    return insertGroup.run(newGroup).changes;
-};
-const insertGroup = db.prepare(
-    `INSERT INTO Groups(id,name,createdAt,updatedAt)
-    VALUES (@id,@name,@createdAt,@updatedAt)`
-);
-const getGroupById = db.prepare("SELECT * FROM Groups WHERE id = ?");
-
-// Creates a new Group with the given `name` (or "New Group").
-//
 //
 module.exports.listAllGroups = () => {
     return listAllGroups.all();
 };
-const listAllGroups = db.prepare(`SELECT * FROM Groups`);
+const listAllGroups = db.prepare(`SELECT  g.id, g.name, g.updatedAt, count(sg.SensorId) as sensorCount
+FROM Groups as g
+LEFT JOIN SensorGroups as sg
+ON g.id = sg.GroupId
+GROUP BY g.id
+ORDER BY g.createdAt`);
+
+// "Helper" for both `createGroupFunc` and `updateGroupFunc`, so there
+// is only one entry point necessary for both
+module.exports.createOrUpdateGroup = (groupId = newUUID(), name) => {
+    if (getGroupById.get(groupId)) {
+        // Group exists, update name;
+        return updateGroupFunc(groupId, name);
+    } else {
+        return createGroupFunc(groupId, name);
+    }
+};
+const getGroupById = db.prepare("SELECT * FROM Groups WHERE id = ?");
 
 // Allows updating of a groups's `name`.
 //
-// Will return an error (as a string) if the `groupId` does
-// not exist, or a 1 if the changes were a success.
+// Will return an error, or the new group data if the change
+// was successful
 //
-module.exports.updateGroup = (groupId, name) => {
+updateGroupFunc = (groupId, name) => {
     var d1 = dateAsUnixTimestamp();
 
-    var currentGroup = getGroupById(groupId).get();
+    var currentGroup = getGroupById.get(groupId);
     if (currentGroup !== undefined) {
         currentGroup.name = name || currentGroup.name;
 
         // Change `updatedAt` always.
         currentGroup.updatedAt = d1;
 
-        // Will return 1 if the change was a success.
-        return updateGroup.run(currentGroup).changes;
+        if (updateGroup.run(currentGroup).changes === 1) {
+            return { status: 200, group: currentGroup };
+        } else {
+            return { status: 500, error: `The server was unable to rename the group in the database` };
+        }
     } else {
-        return "ERROR::GROUPID_DOES_NOT_EXIST";
+        return { status: 500, error: `Group with id ${groupId} does not exist` };
     }
 };
 const updateGroup = db.prepare(
@@ -407,6 +406,39 @@ const updateGroup = db.prepare(
     SET name = @name,
         updatedAt = @updatedAt
     WHERE id = @id`
+);
+
+// Allows creating of a new group.
+//
+// Will return the new group's ID, or if one with the same
+// `id` already exists, will just return the ID.
+//
+createGroupFunc = (id, name) => {
+    var d1 = dateAsUnixTimestamp();
+
+    // Check to see if it already exists,
+    // return early.
+    var current = getGroupById.get(id);
+    if (current && current.id !== undefined) {
+        return id;
+    }
+
+    const newGroup = {
+        id: id,
+        name: name,
+        createdAt: d1,
+        updatedAt: d1
+    };
+
+    if (insertGroup.run(newGroup).changes === 1) {
+        return { status: 200, group: newGroup };
+    }
+    // else
+    return { status: 500, error: `The server was unable to create a new group` };
+};
+const insertGroup = db.prepare(
+    `INSERT INTO Groups(id,name,createdAt,updatedAt)
+    VALUES (@id,@name,@createdAt,@updatedAt)`
 );
 
 // Logs data for a sensors with sensorId `id`
@@ -432,3 +464,28 @@ const insertLogEntry = db.prepare(
     `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
     VALUES (@value,@timestamp,@SensorId,@createdAt)`
 );
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+module.exports.getAllSettings = () => {
+    return getSettings.all();
+};
+const getSettings = db.prepare(`SELECT * FROM Settings`);
+
+module.exports.getSpecificSetting = name => {
+    var res = getSettingByName.get(name);
+    if (res) {
+        return { status: 200, value: res.value };
+    }
+    return { status: 400, error: `Setting with name ${name} does not exist` };
+};
+const getSettingByName = db.prepare(`SELECT * FROM Settings WHERE key = ?`);

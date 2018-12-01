@@ -24,7 +24,8 @@ Dashboard:
     - Remove
     - Add/Remove from groups ✅
 - Manage Groups
-    - Rename
+    - Create ✅
+    - Rename ✅
     - Delete
 
 Library:

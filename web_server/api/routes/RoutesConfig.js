@@ -8,5 +8,6 @@ router.get("/", (req, res) => {
 
 router.use("/sensors", require("./SensorController"));
 router.use("/groups", require("./GroupController"));
+router.use("/settings", require("./SettingsController"));
 
 module.exports = router;
