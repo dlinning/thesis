@@ -13,6 +13,20 @@ class SensorList extends React.Component {
             });
     }
 
+    openSensorLogModal(sensorId) {
+        console.log(sensorId);
+        jsonFetch("/api/sensors/logs/" + sensorId)
+            .then(resp => {
+                messenger.notify("OpenModal", {
+                    title: `Logs For Sensor: ${sensorId.substr(0, 7)}...`,
+                    content: <LogList entries={resp} />
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
     render() {
         let sensors = this.props.sensors;
         if (sensors === undefined) {
@@ -35,7 +49,7 @@ class SensorList extends React.Component {
                                     <div className="sl-dt">{sensor.meta.dataType}</div>
                                 </div>
                             </div>
-                            <div className="sl-logcount">
+                            <div className="sl-logcount clickable" onClick={() => this.openSensorLogModal(sensor.meta.id)}>
                                 <span className="label">Logs: </span>
                                 <span>{sensor.logs ? sensor.logs.count : 0}</span>
                             </div>

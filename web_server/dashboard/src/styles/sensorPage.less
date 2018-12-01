@@ -32,6 +32,21 @@
     }
     .sl-logcount {
         width: 20%;
+        position: relative;
+
+        &::after {
+            content: "Click to view logs";
+            position: absolute;
+            bottom: -0.25rem;
+            left: 0;
+            font-size: 0.6rem;
+            transform:scaleY(0);
+            transform-origin: top left;
+            transition: transform 150ms 500ms @stopToStopEase;
+        }
+        &:hover::after{
+            transform:scaleY(1);
+        }
     }
     .sl-gc {
         width: 10%;

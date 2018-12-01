@@ -44,14 +44,11 @@ class SensorTile extends React.Component {
     }
 
     loadLogEntries() {
-        fetch("/api/sensors/logs/" + this.props.sensor.meta.id)
-            .then(res => {
-                return res.json();
-            })
-            .then(asJson => {
+        jsonFetch("/api/sensors/logs/" + this.props.sensor.meta.id)
+            .then(resp => {
                 messenger.notify("OpenModal", {
-                    title: `Logs For Sensor: ${this.props.sensor.meta.id.substr(0, 7)}`,
-                    content: <LogList entries={asJson} />
+                    title: `Logs For Sensor: ${this.props.sensor.meta.id.substr(0, 7)}...`,
+                    content: <LogList entries={resp} />
                 });
             })
             .catch(err => {
