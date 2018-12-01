@@ -5,7 +5,7 @@ Server:
     - Register / Connect ✅
     - Rename ✅
     - Remove
-    - Add/Remove from groups
+    - Add/Remove from groups ✅
 - Retrieve data
     - List all sensors ✅
         - Readings for specific sensors
@@ -21,9 +21,8 @@ Dashboard:
         - Visualize specific logs (table only, no charts)
 - Manage Sensors
     - Rename ✅
-    - Mange groups
     - Remove
-    - Add/Remove from groups
+    - Add/Remove from groups ✅
 - Manage Groups
     - Rename
     - Delete

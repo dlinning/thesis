@@ -9,6 +9,7 @@ var DBHelper = require("../../../common/helpers/new_dbhelper");
 //
 // Below will cache output for 30 seconds
 //router.get("/list/:page?/:limit?", cache(30), (req, res) => {
+//
 router.get("/list/:page?/:limit?", (req, res) => {
     res.status(200).send(DBHelper.logsAndGroupsForAllSensors());
 });
@@ -24,6 +25,19 @@ router.post("/addToGroup", (req, res) => {
     }
 
     var dbResp = DBHelper.addSensorToGroup(body.sensorID, body.groupID);
+
+    res.status(dbResp.status).send(dbResp);
+});
+
+// Reverse of above
+router.post("/removeFromGroup", (req, res) => {
+    let body = req.body;
+
+    if (body.sensorID == undefined || body.groupID == undefined) {
+        res.status(400).send({ error: "Must send both sensorID and groupID fields." });
+    }
+
+    var dbResp = DBHelper.removeSensorFromGroup(body.sensorID, body.groupID);
 
     res.status(dbResp.status).send(dbResp);
 });

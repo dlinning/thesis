@@ -184,11 +184,7 @@ module.exports.logsAndGroupsForSensorId = sensorId => {
     return data;
 };
 const getGroupsforSensor = db.prepare(
-    `SELECT Groups.id as id, Groups.name as name, Sensors.id as SensorId
-    FROM Sensors
-    LEFT JOIN SensorGroups ON SensorGroups.SensorId = Sensors.id
-    LEFT JOIN Groups ON Groups.id = SensorGroups.GroupId
-    WHERE Sensors.id = ?`
+    `SELECT g.id, g.name FROM Sensors as s INNER JOIN SensorGroups as sg ON s.id = sg.SensorId INNER JOIN Groups as g ON g.id = sg.GroupId WHERE s.id = ?`
 );
 const getMetadataForSensor = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensor = db.prepare(
@@ -287,10 +283,9 @@ const updateSensor = db.prepare(
     WHERE id = @id`
 );
 
-// Allows updating of a sensor's `name` and `dataType` columns.
+// For adding a sensor to a given group.
 //
-// Will return an error (as a string) if the `sensorId` does
-// not exist, or a 1 if the changes were a success.
+// If successful, will return all groups for the given sensor.
 //
 module.exports.addSensorToGroup = (sensorId, groupId) => {
     var now = dateAsUnixTimestamp();
@@ -313,14 +308,34 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
 };
 const addSensorToGroup = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
 
+// For removing a sensor from a given group.
+//
+// If successful, will return all groups for the given sensor.
+//
+module.exports.removeSensorFromGroup = (sensorId, groupId) => {
+    if (checkExists([{ table: "Sensors", id: sensorId }, { table: "Groups", id: groupId }])) {
+        var link = {
+            SensorId: sensorId,
+            GroupId: groupId
+        };
+        if (removeSensorFromGroup.run(link).changes === 1) {
+            // Link was removed
+            return { status: 200, groups: getGroupsforSensor.all(sensorId) };
+        } else {
+            return { status: 500, error: "Error removing sensor from group in DB" };
+        }
+    } else {
+        return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
+    }
+};
+const removeSensorFromGroup = db.prepare(`DELETE FROM SensorGroups WHERE SensorId = @SensorId AND GroupId = @GroupId`);
+
 module.exports.getSensorMeta = sensorId => {
     var res = getMetadataForSensor.get(sensorId);
 
     var groups = getGroupsforSensor.all(sensorId);
 
-    // Set `.groups` to an empty array if
-    // sensor is not in any groups.
-    res.groups = groups[0].name === null ? [] : groups;
+    res.groups = groups;
 
     return res;
 };

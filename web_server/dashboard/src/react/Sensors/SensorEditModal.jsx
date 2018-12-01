@@ -73,13 +73,6 @@ class SensorEditModal extends React.Component {
             });
     }
 
-    removeFromGroup(e) {
-        console.log(e.target);
-        console.log(`Removing from ${e.target.datset.groupId}`);
-
-        e.preventDefault();
-    }
-
     addToGroup(evt) {
         evt.preventDefault();
 
@@ -90,22 +83,38 @@ class SensorEditModal extends React.Component {
             groupID: data.get("groupId")
         };
 
-        fetch(`/api/sensors/addToGroup`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(response => {
-                return response.json();
-            })
-            .then(asJson => {
+        jsonFetch("/api/sensors/addToGroup", "POST", payload)
+            .then(resp => {
                 messenger.notify("SensorGroupsUpdated", {
                     id: payload.sensorID,
-                    groups: asJson.groups
+                    groups: resp.groups
                 });
-                this.updateGroups(asJson.groups);
+                this.updateGroups(resp.groups);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
+    removeFromGroup(groupId, evt) {
+
+        evt.preventDefault();
+
+        var payload = {
+            sensorID: this.props.data.sensorId,
+            groupID: groupId
+        };
+
+        jsonFetch("/api/sensors/removeFromGroup", "POST", payload)
+            .then(resp => {
+                messenger.notify("SensorGroupsUpdated", {
+                    id: payload.sensorID,
+                    groups: resp.groups
+                });
+                this.updateGroups(resp.groups);
+            })
+            .catch(err => {
+                console.error(err);
             });
     }
 
@@ -156,7 +165,7 @@ class SensorEditModal extends React.Component {
                             return (
                                 <div className="editSensorModal-g" key={idx}>
                                     <span className="name">{g.name}</span>
-                                    <button className="small overlay danger" data-group-id={g.id} onClick={this.removeFromGroup}>
+                                    <button className="small overlay danger" onClick={this.removeFromGroup.bind(this, g.id)}>
                                         <i className="fas fa-trash-alt" />
                                         <span>Remove</span>
                                     </button>
