@@ -19,32 +19,32 @@ process.on("exit", () => db.close());
 // Will build the tables of the database
 // if they do not exist.
 //
-const createSensors = db.prepare(
+const createSensorsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "Sensors" ( "id" UUID, "name" TEXT NOT NULL, "dataType" TEXT NOT NULL, "createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL, PRIMARY KEY("id") )`
 );
-const createGroups = db.prepare(
+const createGroupsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "Groups" ("id" UUID PRIMARY KEY, "name" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL)`
 );
-const createLogEntries = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "LogEntries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "timestamp" DATETIME NOT NULL, "value" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "SensorId" UUID REFERENCES "Sensors" ("id") ON DELETE SET NULL ON UPDATE CASCADE)`
+const createLogEntriesStmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS "LogEntries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "timestamp" DATETIME NOT NULL, "value" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "SensorId" UUID REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`
 );
-const createSensorsGroups = db.prepare(
+const createSensorsGroupsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
-const createSettings = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
-const createViews = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ("id" TEXT NOT NULL, "name" INTEGER, PRIMARY KEY("id") )`);
-const createViewTiles = db.prepare(
+const createSettingsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
+const createViewsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ("id" TEXT NOT NULL, "name" INTEGER, PRIMARY KEY("id") )`);
+const createViewTilesStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "ViewTiles" ( "id" TEXT NOT NULL, "apiCall" TEXT NOT NULL, "chartType" TEXT NOT NULL, "viewId" INTEGER NOT NULL, PRIMARY KEY("id") )`
 );
 
 const setupTransaction = db.transaction(() => {
-    createSensors.run();
-    createGroups.run();
-    createLogEntries.run();
-    createSensorsGroups.run();
-    createSettings.run();
-    createViews.run();
-    createViewTiles.run();
+    createSensorsStmt.run();
+    createGroupsStmt.run();
+    createLogEntriesStmt.run();
+    createSensorsGroupsStmt.run();
+    createSettingsStmt.run();
+    createViewsStmt.run();
+    createViewTilesStmt.run();
 });
 setupTransaction();
 
@@ -150,17 +150,17 @@ module.exports.findAndCountPaginated = (table, columns, where = [], page = 0, li
 // in an object keyed by each sensor's ID.
 //
 module.exports.logCountAndGroupsForAllSensors = () => {
-    var res = groupBy(getLogCountsForSensors.all(), "SensorId", "logs", {}, true, true, true);
+    var res = groupBy(getLogCountsForSensorsStmt.all(), "SensorId", "logs", {}, true, true, true);
 
-    groupBy(getAllSensorsMetadata.all(), "id", "meta", res, true, false, true);
+    groupBy(getAllSensorsMetadataStmt.all(), "id", "meta", res, true, false, true);
 
-    groupBy(getSensorsForGroups.all(), "SensorId", "groups", res);
+    groupBy(getSensorsForGroupsStmt.all(), "SensorId", "groups", res);
 
     return res;
 };
-const getAllSensorsMetadata = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
-const getLogCountsForSensors = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
-const getSensorsForGroups = db.prepare(
+const getAllSensorsMetadataStmt = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
+const getLogCountsForSensorsStmt = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
+const getSensorsForGroupsStmt = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
     FROM Sensors
     LEFT JOIN SensorGroups ON SensorGroups.SensorId = Sensors.id
@@ -172,8 +172,8 @@ const getSensorsForGroups = db.prepare(
 // payload, when all data is not needed.
 //
 module.exports.groupsForAllSensors = () => {
-    var data = listAllSensorsGroups.all();
-    groupBy(getSensorsForGroups.all(), "GroupId", "sensors", true, data);
+    var data = listAllSensorsGroupsStmt.all();
+    groupBy(getSensorsForGroupsStmt.all(), "GroupId", "sensors", true, data);
     return data;
 };
 
@@ -181,15 +181,15 @@ module.exports.groupsForAllSensors = () => {
 // for the specific sensor.
 //
 module.exports.logsAndGroupsForSensorId = sensorId => {
-    var data = groupBy(getGroupsforSensor.all(sensorId), "SensorId", "groups", true);
-    groupBy(getLogsForSensor.all(sensorId), "SensorId", "logs", true, data);
+    var data = groupBy(getGroupsforSensorStmt.all(sensorId), "SensorId", "groups", true);
+    groupBy(getLogsForSensorStmt.all(sensorId), "SensorId", "logs", true, data);
     return data;
 };
-const getGroupsforSensor = db.prepare(
+const getGroupsforSensorStmt = db.prepare(
     `SELECT g.id, g.name FROM Sensors as s INNER JOIN SensorGroups as sg ON s.id = sg.SensorId INNER JOIN Groups as g ON g.id = sg.GroupId WHERE s.id = ? ORDER BY g.createdAt`
 );
-const getMetadataForSensor = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
-const getLogsForSensor = db.prepare(
+const getMetadataForSensorStmt = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
+const getLogsForSensorStmt = db.prepare(
     `SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries
     WHERE SensorId = ?`
 );
@@ -199,7 +199,7 @@ const getLogsForSensor = db.prepare(
 // sensor with ID `sensorID` belongs to.
 //
 module.exports.getGroupsForSensor = sensorId => {
-    return getGroupsforSensor.all(sensorId);
+    return getGroupsforSensorStmt.all(sensorId);
 };
 
 // Simple wrapper around `getLogsForSensor` query above.
@@ -207,7 +207,7 @@ module.exports.getGroupsForSensor = sensorId => {
 // with ID `sensorId`
 //
 module.exports.getLogsForSensor = sensorId => {
-    return getLogsForSensor.all(sensorId);
+    return getLogsForSensorStmt.all(sensorId);
 };
 
 // Creates a new Sensor with the given `name` (or "New Sensor")
@@ -222,7 +222,7 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
 
     // Check to see if it already exists,
     // return early.
-    var current = getSensorById.get(id);
+    var current = getSensorByIdStmt.get(id);
     if (current && current.id !== undefined) {
         return id;
     }
@@ -240,15 +240,15 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
         updatedAt: d1
     };
 
-    if (insertSensor.run(newSensor).changes === 1) {
+    if (insertSensorStmt.run(newSensor).changes === 1) {
         return newSensor.id;
     }
 };
-const insertSensor = db.prepare(
+const insertSensorStmt = db.prepare(
     `INSERT INTO Sensors(id,name,dataType,createdAt,updatedAt)
     VALUES (@id,@name,@dataType,@createdAt,@updatedAt)`
 );
-const getSensorById = db.prepare("SELECT * FROM Sensors WHERE id = ?");
+const getSensorByIdStmt = db.prepare("SELECT * FROM Sensors WHERE id = ?");
 
 // Allows updating of a sensor's `name` and `dataType` columns.
 //
@@ -258,7 +258,7 @@ const getSensorById = db.prepare("SELECT * FROM Sensors WHERE id = ?");
 module.exports.updateSensor = (sensorId, name, dataType) => {
     var d1 = dateAsUnixTimestamp();
 
-    var currentSensor = getSensorById.get(sensorId);
+    var currentSensor = getSensorByIdStmt.get(sensorId);
     if (currentSensor !== undefined) {
         currentSensor.name = name || currentSensor.name;
         currentSensor.dataType = dataType || currentSensor.dataType;
@@ -267,7 +267,7 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
         currentSensor.updatedAt = d1;
 
         // Will return a high-level `sensor` entry if the change was a success.
-        if (updateSensor.run(currentSensor).changes === 1) {
+        if (updateSensorStmt.run(currentSensor).changes === 1) {
             return { status: 200, meta: currentSensor };
         } else {
             return { status: 500, error: "Error updating sensor in DB" };
@@ -276,7 +276,7 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
         return "ERROR::SENSORID_DOES_NOT_EXIST";
     }
 };
-const updateSensor = db.prepare(
+const updateSensorStmt = db.prepare(
     `UPDATE Sensors
     SET dataType = @dataType,
         name = @name,
@@ -297,9 +297,9 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
             GroupId: groupId,
             createdAt: now
         };
-        if (addSensorToGroup.run(newLink).changes === 1) {
+        if (addSensorToGroupStmt.run(newLink).changes === 1) {
             // Link was created
-            return { status: 200, groups: getGroupsforSensor.all(sensorId) };
+            return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
         } else {
             return { status: 500, error: "Error adding sensor to group in DB" };
         }
@@ -307,7 +307,7 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
         return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
     }
 };
-const addSensorToGroup = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
+const addSensorToGroupStmt = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
 
 // For removing a sensor from a given group.
 //
@@ -319,9 +319,9 @@ module.exports.removeSensorFromGroup = (sensorId, groupId) => {
             SensorId: sensorId,
             GroupId: groupId
         };
-        if (removeSensorFromGroup.run(link).changes === 1) {
+        if (removeSensorFromGroupStmt.run(link).changes === 1) {
             // Link was removed
-            return { status: 200, groups: getGroupsforSensor.all(sensorId) };
+            return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
         } else {
             return { status: 500, error: "Error removing sensor from group in DB" };
         }
@@ -329,18 +329,46 @@ module.exports.removeSensorFromGroup = (sensorId, groupId) => {
         return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
     }
 };
-const removeSensorFromGroup = db.prepare(`DELETE FROM SensorGroups WHERE SensorId = @SensorId AND GroupId = @GroupId`);
+const removeSensorFromGroupStmt = db.prepare(`DELETE FROM SensorGroups WHERE SensorId = @SensorId AND GroupId = @GroupId`);
 
 module.exports.getSensorMeta = sensorId => {
-    var res = getMetadataForSensor.get(sensorId);
+    var res = getMetadataForSensorStmt.get(sensorId);
 
-    var groups = getGroupsforSensor.all(sensorId);
+    var groups = getGroupsforSensorStmt.all(sensorId);
 
     res.groups = groups;
 
     return res;
 };
 
+// For Deleting a sensor from the database
+//
+// If successful, will return all groups for the given sensor.
+//
+module.exports.deleteSensor = (sensorId, deleteWithLogs = false) => {
+    var currentSensor = getSensorByIdStmt.get(sensorId);
+
+    if (currentSensor !== undefined) {
+        currentSensor.hasLogs = getLogsForSensorStmt.get(sensorId) !== undefined;
+
+        if (currentSensor.hasLogs === true && deleteWithLogs === false) {
+            // Will NOT delete the sensor if it has logs
+            // and`deleteWithLogs` is false
+            return { status: 200, sensor: currentSensor };
+        } else {
+            // Either it has no logs, or `deleteWithLogs` is true
+            // so delete the sensor
+            deleteSensorStmt.run(sensorId);
+            // The sensor should now be `undefined`,
+            // meaning the delte was a success
+            currentSensor = getSensorByIdStmt.get(sensorId);
+            return { status: 200, sensor: currentSensor };
+        }
+    } else {
+        return { status: 400, erorr: "SENSOR DOES NOT EXIST" };
+    }
+};
+const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
 //
 //
 //
@@ -356,9 +384,9 @@ module.exports.getSensorMeta = sensorId => {
 //
 //
 module.exports.listAllGroups = () => {
-    return listAllGroups.all();
+    return listAllGroupsStmt.all();
 };
-const listAllGroups = db.prepare(`SELECT  g.id, g.name, g.updatedAt, count(sg.SensorId) as sensorCount
+const listAllGroupsStmt = db.prepare(`SELECT  g.id, g.name, g.updatedAt, count(sg.SensorId) as sensorCount
 FROM Groups as g
 LEFT JOIN SensorGroups as sg
 ON g.id = sg.GroupId
@@ -368,14 +396,14 @@ ORDER BY g.createdAt`);
 // "Helper" for both `createGroupFunc` and `updateGroupFunc`, so there
 // is only one entry point necessary for both
 module.exports.createOrUpdateGroup = (groupId = newUUID(), name) => {
-    if (getGroupById.get(groupId)) {
+    if (getGroupByIdStmt.get(groupId)) {
         // Group exists, update name;
         return updateGroupFunc(groupId, name);
     } else {
         return createGroupFunc(groupId, name);
     }
 };
-const getGroupById = db.prepare("SELECT * FROM Groups WHERE id = ?");
+const getGroupByIdStmt = db.prepare("SELECT * FROM Groups WHERE id = ?");
 
 // Allows updating of a groups's `name`.
 //
@@ -385,14 +413,14 @@ const getGroupById = db.prepare("SELECT * FROM Groups WHERE id = ?");
 updateGroupFunc = (groupId, name) => {
     var d1 = dateAsUnixTimestamp();
 
-    var currentGroup = getGroupById.get(groupId);
+    var currentGroup = getGroupByIdStmt.get(groupId);
     if (currentGroup !== undefined) {
         currentGroup.name = name || currentGroup.name;
 
         // Change `updatedAt` always.
         currentGroup.updatedAt = d1;
 
-        if (updateGroup.run(currentGroup).changes === 1) {
+        if (updateGroupStmt.run(currentGroup).changes === 1) {
             return { status: 200, group: currentGroup };
         } else {
             return { status: 500, error: `The server was unable to rename the group in the database` };
@@ -401,7 +429,7 @@ updateGroupFunc = (groupId, name) => {
         return { status: 500, error: `Group with id ${groupId} does not exist` };
     }
 };
-const updateGroup = db.prepare(
+const updateGroupStmt = db.prepare(
     `UPDATE Groups
     SET name = @name,
         updatedAt = @updatedAt
@@ -418,7 +446,7 @@ createGroupFunc = (id, name) => {
 
     // Check to see if it already exists,
     // return early.
-    var current = getGroupById.get(id);
+    var current = getGroupByIdStmt.get(id);
     if (current && current.id !== undefined) {
         return id;
     }
@@ -430,13 +458,13 @@ createGroupFunc = (id, name) => {
         updatedAt: d1
     };
 
-    if (insertGroup.run(newGroup).changes === 1) {
+    if (insertGroupStmt.run(newGroup).changes === 1) {
         return { status: 200, group: newGroup };
     }
     // else
     return { status: 500, error: `The server was unable to create a new group` };
 };
-const insertGroup = db.prepare(
+const insertGroupStmt = db.prepare(
     `INSERT INTO Groups(id,name,createdAt,updatedAt)
     VALUES (@id,@name,@createdAt,@updatedAt)`
 );
@@ -458,9 +486,9 @@ module.exports.logData = (value, sensorUUID, timestamp) => {
         createdAt: currentTime
     };
     // Will return 1 if the change was a success.
-    return insertLogEntry.run(logEntry).changes;
+    return insertLogEntryStmt.run(logEntry).changes;
 };
-const insertLogEntry = db.prepare(
+const insertLogEntryStmt = db.prepare(
     `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
     VALUES (@value,@timestamp,@SensorId,@createdAt)`
 );
@@ -477,15 +505,15 @@ const insertLogEntry = db.prepare(
 //
 
 module.exports.getAllSettings = () => {
-    return getSettings.all();
+    return getSettingsStmt.all();
 };
-const getSettings = db.prepare(`SELECT * FROM Settings`);
+const getSettingsStmt = db.prepare(`SELECT * FROM Settings`);
 
 module.exports.getSpecificSetting = name => {
-    var res = getSettingByName.get(name);
+    var res = getSettingByNameStmt.get(name);
     if (res) {
         return { status: 200, value: res.value };
     }
     return { status: 400, error: `Setting with name ${name} does not exist` };
 };
-const getSettingByName = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
+const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);

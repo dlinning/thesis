@@ -27,6 +27,28 @@ class SensorList extends React.Component {
             });
     }
 
+    removeSensor(sensorId, deleteWithLogs = undefined) {
+        jsonFetch(`/api/sensors/delete/${sensorId}/${deleteWithLogs ? deleteWithLogs : ""}`, null, "DELETE")
+            .then(resp => {
+                if (resp.sensor && resp.sensor.hasLogs) {
+                    // Verify the user wants to remove a sensor that has logged data
+                    var r = confirm(`Are you sure you want to delete sensor with ID:\n${sensorId}\nas it has logged data?\nNOTE: This will also delete the logged data.`);
+                    if (r == true) {
+                        // Force the remove
+                        this.removeSensor(sensorId, true);
+                    }
+                } else {
+                    // Sensor was removed, either by previous prompt
+                    // or it never had logs in the first place
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
+    //
+
     render() {
         let sensors = this.props.sensors;
         if (sensors === undefined) {
@@ -62,7 +84,7 @@ class SensorList extends React.Component {
                                     <i className="fas fa-cog" />
                                     <span>Manage</span>
                                 </button>
-                                <button className="small overlay danger">
+                                <button className="small overlay danger" onClick={() => this.removeSensor(sensor.meta.id)}>
                                     <i className="fas fa-trash-alt" />
                                     <span>Remove</span>
                                 </button>

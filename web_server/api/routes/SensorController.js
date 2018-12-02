@@ -61,6 +61,20 @@ router.post("/modify", (req, res) => {
     }
 });
 
+// Allows deletion of a sensor
+//
+router.delete("/delete/:id/:deleteWithLogs?", (req, res) => {
+    let p = req.params;
+
+    var dbResp = DBHelper.deleteSensor(p.id, p.deleteWithLogs);
+    if (dbResp) {
+        res.status(dbResp.status).send(dbResp);
+        return;
+    } else {
+        res.status(500).send("ERROR DELETING SENSOR");
+    }
+});
+
 router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) => {
     let p = req.params;
 

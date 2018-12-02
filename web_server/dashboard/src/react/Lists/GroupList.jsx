@@ -1,4 +1,7 @@
 class GroupList extends React.Component {
+
+    // TODO: Removing groups
+
     render() {
         let groups = this.props.groups;
         if (groups === undefined || groups.length === 0) {
