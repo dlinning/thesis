@@ -4,7 +4,7 @@ Server:
 - Manage sensors
     - Register / Connect ✅
     - Rename ✅
-    - Remove
+    - Remove ✅
     - Add/Remove from groups ✅
 - Retrieve data
     - List all sensors ✅
@@ -21,12 +21,12 @@ Dashboard:
         - Visualize specific logs (table only, no charts)
 - Manage Sensors
     - Rename ✅
-    - Remove
+    - Remove ✅
     - Add/Remove from groups ✅
 - Manage Groups
     - Create ✅
     - Rename ✅
-    - Delete
+    - Delete ✅
 
 Library:
 - Python

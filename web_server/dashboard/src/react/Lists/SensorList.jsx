@@ -27,8 +27,8 @@ class SensorList extends React.Component {
             });
     }
 
-    removeSensor(sensorId, deleteWithLogs = undefined) {
-        jsonFetch(`/api/sensors/delete/${sensorId}/${deleteWithLogs ? deleteWithLogs : ""}`, null, "DELETE")
+    removeSensor(sensorId, deleteWithLogs = "") {
+        jsonFetch(`/api/sensors/delete/${sensorId}/${deleteWithLogs}`, null, "DELETE")
             .then(resp => {
                 if (resp.sensor && resp.sensor.hasLogs) {
                     // Verify the user wants to remove a sensor that has logged data
@@ -40,6 +40,7 @@ class SensorList extends React.Component {
                 } else {
                     // Sensor was removed, either by previous prompt
                     // or it never had logs in the first place
+                    this.props.sensorRemoveCallback();
                 }
             })
             .catch(err => {

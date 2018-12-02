@@ -17,6 +17,20 @@ router.post("/createorupdate", (req, res) => {
     }
 });
 
+// Allows deletion of a group
+//
+router.delete("/delete/:id/:deleteWithSensors?", (req, res) => {
+    let p = req.params;
+
+    var dbResp = DBHelper.deleteGroup(p.id, p.deleteWithSensors);
+    if (dbResp) {
+        res.status(dbResp.status).send(dbResp);
+        return;
+    } else {
+        res.status(500).send("ERROR DELETING GROUP");
+    }
+});
+
 // Will return a paginated list of Groups
 // (UUID, Name).
 // By default, will get the first page.

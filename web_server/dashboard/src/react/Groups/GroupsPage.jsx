@@ -24,7 +24,7 @@ class GroupsPage extends React.Component {
             <>
                 <h1>Manage Groups</h1>
                 <GroupAddForm groupAddCallback={this.updateGroups.bind(this)} />
-                <GroupList groups={s.groups} />
+                <GroupList groups={s.groups} groupRemoveCallback={this.updateGroups.bind(this)}/>
             </>
         );
     }

@@ -33,6 +33,10 @@ class SensorsPage extends React.Component {
     }
 
     componentDidMount() {
+        this.updateSensors();
+    }
+
+    updateSensors() {
         Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list")])
             .then(res => {
                 this.setState({ sensors: res[0], allGroups: res[1] });
@@ -47,7 +51,7 @@ class SensorsPage extends React.Component {
         return (
             <>
                 <h1>Manage Sensors</h1>
-                <SensorList sensors={s.sensors} allGroups={s.allGroups} />
+                <SensorList sensors={s.sensors} allGroups={s.allGroups} sensorRemoveCallback={this.updateSensors.bind(this)} />
             </>
         );
     }

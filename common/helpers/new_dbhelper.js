@@ -166,6 +166,11 @@ const getSensorsForGroupsStmt = db.prepare(
     LEFT JOIN SensorGroups ON SensorGroups.SensorId = Sensors.id
     LEFT JOIN Groups ON Groups.id = SensorGroups.GroupId`
 );
+const getSensorCountForGroupStmt = db.prepare(
+    `SELECT count(SensorId) as count 
+    FROM SensorGroups
+    WHERE GroupId = ?`
+);
 
 // Simple wrapper around `getSensorsForGroups` query above.
 // Split off as `getLogsForSensors` may result in a large
@@ -365,7 +370,7 @@ module.exports.deleteSensor = (sensorId, deleteWithLogs = false) => {
             return { status: 200, sensor: currentSensor };
         }
     } else {
-        return { status: 400, erorr: "SENSOR DOES NOT EXIST" };
+        return { status: 400, error: "SENSOR DOES NOT EXIST" };
     }
 };
 const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
@@ -469,29 +474,33 @@ const insertGroupStmt = db.prepare(
     VALUES (@id,@name,@createdAt,@updatedAt)`
 );
 
-// Logs data for a sensors with sensorId `id`
+// For Deleting a sensor from the database
 //
-module.exports.logData = (value, sensorUUID, timestamp) => {
-    if (timestamp === undefined && config.allowEmptyTimestamp === false) {
-        console.error(
-            `Timestamp was not provided for LogEntry when required by the server.\n\nNot logging: {value: ${value}, sensorUUID: ${sensorUUID}}`
-        );
-        return;
+// If successful, will return all groups for the given sensor.
+//
+module.exports.deleteGroup = (groupId, deleteWithSensors = false) => {
+    var group = getGroupByIdStmt.get(groupId);
+
+    if (group !== undefined) {
+        group.hasSensors = getSensorCountForGroupStmt.get(groupId).count > 0 ;
+        if (group.hasSensors === true && deleteWithSensors === false) {
+            // Will NOT delete the group if it has sensors in it
+            // and`deleteWithSensors` is false
+            return { status: 200, group: group };
+        } else {
+            // Either it has no sensors, or `deleteWithSensors` is true
+            // so delete the group
+            deleteGroupStmt.run(groupId);
+            // The sensor should now be `undefined`,
+            // meaning the delte was a success
+            group = getGroupByIdStmt.get(groupId);
+            return { status: 200, group: group };
+        }
+    } else {
+        return { status: 400, error: "GROUP DOES NOT EXIST" };
     }
-    const currentTime = dateAsUnixTimestamp();
-    const logEntry = {
-        value: value,
-        timestamp: timestamp || currentTime,
-        SensorId: sensorUUID,
-        createdAt: currentTime
-    };
-    // Will return 1 if the change was a success.
-    return insertLogEntryStmt.run(logEntry).changes;
 };
-const insertLogEntryStmt = db.prepare(
-    `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
-    VALUES (@value,@timestamp,@SensorId,@createdAt)`
-);
+const deleteGroupStmt = db.prepare(`DELETE FROM Groups WHERE id = ?`);
 
 //
 //
@@ -517,3 +526,38 @@ module.exports.getSpecificSetting = name => {
     return { status: 400, error: `Setting with name ${name} does not exist` };
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+// Logs data for a sensors with sensorId `id`
+//
+module.exports.logData = (value, sensorUUID, timestamp) => {
+    if (timestamp === undefined && config.allowEmptyTimestamp === false) {
+        console.error(
+            `Timestamp was not provided for LogEntry when required by the server.\n\nNot logging: {value: ${value}, sensorUUID: ${sensorUUID}}`
+        );
+        return;
+    }
+    const currentTime = dateAsUnixTimestamp();
+    const logEntry = {
+        value: value,
+        timestamp: timestamp || currentTime,
+        SensorId: sensorUUID,
+        createdAt: currentTime
+    };
+    // Will return 1 if the change was a success.
+    return insertLogEntryStmt.run(logEntry).changes;
+};
+const insertLogEntryStmt = db.prepare(
+    `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
+    VALUES (@value,@timestamp,@SensorId,@createdAt)`
+);

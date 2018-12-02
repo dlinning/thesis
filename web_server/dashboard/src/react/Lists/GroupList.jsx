@@ -1,6 +1,28 @@
 class GroupList extends React.Component {
+    removeGroup(groupId, deleteWithSensors = "") {
+        jsonFetch(`/api/groups/delete/${groupId}/${deleteWithSensors}`, null, "DELETE")
+            .then(resp => {
+                if (resp.group && resp.group.hasSensors) {
+                    // Verify the user wants to remove a sensor that has logged data
+                    var r = confirm(
+                        `Are you sure you want to delete group with ID:\n${groupId}\nas it has sensors assigned to it?\nThis will NOT delete the sensors, only remove them from this group.`
+                    );
+                    if (r == true) {
+                        // Force the remove
+                        this.removeGroup(groupId, true);
+                    }
+                } else {
+                    // Sensor was removed, either by previous prompt
+                    // or it never had logs in the first place
+                    this.props.groupRemoveCallback();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
 
-    // TODO: Removing groups
+    //
 
     render() {
         let groups = this.props.groups;
@@ -25,7 +47,7 @@ class GroupList extends React.Component {
                                         <span>{g.sensorCount || 0}</span>
                                     </div>
                                     <div className="g-controls flex-row">
-                                        <button className="small overlay danger">
+                                        <button className="small overlay danger" onClick={() => this.removeGroup(g.id)}>
                                             <i className="fas fa-trash-alt" />
                                             <span>Remove</span>
                                         </button>
