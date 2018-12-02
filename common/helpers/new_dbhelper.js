@@ -150,9 +150,9 @@ module.exports.findAndCountPaginated = (table, columns, where = [], page = 0, li
 // in an object keyed by each sensor's ID.
 //
 module.exports.logCountAndGroupsForAllSensors = () => {
-    var res = groupBy(getLogCountsForSensorsStmt.all(), "SensorId", "logs", {}, true, true, true);
+    var res = groupBy(getAllSensorsMetadataStmt.all(), "id", "meta", {}, true, false, true);
 
-    groupBy(getAllSensorsMetadataStmt.all(), "id", "meta", res, true, false, true);
+    groupBy(getLogCountsForSensorsStmt.all(), "SensorId", "logs", res, true, true, true);
 
     groupBy(getSensorsForGroupsStmt.all(), "SensorId", "groups", res);
 
