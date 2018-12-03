@@ -1,42 +1,40 @@
 class HomePage extends React.Component {
-	constructor(p) {
-		super(p);
+    constructor(p) {
+        super(p);
 
-		this.state = {};
-	}
+        this.state = {};
+    }
 
-	componentDidMount() {
-		fetch("/api/sensors/list")
-			.then(res => {
-				return res.json();
-			})
-			.then(asJson => {
-				this.setState({ sensors: asJson });
-			})
-			.catch(err => {
-				console.error(err);
-			});
-	}
+    componentDidMount() {
+        jsonFetch("/api/views/get/default")
+            .then(res => {
+                this.setState({ tiles: res.tiles });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
 
-	render() {
-		var s = this.state;
-		return (
-			<>
-				<h1>Home</h1>
-				<DashboardTiles>
-					{s.sensors &&
-						Object.keys(s.sensors).map((id, idx) => {
-							return (
-								<SensorTile
-									rowSpan={3}
-									colSpan={(idx + 2) % 3}
-									key={idx}
-									sensor={s.sensors[id]}
-								/>
-							);
-						})}
-				</DashboardTiles>
-			</>
-		);
-	}
+    render() {
+        var s = this.state;
+        return (
+            <>
+                <h1>Home</h1>
+                <DashboardTiles>
+                    {s.tiles &&
+                        s.tiles.map((t, idx) => {
+                            var style = {
+                                gridColumn: `${t.col} / span ${t.width}`,
+                                gridRow: `${t.row} / span ${t.height}`
+                            };
+                            return (
+                                <div className="tile" key={idx} style={style}>
+                                    {JSON.stringify(t)}
+                                </div>
+                            );
+                        })}
+                </DashboardTiles>
+            </>
+        );
+    }
 }

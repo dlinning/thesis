@@ -14,7 +14,7 @@ router.get("/get/:name?", (req, res) => {
     }
 });
 
-router.post("set/:name", (req, res) => {
+router.post("/set/:name", (req, res) => {
     var groupName = req.body.groupName;
 
     if (groupName && groupName.length > 0) {

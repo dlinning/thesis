@@ -32,17 +32,20 @@ const createSensorsGroupsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
 const createSettingsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
-const createViewsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ("id" TEXT NOT NULL, "name" INTEGER, PRIMARY KEY("id") )`);
+const createViewsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ( 'id' TEXT NOT NULL, 'name' TEXT NOT NULL, PRIMARY KEY('id') )`);
 const createViewTilesStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "ViewTiles" ( "id" TEXT NOT NULL, "apiCall" TEXT NOT NULL, "chartType" TEXT NOT NULL, "viewId" INTEGER NOT NULL, PRIMARY KEY("id") )`
+    `CREATE TABLE IF NOT EXISTS "ViewTiles" ( 'id' TEXT NOT NULL, 'title' TEXT, 'apiCall' TEXT NOT NULL, 'chartType' TEXT NOT NULL, 'row' INTEGER, 'col' INTEGER, 'width' INTEGER, 'height' INTEGER, 'viewId' TEXT NOT NULL, FOREIGN KEY('viewId') REFERENCES 'Views'('id') ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY('id') )`
 );
 
 const setupTransaction = db.transaction(() => {
     createSensorsStmt.run();
     createGroupsStmt.run();
-    createLogEntriesStmt.run();
+
     createSensorsGroupsStmt.run();
+    createLogEntriesStmt.run();
+
     createSettingsStmt.run();
+
     createViewsStmt.run();
     createViewTilesStmt.run();
 });
@@ -482,7 +485,7 @@ module.exports.deleteGroup = (groupId, deleteWithSensors = false) => {
     var group = getGroupByIdStmt.get(groupId);
 
     if (group !== undefined) {
-        group.hasSensors = getSensorCountForGroupStmt.get(groupId).count > 0 ;
+        group.hasSensors = getSensorCountForGroupStmt.get(groupId).count > 0;
         if (group.hasSensors === true && deleteWithSensors === false) {
             // Will NOT delete the group if it has sensors in it
             // and`deleteWithSensors` is false
@@ -526,6 +529,93 @@ module.exports.getSpecificSetting = name => {
     return { status: 400, error: `Setting with name ${name} does not exist` };
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+module.exports.listAllViews = () => {
+    return { status: 200, views: getViewsListStmt.all() };
+};
+const getViewsListStmt = db.prepare(`SELECT * FROM Views`);
+
+module.exports.getTilesForViewByName = name => {
+    var res = getTilesForViewByNameStmt.all(name);
+    if (res) {
+        return { status: 200, tiles: res || [] };
+    }
+    return { status: 400, error: `View with name ${name} does not exist` };
+};
+const getTilesForViewByNameStmt = db.prepare(`SELECT * FROM Views INNER JOIN ViewTiles ON ViewTiles.viewId = Views.id WHERE Views.name = ?`);
+
+module.exports.createView = name => {
+    if (getViewByNameStmt.get(name)) {
+        // Exists
+        return { status: 400, error: "VIEW ALREADY EXISTS WITH NAME " + name };
+    } else {
+        // Name does not exist
+        var newView = {
+            id: newUUID(),
+            name: name
+        };
+        if (createViewStmt.run(newView).changes === 1) {
+            return { status: 200, view: newView };
+        } else {
+            return { status: 500, error: "UNABLE TO CREATE NEW VIEW" };
+        }
+    }
+};
+const getViewByNameStmt = db.prepare(`SELECT * FROM Views WHERE name = ?`);
+const getViewByIdStmt = db.prepare(`SELECT * FROM Views WHERE id = ?`);
+const createViewStmt = db.prepare(`INSERT INTO Views(id,name) VALUES(@id,@name)`);
+module.exports.deleteViewById = id => {
+    var currentView = getViewByIdStmt.get(id);
+    if (currentView.name === "default") {
+        return { status: 400, error: "CANNOT DELETE 'default' VIEW" };
+    }
+
+    if (deleteViewByIdStmt.run(id).changes === 1) {
+        return { status: 200 };
+    } else {
+        return { status: 500, error: "UNABLE TO DELETE VIEW" };
+    }
+};
+const deleteViewByIdStmt = db.prepare(`DELETE FROM Views WHERE id = ?`);
+
+module.exports.createTile = (payload) => {
+    payload.id = newUUID();
+    payload.title = payload.title || "";
+    if (createTileStmt.run(payload).changes === 1) {
+        return { status: 200, tile: payload };
+    } else {
+        return { status: 500, error: "UNABLE TO CREATE TILE" };
+    }
+};
+const createTileStmt = db.prepare(
+    `INSERT INTO ViewTiles(id,title,apiCall,chartType,row,col,width,height,viewId) VALUES(@id,@title,@apiCall,@chartType,@row,@col,@width,@height,@viewId)`
+);
+const getTileByIdStmt = db.prepare(`SELECT * FROM ViewTiles WHERE id = ?`);
+
+module.exports.deleteTileById = (id) => {
+    var tile = getTileByIdStmt.get(id);
+    if (tile.name === "default") {
+        return { status: 400, error: "CANNOT DELETE 'default' VIEW" };
+    }
+
+    if (deleteTileByIdStmt.run(id).changes === 1) {
+        return { status: 200 };
+    } else {
+        return { status: 500, error: "UNABLE TO DELETE TILE" };
+    }
+};
+const deleteTileByIdStmt = db.prepare(`DELETE FROM ViewTiles WHERE id = ?`);
 
 //
 //
