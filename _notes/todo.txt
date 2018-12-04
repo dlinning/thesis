@@ -18,7 +18,7 @@ Dashboard:
     - Sensors ✅
     - Groups ✅
     - Logs
-        - Visualize specific logs (table only, no charts)
+        - Visualize specific logs (table only, no charts)  ✅ish
 - Manage Sensors
     - Rename ✅
     - Remove ✅
