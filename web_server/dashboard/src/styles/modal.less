@@ -1,70 +1,84 @@
 #modal-scrim {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-    opacity: 0;
-    pointer-events: none;
+	opacity: 0;
+	pointer-events: none;
 
-    transition: opacity 100ms 0ms @entranceEase;
-    background-color: fadeout(mix(@primaryColor, @bgColor, 5), 30);
+	transition: opacity 100ms 0ms @entranceEase;
+	background-color: fadeout(mix(@primaryColor, @bgColor, 5), 30);
 
-    &.open {
-        opacity: 1;
-        pointer-events: initial;
+	&.open {
+		opacity: 1;
+		pointer-events: initial;
 
-        #modal {
-            transition: transform 200ms 150ms @entranceEase, opacity 150ms 150ms @entranceEase;
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
+		#modal {
+			transition: transform 200ms 150ms @entranceEase,
+				opacity 150ms 150ms @entranceEase;
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
 }
 
 #modal {
-    min-width: 40vw;
-    max-width: 60vw;
+	min-width: 40vw;
+	max-width: 60vw;
 
-    background-color: @cardBg;
-    border: 2px solid darken(@bgColor, 10);
-    border-radius: 3px;
+	@media screen and(max-width:600px) {
+		position: absolute;
+		top: 2.5vh;
+		left: 2.5vw;
+		max-width: 95vw;
+		min-width: 95vw;
+	}
 
-    .md-3();
+	background-color: @cardBg;
+	border: 2px solid darken(@bgColor, 10);
+	border-radius: 3px;
 
-    transition: transform 150ms 0ms @exitEase, opacity 100ms 0ms @exitEase;
-    transform: scale(0.75);
-    opacity: 0;
+	.md-3();
 
-    .controls {
-        display: flex;
-        justify-content: flex-end;
-        padding: 0.5rem 1rem;
+	transition: transform 150ms 0ms @exitEase, opacity 100ms 0ms @exitEase;
+	transform: scale(0.75);
+	opacity: 0;
 
-        border-bottom: 1px solid @dividerColor;
+	.controls {
+		display: flex;
+		justify-content: flex-end;
+		padding: 0.5rem 1rem;
 
-        .title {
-            display: flex;
-            justify-self: flex-start;
-            width: 100%;
-            align-items: center;
+		border-bottom: 1px solid @dividerColor;
 
-            font-size: 1.2rem;
-        }
+		.title {
+			display: flex;
+			justify-self: flex-start;
+			width: 100%;
+			align-items: center;
 
-        button {
-            margin: 0;
-        }
-    }
+			font-size: 1.2rem;
+		}
+
+		button {
+			margin: 0;
+		}
+	}
 }
 
 #modal-content {
-    min-height: 40vh;
-    max-height: 60vh;
-    overflow-y: auto;
+	min-height: 40vh;
+	max-height: 70vh;
+	overflow-y: auto;
+
+	@media screen and (max-width: 600px) {
+		min-height: 80vh;
+		max-height: 80vh;
+	}
 }
