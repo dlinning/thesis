@@ -6,7 +6,14 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        jsonFetch("/api/views/get/default")
+        this.getCurrentView(this.props.currentView);
+    }
+    componentWillReceiveProps(newP) {
+        this.getCurrentView(newP.currentView);
+    }
+
+    getCurrentView(viewName) {
+        jsonFetch("/api/views/get/" + viewName)
             .then(res => {
                 this.setState({ tiles: res.tiles, error: null });
             })
@@ -20,11 +27,11 @@ class HomePage extends React.Component {
         var s = this.state;
         return (
             <>
-                <h1>Home</h1>
+                <h1>Home {this.props.currentView === "default" ? "" : " | " + this.props.currentView}</h1>
                 <ErrorCard error={s.error} />
-                <DashboardTiles>
-                    {s.tiles &&
-                        s.tiles.map((t, idx) => {
+                {s.tiles && s.tiles.length > 0 && (
+                    <DashboardTiles>
+                        {s.tiles.map((t, idx) => {
                             var style = {
                                 gridColumn: `${t.col} / span ${t.width}`,
                                 gridRow: `${t.row} / span ${t.height}`
@@ -35,8 +42,22 @@ class HomePage extends React.Component {
                                 </div>
                             );
                         })}
-                </DashboardTiles>
+                    </DashboardTiles>
+                )}
+                {s.tiles && s.tiles.length === 0 && <h3>There are currently no tiles for this view.</h3>}
+                <AddTileButton />
             </>
+        );
+    }
+}
+
+class AddTileButton extends React.Component {
+    render() {
+        return (
+            <button id="home-addTileButton" onClick={() => alert("Opening Add Tile Modal")}>
+                <i className="fas fa-plus" />
+                <span>New Tile</span>
+            </button>
         );
     }
 }

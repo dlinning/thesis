@@ -37,7 +37,7 @@ class DashboardNav extends React.Component {
                         return (
                             <li
                                 key={tab.name}
-                                className={this.props.current === tab.name ? "selected" : ""}
+                                className={this.props.currentPage === tab.name ? "selected" : ""}
                                 onClick={() => this.props.pageChangeFunc(tab.name)}
                             >
                                 <i className={"fas fa-" + tab.icon} />
