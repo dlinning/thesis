@@ -91,7 +91,7 @@ button {
         }
     }
 
-    i{
+    i {
         pointer-events: none;
     }
 
@@ -116,9 +116,13 @@ select {
         outline: none;
         border-bottom-color: @primaryColor;
     }
+
+    &[type="checkbox"] {
+        margin-bottom: 0;
+    }
 }
-option{
-    color:@bgColor;
+option {
+    color: @bgColor;
 }
 
 .table {
@@ -156,7 +160,14 @@ option{
     }
 }
 
-
-.clickable{
+.clickable {
     cursor: pointer;
+}
+
+.errorCard {
+    .cardBase();
+    background: @dangerColor;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
 }

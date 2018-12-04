@@ -8,9 +8,10 @@ class HomePage extends React.Component {
     componentDidMount() {
         jsonFetch("/api/views/get/default")
             .then(res => {
-                this.setState({ tiles: res.tiles });
+                this.setState({ tiles: res.tiles, error: null });
             })
             .catch(err => {
+                this.setState({ error: err });
                 console.error(err);
             });
     }
@@ -20,6 +21,7 @@ class HomePage extends React.Component {
         return (
             <>
                 <h1>Home</h1>
+                <ErrorCard error={s.error} />
                 <DashboardTiles>
                     {s.tiles &&
                         s.tiles.map((t, idx) => {

@@ -12,7 +12,7 @@ class SensorsPage extends React.Component {
                 for (var id in sensors) {
                     if (id === obj.id) {
                         sensors[id].meta = obj.new.meta;
-                        this.setState({ sensors: sensors });
+                        this.setState({ sensors: sensors, error: null });
                         break;
                     }
                 }
@@ -24,7 +24,7 @@ class SensorsPage extends React.Component {
                 for (var id in sensors) {
                     if (id === obj.id) {
                         sensors[id].groups = obj.groups;
-                        this.setState({ sensors: sensors });
+                        this.setState({ sensors: sensors, error: null });
                         break;
                     }
                 }
@@ -39,9 +39,10 @@ class SensorsPage extends React.Component {
     updateSensors() {
         Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list")])
             .then(res => {
-                this.setState({ sensors: res[0], allGroups: res[1] });
+                this.setState({ sensors: res[0], allGroups: res[1], error: null });
             })
             .catch(err => {
+                this.setState({ error: err });
                 console.error(err);
             });
     }
@@ -51,6 +52,7 @@ class SensorsPage extends React.Component {
         return (
             <>
                 <h1>Manage Sensors</h1>
+                <ErrorCard error={s.error} />
                 <SensorList sensors={s.sensors} allGroups={s.allGroups} sensorRemoveCallback={this.updateSensors.bind(this)} />
             </>
         );

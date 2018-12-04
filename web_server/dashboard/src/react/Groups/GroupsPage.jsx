@@ -11,9 +11,10 @@ class GroupsPage extends React.Component {
     updateGroups() {
         jsonFetch("/api/groups/list")
             .then(resp => {
-                this.setState({ groups: resp });
+                this.setState({ groups: resp, error: null });
             })
             .catch(err => {
+                this.setState({ error: err });
                 console.error(err);
             });
     }
@@ -24,7 +25,8 @@ class GroupsPage extends React.Component {
             <>
                 <h1>Manage Groups</h1>
                 <GroupAddForm groupAddCallback={this.updateGroups.bind(this)} />
-                <GroupList groups={s.groups} groupRemoveCallback={this.updateGroups.bind(this)}/>
+                <ErrorCard error={s.error} />
+                <GroupList groups={s.groups} groupRemoveCallback={this.updateGroups.bind(this)} />
             </>
         );
     }

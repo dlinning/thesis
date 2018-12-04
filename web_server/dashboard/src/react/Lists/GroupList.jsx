@@ -38,7 +38,20 @@ class GroupList extends React.Component {
                             let g = group;
                             return (
                                 <div className="g-tile flex-col" key={g.id}>
-                                    <GroupNameField name={g.name} id={g.id} />
+                                    <OnChangeInput
+                                        initialValue={g.name}
+                                        classes={["g-name"]}
+                                        callback={newValue => {
+                                            if (newValue.length > 0) {
+                                                // No .then(), since the change is already reflected client-side
+                                                jsonFetch("/api/groups/createorupdate", { groupName: newValue, uuid: g.id }, "POST").catch(
+                                                    err => {
+                                                        console.error(err);
+                                                    }
+                                                );
+                                            }
+                                        }}
+                                    />
                                     <div className="g-id" title={g.id}>
                                         ({g.id.substr(0, 7)}...)
                                     </div>
@@ -60,44 +73,5 @@ class GroupList extends React.Component {
                 {groups.length === 0 && <p>You have no groups currently created.</p>}
             </>
         );
-    }
-}
-
-class GroupNameField extends React.Component {
-    constructor(p) {
-        super(p);
-
-        this.initialName = p.name;
-
-        this.updateTimer = null;
-
-        this.state = {
-            name: p.name
-        };
-    }
-
-    updateGroupName(evt) {
-        var newName = evt.target.value || "";
-
-        this.setState({ name: newName });
-
-        // Make it so updates are only sent every 300ms,
-        // once the user has stopped updating.
-        clearTimeout(this.updateTimer);
-        this.updateTimer = setTimeout(() => {
-            if (newName.length > 0) {
-                jsonFetch("/api/groups/createorupdate", { groupName: newName, uuid: this.props.id }, "POST")
-                    .then(resp => {
-                        console.log(resp);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            }
-        }, 300);
-    }
-
-    render() {
-        return <input className="g-name" type="text" value={this.state.name} onChange={this.updateGroupName.bind(this)} />;
     }
 }

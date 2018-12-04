@@ -42,9 +42,10 @@
             font-size: 0.6rem;
             transform:scaleY(0);
             transform-origin: top left;
-            transition: transform 150ms 500ms @stopToStopEase;
+            transition: transform 150ms 0ms @stopToStopEase;
         }
         &:hover::after{
+            transition-delay: 500ms;
             transform:scaleY(1);
         }
     }

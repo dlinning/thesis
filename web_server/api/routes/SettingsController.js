@@ -15,14 +15,8 @@ router.get("/get/:name?", (req, res) => {
 });
 
 router.post("/set/:name", (req, res) => {
-    var groupName = req.body.groupName;
-
-    if (groupName && groupName.length > 0) {
-            var resp = DBHelper.createOrUpdateGroup(req.body.uuid, groupName);
-            res.status(resp.status).send(resp)
-    } else {
-        res.status(400).send("Must send `groupName` on body");
-    }
+    var resp = DBHelper.modifySetting(req.params.name, req.body.value);
+    res.status(resp.status).send(resp);
 });
 
 module.exports = router;

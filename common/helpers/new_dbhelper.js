@@ -31,7 +31,9 @@ const createLogEntriesStmt = db.prepare(
 const createSensorsGroupsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
-const createSettingsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT, "value" TEXT, PRIMARY KEY("key") )`);
+const createSettingsStmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT NOT NULL, "value" TEXT NOT NULL, "type" TEXT NOT NULL, "description" TEXT, PRIMARY KEY("key") )`
+);
 const createViewsStmt = db.prepare(`CREATE TABLE IF NOT EXISTS "Views" ( 'id' TEXT NOT NULL, 'name' TEXT NOT NULL, PRIMARY KEY('id') )`);
 const createViewTilesStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "ViewTiles" ( 'id' TEXT NOT NULL, 'title' TEXT, 'apiCall' TEXT NOT NULL, 'chartType' TEXT NOT NULL, 'row' INTEGER, 'col' INTEGER, 'width' INTEGER, 'height' INTEGER, 'viewId' TEXT NOT NULL, FOREIGN KEY('viewId') REFERENCES 'Views'('id') ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY('id') )`
@@ -530,6 +532,15 @@ module.exports.getSpecificSetting = name => {
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
 
+module.exports.modifySetting = (name, newValue) => {
+    var res = modifySettingByNameStmt.run(newValue, name);
+    if (res.changes === 1) {
+        return { status: 200 };
+    }
+    return { status: 400, error: "SETTING DOES NOT EXIST" };
+};
+const modifySettingByNameStmt = db.prepare(`UPDATE Settings SET value = ? WHERE key = ?`);
+
 //
 //
 //
@@ -553,7 +564,9 @@ module.exports.getTilesForViewByName = name => {
     }
     return { status: 400, error: `View with name ${name} does not exist` };
 };
-const getTilesForViewByNameStmt = db.prepare(`SELECT * FROM Views INNER JOIN ViewTiles ON ViewTiles.viewId = Views.id WHERE Views.name = ?`);
+const getTilesForViewByNameStmt = db.prepare(
+    `SELECT * FROM Views INNER JOIN ViewTiles ON ViewTiles.viewId = Views.id WHERE Views.name = ?`
+);
 
 module.exports.createView = name => {
     if (getViewByNameStmt.get(name)) {
@@ -589,7 +602,7 @@ module.exports.deleteViewById = id => {
 };
 const deleteViewByIdStmt = db.prepare(`DELETE FROM Views WHERE id = ?`);
 
-module.exports.createTile = (payload) => {
+module.exports.createTile = payload => {
     payload.id = newUUID();
     payload.title = payload.title || "";
     if (createTileStmt.run(payload).changes === 1) {
@@ -603,7 +616,7 @@ const createTileStmt = db.prepare(
 );
 const getTileByIdStmt = db.prepare(`SELECT * FROM ViewTiles WHERE id = ?`);
 
-module.exports.deleteTileById = (id) => {
+module.exports.deleteTileById = id => {
     var tile = getTileByIdStmt.get(id);
     if (tile.name === "default") {
         return { status: 400, error: "CANNOT DELETE 'default' VIEW" };

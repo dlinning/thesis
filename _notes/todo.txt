@@ -37,7 +37,7 @@ Library:
 Final due:
 
 Server:
-- Manage settings from Dashboard
+- Manage settings from Dashboard ✅
 - IFTTT functionality implementation
 
 Dashboard:
