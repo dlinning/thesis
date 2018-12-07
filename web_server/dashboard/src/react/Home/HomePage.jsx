@@ -30,7 +30,7 @@ class HomePage extends React.Component {
                 <h1>Home {this.props.currentView === "default" ? "" : " | " + this.props.currentView}</h1>
                 <ErrorCard error={s.error} />
                 {s.tiles && s.tiles.length > 0 && (
-                    <DashboardTiles>
+                    <DashboardTiles isHome={true}>
                         {s.tiles.map((t, idx) => {
                             var style = {
                                 gridColumn: `${t.col} / span ${t.width}`,

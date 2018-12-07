@@ -15,7 +15,7 @@ html {
 }
 
 button {
-    min-height: 36px;
+    min-height: 32px;
     line-height: 32px; // min-height - (2*border-width)
     padding: 0 16px;
     min-width: 36px;
@@ -27,16 +27,16 @@ button {
     border: 0;
 
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
 
     color: @primaryTextColor;
-    background-color: fadeout(@lightPrimaryColor, 80);
-    border: 2px solid @dividerColor;
+    background-color: darken(@primaryColor, 10);
+    border: none;
     cursor: pointer;
 
     transition: background-color 75ms ease-in-out;
     &:hover {
-        background-color: fadeout(@darkPrimaryColor, 80);
+        background-color: @darkPrimaryColor;
     }
 
     &.floating {
@@ -54,8 +54,8 @@ button {
     &.small {
         font-size: 11px;
         text-transform: uppercase;
-        line-height: 26px;
-        min-height: 30px;
+        line-height: 28px;
+        min-height: 28px;
     }
 
     &.danger {
@@ -81,7 +81,6 @@ button {
 
     &.overlay {
         background: transparent;
-        border-color: transparent;
 
         &:hover {
             background-color: fadeout(@lightPrimaryColor, 80);
