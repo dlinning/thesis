@@ -1,0 +1,1 @@
+Sequelize makes weird queries. / Switch to hand-written queries.
