@@ -1,3 +1,8 @@
+BUGS:
+- Database does not currently create initial setting upon creation
+
+--------------------------------------------------
+
 Due at end of term:
 
 Server:
