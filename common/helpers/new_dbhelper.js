@@ -172,15 +172,10 @@ module.exports.logCountAndGroupsForAllSensors = () => {
     }
     for (var i = 0, len = groups.length; i < len; i++) {
         let data = groups[i];
-        console.log(data);
         if (data.GroupId) {
             sensors[sensorIdx[data.SensorId]].groups.push(data);
         }
     }
-
-    console.log("-------------");
-
-    console.log(sensors);
 
     return sensors;
 };
@@ -576,7 +571,7 @@ const modifySettingByNameStmt = db.prepare(`UPDATE Settings SET value = ? WHERE 
 module.exports.getAllFlows = () => {
     return getAllFlowsStmt.all();
 };
-const getAllFlowsStmt = db.prepare(`SELECT id, name, description FROM Flows`);
+const getAllFlowsStmt = db.prepare(`SELECT id, name, description, activationCount FROM Flows`);
 module.exports.getFlowByName = name => {
     let res = getFlowByNameStmt.get(name);
     if (res) {

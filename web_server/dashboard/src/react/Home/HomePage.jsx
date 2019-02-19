@@ -6,10 +6,9 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        //TODO: All "flows" to this
-        Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list")])
+        Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list"), jsonFetch("/api/flows/list")])
             .then(res => {
-                this.setState({ sensors: res[0], allGroups: res[1], error: null });
+                this.setState({ sensors: res[0], allGroups: res[1], flows: res[2], error: null });
             })
             .catch(err => {
                 this.setState({ error: err });
@@ -22,20 +21,16 @@ class HomePage extends React.Component {
             <>
                 <h1>Home</h1>
                 <div id="home-lists">
-                    <HomePageSensorList sensors={this.state.sensors} />
-                    <HomePageGroupList groups={this.state.allGroups} />
-
-                    <div className="flex-col">
-                        <h2>Flows</h2>
-                        <div className="tile">Tile 3</div>
-                    </div>
+                    <HomePageSensorsList sensors={this.state.sensors} />
+                    <HomePageGroupsList groups={this.state.allGroups} />
+                    <HomePageFlowsList flows={this.state.flows} />
                 </div>
             </>
         );
     }
 }
 
-class HomePageSensorList extends React.PureComponent {
+class HomePageSensorsList extends React.PureComponent {
     render() {
         return (
             <div className="flex-col">
@@ -71,7 +66,7 @@ class HomePageSensorList extends React.PureComponent {
     }
 }
 
-class HomePageGroupList extends React.PureComponent {
+class HomePageGroupsList extends React.PureComponent {
     render() {
         let p = this.props;
         return (
@@ -89,6 +84,39 @@ class HomePageGroupList extends React.PureComponent {
                                     <div className="data-module">
                                         <span className="value">{g.sensorCount}</span>
                                         <span className="label">Sensors</span>
+                                    </div>
+                                    <div className="data-module">
+                                        <button>MANAGE</button>
+                                        <button className="warn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </div>
+        );
+    }
+}
+
+class HomePageFlowsList extends React.PureComponent {
+    render() {
+        let p = this.props;
+        return (
+            <div className="flex-col">
+                <h2>Flows</h2>
+                {p.flows &&
+                    p.flows.map(flow => {
+                        return (
+                            <div className="tile" key={`group_${flow.id}`}>
+                                <div className="title">{flow.name}</div>
+                                <div className="desc">
+                                    <span title={flow.id}>({flow.id.substr(0, 6)})</span>
+                                    {flow.description && <p>{flow.description}</p>}
+                                </div>
+                                <div className="content">
+                                    <div className="data-module">
+                                        <span className="value">{flow.activationCount}</span>
+                                        <span className="label">Activation Count</span>
                                     </div>
                                     <div className="data-module">
                                         <button>MANAGE</button>
