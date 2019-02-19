@@ -4,30 +4,26 @@ const express = require("express"),
 var DBHelper = require("../../../common/helpers/new_dbhelper");
 
 router.get("/list", (req, res) => {
-    //res.status(200).send(DBHelper.listAllFlows());
-
-    res.status(200).send("Summary list of all flows");
+    res.status(200).send(DBHelper.getAllFlows());
 });
 
 router.get("/get/:name?", (req, res) => {
-    //res.status(200).send(DBHelper.getFlowByName(req.params.name));
-    res.status(200).send(`DATA for flow with name ${req.params.name}`);
+    let data = DBHelper.getFlowByName(req.params.name)
+    res.status(data.status).send(data);
 });
 router.get("/getbyid/:id?", (req, res) => {
-    //res.status(200).send(DBHelper.getFlowById(req.params.id));
-    res.status(200).send(`DATA for flow with ID ${req.params.id}`);
+    let data = DBHelper.getFlowById(req.params.id);
+    res.status(data.status).send(data);
 });
 
 router.get("/create/:name", (req, res) => {
-    //res.status(200).send(DBHelper.createFlow(req.params.name));
-
-    res.status(200).send(`CREATED a flow with name ${req.params.name}`);
+    let data = DBHelper.createFlow(req.params.name);
+    res.status(data.status).send(data);
 });
 
 router.delete("/:id", (req, res) => {
-    //res.status(200).send(DBHelper.deleteFlowById(req.params.id));
-
-    res.status(200).send(`DELETED a flow with ID ${req.params.id}`);
+    let data = DBHelper.deleteFlowById(req.params.id);
+    res.status(data.status).send(data);
 });
 
 module.exports = router;

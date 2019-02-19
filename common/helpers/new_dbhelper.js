@@ -167,7 +167,7 @@ module.exports.logCountAndGroupsForAllSensors = () => {
     for (var i = 0, len = logCounts.length; i < len; i++) {
         let data = logCounts[i],
             sensor = sensors[sensorIdx[data.SensorId]];
-        
+
         sensor.logCount = data.count;
     }
     for (var i = 0, len = groups.length; i < len; i++) {
@@ -396,7 +396,7 @@ module.exports.deleteSensor = (sensorId, deleteWithLogs = false) => {
             return { status: 200, sensor: currentSensor };
         }
     } else {
-        return { status: 400, error: "SENSOR DOES NOT EXIST" };
+        return { status: 400, error: `Sensor does not exist with ID ${id}` };
     }
 };
 const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
@@ -523,7 +523,7 @@ module.exports.deleteGroup = (groupId, deleteWithSensors = false) => {
             return { status: 200, group: group };
         }
     } else {
-        return { status: 400, error: "GROUP DOES NOT EXIST" };
+        return { status: 400, error: `Group does not exist with ID ${groupId}` };
     }
 };
 const deleteGroupStmt = db.prepare(`DELETE FROM Groups WHERE id = ?`);
@@ -549,7 +549,7 @@ module.exports.getSpecificSetting = name => {
     if (res) {
         return { status: 200, value: res.value };
     }
-    return { status: 400, error: `Setting with name ${name} does not exist` };
+    return { status: 400, error: `Setting with name "${name}" does not exist` };
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
 
@@ -558,7 +558,7 @@ module.exports.modifySetting = (name, newValue) => {
     if (res.changes === 1) {
         return { status: 200 };
     }
-    return { status: 400, error: "SETTING DOES NOT EXIST" };
+    return { status: 400, error: `Setting does not exist with name ${name}` };
 };
 const modifySettingByNameStmt = db.prepare(`UPDATE Settings SET value = ? WHERE key = ?`);
 
@@ -573,6 +573,71 @@ const modifySettingByNameStmt = db.prepare(`UPDATE Settings SET value = ? WHERE 
 //
 //
 
+module.exports.getAllFlows = () => {
+    return getAllFlowsStmt.all();
+};
+const getAllFlowsStmt = db.prepare(`SELECT id, name, description FROM Flows`);
+module.exports.getFlowByName = name => {
+    let res = getFlowByNameStmt.get(name);
+    if (res) {
+        return { status: 200, flow: res };
+    }
+    return { status: 400, error: `Flow with name "${name}" does not exist` };
+};
+const getFlowByNameStmt = db.prepare(`SELECT * FROM Flows WHERE name = ?`);
+module.exports.getFlowById = id => {
+    let res = getFlowByIdStmt.get(id);
+    if (res) {
+        return { status: 200, flow: res };
+    }
+    return { status: 400, error: `Flow with ID "${name}" does not exist` };
+};
+const getFlowByIdStmt = db.prepare(`SELECT * FROM Flows WHERE id = ?`);
+module.exports.createFlow = name => {
+    var d1 = dateAsUnixTimestamp();
+
+    const newFlow = {
+        id: newUUID(),
+        name: name,
+        createdAt: d1,
+        updatedAt: d1
+    };
+
+    if (makeNewFlowWithNameStmt.run(newFlow).changes === 1) {
+        return { status: 200, group: newFlow };
+    }
+    // else
+    return { status: 500, error: `The server was unable to create a new flow` };
+};
+const makeNewFlowWithNameStmt = db.prepare(
+    `INSERT INTO Flows(id,name,createdAt,updatedAt)
+    VALUES (@id,@name,@createdAt,@updatedAt)`
+);
+module.exports.deleteFlowById = id => {
+    var flow = getFlowByIdStmt.get(id);
+
+    if (flow !== undefined) {
+        deleteFlowByIdStmt.run(id);
+            // The Flow should now be `undefined`,
+            // meaning the delte was a success
+            flow = getFlowByIdStmt.get(id);
+            return { status: 200, flow: flow };
+    } else {
+        return { status: 400, error: `Flow does not exist with ID ${id}` };
+    }
+};
+const deleteFlowByIdStmt = db.prepare(`DELETE FROM Flows WHERE id = ?`);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 // Logs data for a sensors with sensorId `id`
 //
