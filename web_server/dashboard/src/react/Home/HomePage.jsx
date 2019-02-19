@@ -54,8 +54,8 @@ class HomePageSensorsList extends React.PureComponent {
                                         <span className="label">Groups</span>
                                     </div>
                                     <div className="data-module">
-                                        <button>MANAGE</button>
-                                        <button className="warn">Remove</button>
+                                        <button>Manage</button>
+                                        <button className="warn overlay">Remove</button>
                                     </div>
                                 </div>
                             </div>
@@ -86,8 +86,8 @@ class HomePageGroupsList extends React.PureComponent {
                                         <span className="label">Sensors</span>
                                     </div>
                                     <div className="data-module">
-                                        <button>MANAGE</button>
-                                        <button className="warn">Remove</button>
+                                        <button>Manage</button>
+                                        <button className="warn overlay">Remove</button>
                                     </div>
                                 </div>
                             </div>
@@ -119,8 +119,8 @@ class HomePageFlowsList extends React.PureComponent {
                                         <span className="label">Activation Count</span>
                                     </div>
                                     <div className="data-module">
-                                        <button>MANAGE</button>
-                                        <button className="warn">Remove</button>
+                                        <button>Manage</button>
+                                        <button className="warn overlay">Remove</button>
                                     </div>
                                 </div>
                             </div>
