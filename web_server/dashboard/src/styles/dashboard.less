@@ -1,214 +1,164 @@
 #dashboard {
-	display: grid;
-	height: 100vh;
+    display: grid;
+    height: 100vh;
 
-	grid-template-columns: 6rem 1fr;
-	grid-template-rows: 4rem 1fr;
+    grid-template-columns: 6rem 1fr;
+    grid-template-areas: "sidebar content";
 
-	&.changing {
-		#dashboard-content {
-			transition-timing-function: @entranceEase;
-			opacity: 0;
-		}
-	}
+    &.changing {
+        #dashboard-content {
+            transition-timing-function: @entranceEase;
+            opacity: 0;
+        }
+    }
 }
 
-.dashboard-nav {
-	@media screen and (min-width: 769px) {
-		grid-row: 1 / span 2;
-		grid-column: 1 / span 1;
-	}
+#dashboard-sidebar {
+    grid-area: sidebar;
 
-	grid-area: nav;
+    display: flex;
+    flex-flow: column;
 
-	display: flex;
-	flex-flow: column;
+    border-right: 1px solid @divider;
 
-	border-right: 1px solid @divider;
+    ul {
+        list-style-type: none;
+    }
 
-	padding-top: 2.5rem; //Half of the height of li
+    li {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
 
-	ul {
-		list-style-type: none;
-	}
+        height: 5rem;
 
-	li {
-		display: flex;
-		flex-flow: column;
-		align-items: center;
-		justify-content: center;
+        cursor: pointer;
 
-		height: 5rem;
+        border-left: 0.5rem solid transparent;
+        transition: border-color 350ms @stopToStopEase;
 
-		cursor: pointer;
+        span {
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 11px;
 
-		border-left: 0.5rem solid transparent;
-		transition: border-color 350ms @stopToStopEase;
+            opacity: 0;
+            transform: translateY(0.25rem);
+            transition: all 100ms @exitEase;
 
-		span {
-			text-transform: uppercase;
-			font-weight: 700;
-			font-size: 11px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-			opacity: 0;
-			transform: translateY(0.25rem);
-			transition: all 100ms @exitEase;
+        i {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
 
-			user-select: none;
-			-webkit-user-select: none;
-		}
+            opacity: 0.6;
+        }
 
-		&:hover {
-			background: fadeout(@primaryLight1, 90);
+        &:hover {
+            background: fadeout(@primaryLight1, 90);
 
-			span {
-				opacity: 1;
-				transform: translateY(0);
-				transition: all 150ms 150ms @entranceEase;
-			}
+            span {
+                opacity: 1;
+                transform: translateY(0);
+                transition: all 150ms 150ms @entranceEase;
+            }
 
-			&:not(.selected) i {
-				opacity: 0.8;
-			}
-		}
+            &:not(.selected) i {
+                opacity: 0.8;
+            }
+        }
 
-		i {
-			font-size: 1.75rem;
-			margin-bottom: 0.5rem;
+        &.selected {
+            border-color: @primary;
+            background: fadeout(@primaryLight1, 95);
 
-			opacity: 0.6;
-		}
+            span {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-		&.selected {
-			border-color: @primary;
-			background: fadeout(@primaryLight1, 95);
-
-			span {
-				opacity: 1;
-				transform: translateY(0);
-			}
-
-			i {
-				opacity: 1;
-			}
-		}
-	}
+            i {
+                opacity: 1;
+            }
+        }
+    }
 }
-
-.dashboard-controls {
-	@media screen and (min-width: 769px) {
-		grid-row: 1 / span 1;
-		grid-column: 2 / span 1;
-	}
-
-	grid-area: controls;
-
-	border-bottom: 1px solid @divider;
-
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-
-	padding: 0 1rem;
-
-	button {
-		margin-left: 1rem;
-		margin-right: 0;
-	}
+#logo {
+    width: 4rem;
+    margin: 1rem auto;
 }
 
 #dashboard-content {
-	@media screen and (min-width: 769px) {
-		grid-column: 2 / span 1;
-		grid-row: 2 / span 1;
-	}
+    grid-area: content;
 
-	grid-area: content;
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto 0 3rem;
 
-	max-width: 1200px;
-	width: 90%;
-	margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 
-	display: flex;
-	flex-direction: column;
+    padding: 1rem;
 
-	padding: 1rem;
+    opacity: 1;
+    transition: opacity 100ms @exitEase;
 
-	opacity: 1;
-	transition: opacity 100ms @exitEase;
-
-	h1 {
-		text-align: left;
-		margin-bottom: 0.5rem;
-	}
-}
-
-.dashboard-tiles {
-	display: grid;
-	grid-auto-rows: 5rem;
-	grid-template-columns: repeat(3, 1fr);
-	grid-gap: 1rem;
-
-	max-height: 100vh;
-	overflow-y: auto;
-
-	.tile {
-		padding: 1rem;
-		border-radius: 0.25rem;
-		display: flex;
-		flex-flow: column;
-		background: @background;
-
-		.md-1();
-	}
+    h1 {
+        text-align: left;
+        margin-bottom: 0.5rem;
+    }
 }
 
 @media screen and (max-width: 768px) {
-	#dashboard {
-		grid-template-areas:
-			"controls"
-			"content"
-			"nav";
-		grid-template-rows: 4rem auto 5rem;
-		grid-template-columns: 1fr;
-	}
+    #dashboard {
+        grid-template-areas:
+            "controls"
+            "content"
+            "nav";
+        grid-template-rows: 4rem auto 5rem;
+        grid-template-columns: 1fr;
+    }
 
-	#dashboard-content {
-		width: 98vw;
-		max-height: calc(100vh ~"-" 4rem);
-		overflow-y: auto;
-	}
-	.dashboard-tiles {
-		grid-template-columns: 1fr;
-	}
+    #dashboard-content {
+        width: 98vw;
+        max-height: calc(100vh ~"-" 4rem);
+        overflow-y: auto;
+    }
+    .dashboard-tiles {
+        grid-template-columns: 1fr;
+    }
 
-	.dashboard-nav {
-		z-index: 1;
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100vw;
-		flex-flow: row;
-		border-top: 1px solid @divider;
-		border-right: none;
-		background: @background;
-		padding-top: 0;
+    .dashboard-nav {
+        z-index: 1;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        flex-flow: row;
+        border-top: 1px solid @divider;
+        border-right: none;
+        background: @background;
+        padding-top: 0;
 
-		ul {
-			display: flex;
-			width: 100%;
-		}
-		li {
-			width: 25%;
-			height: 15vw;
-			min-height: 3rem;
+        ul {
+            display: flex;
+            width: 100%;
+        }
+        li {
+            width: 25%;
+            height: 15vw;
+            min-height: 3rem;
 
-			border-left: none;
-			border-bottom: 0.25rem solid transparent;
+            border-left: none;
+            border-bottom: 0.25rem solid transparent;
 
-			i {
-				font-size: 5vw;
-			}
-		}
-	}
+            i {
+                font-size: 5vw;
+            }
+        }
+    }
 }

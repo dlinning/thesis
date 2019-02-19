@@ -1,4 +1,4 @@
-class DashboardNav extends React.Component {
+class DashboardSidebar extends React.Component {
     // Stateless, as it takes the currently selected page
     // via props from Dashboard component.
 
@@ -31,7 +31,8 @@ class DashboardNav extends React.Component {
 
     render() {
         return (
-            <aside className="dashboard-nav">
+            <aside id="dashboard-sidebar">
+                <img src="./assets/logo.png" alt="" id="logo"/>
                 <ul>
                     {this.tabsMap.map(tab => {
                         return (

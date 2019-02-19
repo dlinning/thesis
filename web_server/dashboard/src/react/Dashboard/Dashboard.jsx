@@ -43,10 +43,9 @@ class Dashboard extends React.Component {
         var s = this.state;
         return (
             <div id="dashboard" className={this.state.changing === true ? " changing" : ""} data-current-page={this.state.page}>
-                <DashboardControls currentPage={s.page} currentView={s.view} changeViewFunc={this.changeView.bind(this)} />
-                <DashboardNav currentPage={s.page} pageChangeFunc={this.setPage} />
+                <DashboardSidebar currentPage={s.page} pageChangeFunc={this.setPage} />
                 <div id="dashboard-content">
-                    {s.page === "home" && <HomePage currentView={s.view} />}
+                    {s.page === "home" && <HomePage />}
                     {s.page === "sensors" && <SensorsPage />}
                     {s.page === "groups" && <GroupsPage />}
                     {s.page === "settings" && <SettingsPage />}

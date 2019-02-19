@@ -9,8 +9,7 @@ router.get("/", (req, res) => {
 router.use("/sensors", require("./SensorController"));
 router.use("/groups", require("./GroupController"));
 
-router.use("/views", require("./ViewsController"));
-router.use("/tiles", require("./TilesController"));
+router.use("/flows", require("./FlowsController"));
 
 router.use("/settings", require("./SettingsController"));
 

@@ -29,7 +29,7 @@ button {
     font-weight: 700;
     font-size: 13px;
 
-    color: @text;
+    color: @background;
     background-color: darken(@primary, 10);
     border: none;
     cursor: pointer;
@@ -58,9 +58,20 @@ button {
         min-height: 28px;
     }
 
-    &.danger {
+    &.overlay {
+        background: transparent;
+
+        &:hover {
+            background-color: fadeout(@primaryLight1, 80);
+        }
+        &:active {
+            background-color: fadeout(@primaryDark1, 80);
+        }
+    }
+
+    &.warn {
         background-color: fadeout(@warn, 80);
-        border-color: darken(@warn, 10);
+        border-color: @warn;
 
         &:hover {
             background-color: fadeout(darken(@warn, 10), 20);
@@ -76,17 +87,6 @@ button {
             &:active {
                 background-color: fadeout(darken(@warn, 10), 20);
             }
-        }
-    }
-
-    &.overlay {
-        background: transparent;
-
-        &:hover {
-            background-color: fadeout(@primaryLight1, 80);
-        }
-        &:active {
-            background-color: fadeout(@primaryDark1, 80);
         }
     }
 

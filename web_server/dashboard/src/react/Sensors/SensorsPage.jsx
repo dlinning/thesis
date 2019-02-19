@@ -53,8 +53,8 @@ class SensorsPage extends React.Component {
             <>
                 <h1>Manage Sensors</h1>
                 <ErrorCard error={s.error} />
-                <SensorList sensors={s.sensors} allGroups={s.allGroups} sensorRemoveCallback={this.updateSensors.bind(this)} />
             </>
         );
     }
 }
+// <SensorList sensors={s.sensors} allGroups={s.allGroups} sensorRemoveCallback={this.updateSensors.bind(this)} />

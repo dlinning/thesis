@@ -6,16 +6,10 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        this.getCurrentView(this.props.currentView);
-    }
-    componentWillReceiveProps(newP) {
-        this.getCurrentView(newP.currentView);
-    }
-
-    getCurrentView(viewName) {
-        jsonFetch("/api/views/get/" + viewName)
+        //TODO: All "flows" to this
+        Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/groups/list")])
             .then(res => {
-                this.setState({ tiles: res.tiles, error: null });
+                this.setState({ sensors: res[0], allGroups: res[1], error: null });
             })
             .catch(err => {
                 this.setState({ error: err });
@@ -24,40 +18,87 @@ class HomePage extends React.Component {
     }
 
     render() {
-        var s = this.state;
         return (
             <>
-                <h1>Home {this.props.currentView === "default" ? "" : " | " + this.props.currentView}</h1>
-                <ErrorCard error={s.error} />
-                {s.tiles && s.tiles.length > 0 && (
-                    <DashboardTiles isHome={true}>
-                        {s.tiles.map((t, idx) => {
-                            var style = {
-                                gridColumn: `${t.col} / span ${t.width}`,
-                                gridRow: `${t.row} / span ${t.height}`
-                            };
-                            return (
-                                <div className="tile" key={idx} style={style}>
-                                    {JSON.stringify(t)}
-                                </div>
-                            );
-                        })}
-                    </DashboardTiles>
-                )}
-                {s.tiles && s.tiles.length === 0 && <h3>There are currently no tiles for this view.</h3>}
-                <AddTileButton />
+                <h1>Home</h1>
+                <div id="home-lists">
+                    <HomePageSensorList sensors={this.state.sensors} />
+                    <HomePageGroupList groups={this.state.allGroups} />
+
+                    <div className="flex-col">
+                        <h2>Flows</h2>
+                        <div className="tile">Tile 3</div>
+                    </div>
+                </div>
             </>
         );
     }
 }
 
-class AddTileButton extends React.Component {
+class HomePageSensorList extends React.PureComponent {
     render() {
         return (
-            <button id="home-addTileButton" onClick={() => alert("Opening Add Tile Modal")}>
-                <i className="fas fa-plus" />
-                <span>New Tile</span>
-            </button>
+            <div className="flex-col">
+                <h2>Sensors</h2>
+                {this.props.sensors &&
+                    this.props.sensors.map(s => {
+                        return (
+                            <div className="tile" key={`sensor_${s.id}`}>
+                                <div className="title">{s.name}</div>
+                                <div className="desc">
+                                    <span title={s.id}>({s.id.substr(0, 6)})</span>
+                                    <span>{s.dataType}</span>
+                                </div>
+                                <div className="content">
+                                    <div className="data-module">
+                                        <span className="value">{s.logCount > 999000 ? "999k+" : Number(s.logCount).toLocaleString()}</span>
+                                        <span className="label">Log Count</span>
+                                    </div>
+                                    <div className="data-module">
+                                        <span className="value">{s.groups.length}</span>
+                                        <span className="label">Groups</span>
+                                    </div>
+                                    <div className="data-module">
+                                        <button>MANAGE</button>
+                                        <button className="warn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </div>
+        );
+    }
+}
+
+class HomePageGroupList extends React.PureComponent {
+    render() {
+        let p = this.props;
+        return (
+            <div className="flex-col">
+                <h2>Groups</h2>
+                {p.groups &&
+                    p.groups.map(g => {
+                        return (
+                            <div className="tile" key={`group_${g.id}`}>
+                                <div className="title">{g.name}</div>
+                                <div className="desc">
+                                    <span title={g.id}>({g.id.substr(0, 6)})</span>
+                                </div>
+                                <div className="content">
+                                    <div className="data-module">
+                                        <span className="value">{g.sensorCount}</span>
+                                        <span className="label">Sensors</span>
+                                    </div>
+                                    <div className="data-module">
+                                        <button>MANAGE</button>
+                                        <button className="warn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </div>
         );
     }
 }

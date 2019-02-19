@@ -1,0 +1,53 @@
+.tile {
+    .cardBase();
+    display: flex;
+    flex-flow: column nowrap;
+
+    text-align: left;
+
+    width: 25vw;
+    max-width: 400px;
+
+    margin-bottom: 1rem;
+
+    .title {
+        font-size: 1.5rem;
+    }
+    .desc {
+        font-size: 0.8rem;
+        color: @textLight;
+        margin-bottom: 0.5rem;
+
+        > span {
+            text-transform: capitalize;
+            + span {
+                margin-left: 1rem;
+            }
+        }
+    }
+    .content {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &:hover {
+        .md-2();
+    }
+
+    .data-module {
+        display: flex;
+        flex-flow: column nowrap;
+        text-align: center;
+
+        .value {
+            font-size: 1.2rem;
+        }
+        .label {
+            font-size: 1rem;
+            color: @textLight;
+            margin-top: 0.5rem;
+        }
+    }
+}
