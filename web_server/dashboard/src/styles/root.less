@@ -10,8 +10,8 @@ html {
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
     text-align: center;
 
-    background-color: @bgColor;
-    color: @primaryTextColor;
+    background-color: @background;
+    color: @text;
 }
 
 button {
@@ -29,19 +29,19 @@ button {
     font-weight: 700;
     font-size: 13px;
 
-    color: @primaryTextColor;
-    background-color: darken(@primaryColor, 10);
+    color: @text;
+    background-color: darken(@primary, 10);
     border: none;
     cursor: pointer;
 
     transition: background-color 75ms ease-in-out;
     &:hover {
-        background-color: @darkPrimaryColor;
+        background-color: @primaryDark1;
     }
 
     &.floating {
-        background-color: @darkPrimaryColor;
-        color: @primaryTextColor;
+        background-color: @primaryDark1;
+        color: @text;
         border-width: 0;
 
         transition: box-shadow 75ms @stopToStopEase;
@@ -59,22 +59,22 @@ button {
     }
 
     &.danger {
-        background-color: fadeout(@dangerColor, 80);
-        border-color: darken(@dangerColor, 10);
+        background-color: fadeout(@warn, 80);
+        border-color: darken(@warn, 10);
 
         &:hover {
-            background-color: fadeout(darken(@dangerColor, 10), 20);
+            background-color: fadeout(darken(@warn, 10), 20);
         }
         &.floating {
-            background-color: @dangerColor;
+            background-color: @warn;
         }
 
         &.overlay {
             &:hover {
-                background-color: fadeout(@dangerColor, 55);
+                background-color: fadeout(@warn, 55);
             }
             &:active {
-                background-color: fadeout(darken(@dangerColor, 10), 20);
+                background-color: fadeout(darken(@warn, 10), 20);
             }
         }
     }
@@ -83,10 +83,10 @@ button {
         background: transparent;
 
         &:hover {
-            background-color: fadeout(@lightPrimaryColor, 80);
+            background-color: fadeout(@primaryLight1, 80);
         }
         &:active {
-            background-color: fadeout(@darkPrimaryColor, 80);
+            background-color: fadeout(@primaryDark1, 80);
         }
     }
 
@@ -102,9 +102,9 @@ button {
 input,
 select {
     background: transparent;
-    color: @primaryTextColor;
+    color: @text;
     border: 0;
-    border-bottom: 1px solid @darkPrimaryColor;
+    border-bottom: 1px solid @primaryDark1;
     line-height: 2;
     height: 2rem;
     margin: 0 1rem 0.5rem;
@@ -113,7 +113,7 @@ select {
     &:valid,
     &:focus {
         outline: none;
-        border-bottom-color: @primaryColor;
+        border-bottom-color: @primary;
     }
 
     &[type="checkbox"] {
@@ -121,7 +121,7 @@ select {
     }
 }
 option {
-    color: @bgColor;
+    color: @background;
 }
 
 .table {
@@ -129,7 +129,7 @@ option {
     overflow: auto;
     table-layout: fixed;
     width: 100%;
-    border: 2px solid @dividerColor;
+    border: 2px solid @divider;
 
     .tr {
         display: table-row;
@@ -140,7 +140,7 @@ option {
         background-color: rgba(0, 0, 0, 0.08);
     }
     .tr:not(:first-of-type):hover {
-        background-color: fadeout(@lightPrimaryColor, 90);
+        background-color: fadeout(@primaryLight1, 90);
     }
 
     .td,
@@ -155,7 +155,7 @@ option {
     .th {
         font-weight: 700;
         padding: 0.5rem 0.25rem;
-        border-bottom: 2px solid @dividerColor;
+        border-bottom: 2px solid @divider;
     }
 }
 
@@ -165,7 +165,7 @@ option {
 
 .errorCard {
     .cardBase();
-    background: @dangerColor;
+    background: @warn;
     font-size: 1.1rem;
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;

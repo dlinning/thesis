@@ -13,7 +13,7 @@
 	pointer-events: none;
 
 	transition: opacity 100ms 0ms @entranceEase;
-	background-color: fadeout(mix(@primaryColor, @bgColor, 5), 30);
+	background-color: fadeout(mix(@primary, @background, 5), 30);
 
 	&.open {
 		opacity: 1;
@@ -40,8 +40,8 @@
 		min-width: 95vw;
 	}
 
-	background-color: @cardBg;
-	border: 2px solid darken(@bgColor, 10);
+	background-color: @background;
+	border: 2px solid darken(@background, 10);
 	border-radius: 3px;
 
 	.md-3();
@@ -55,7 +55,7 @@
 		justify-content: flex-end;
 		padding: 0.5rem 1rem;
 
-		border-bottom: 1px solid @dividerColor;
+		border-bottom: 1px solid @divider;
 
 		.title {
 			display: flex;

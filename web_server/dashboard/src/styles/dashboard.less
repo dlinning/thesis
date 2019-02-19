@@ -24,7 +24,7 @@
 	display: flex;
 	flex-flow: column;
 
-	border-right: 1px solid @dividerColor;
+	border-right: 1px solid @divider;
 
 	padding-top: 2.5rem; //Half of the height of li
 
@@ -59,7 +59,7 @@
 		}
 
 		&:hover {
-			background: fadeout(@lightPrimaryColor, 90);
+			background: fadeout(@primaryLight1, 90);
 
 			span {
 				opacity: 1;
@@ -80,8 +80,8 @@
 		}
 
 		&.selected {
-			border-color: @primaryColor;
-			background: fadeout(@lightPrimaryColor, 95);
+			border-color: @primary;
+			background: fadeout(@primaryLight1, 95);
 
 			span {
 				opacity: 1;
@@ -103,7 +103,7 @@
 
 	grid-area: controls;
 
-	border-bottom: 1px solid @dividerColor;
+	border-bottom: 1px solid @divider;
 
 	display: flex;
 	align-items: center;
@@ -157,7 +157,7 @@
 		border-radius: 0.25rem;
 		display: flex;
 		flex-flow: column;
-		background: @cardBg;
+		background: @background;
 
 		.md-1();
 	}
@@ -189,9 +189,9 @@
 		left: 0;
 		width: 100vw;
 		flex-flow: row;
-		border-top: 1px solid @dividerColor;
+		border-top: 1px solid @divider;
 		border-right: none;
-		background: @bgColor;
+		background: @background;
 		padding-top: 0;
 
 		ul {
