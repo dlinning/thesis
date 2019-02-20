@@ -15,6 +15,10 @@ class DashboardSidebar extends React.Component {
                 icon: "home"
             },
             {
+                name: "flows",
+                icon: "code-branch" // Chosen by @Thor#8916
+            },
+            {
                 name: "sensors",
                 icon: "broadcast-tower"
             },

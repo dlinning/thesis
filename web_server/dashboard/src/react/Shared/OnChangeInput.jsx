@@ -32,7 +32,9 @@ class OnChangeInput extends React.Component {
             className: this.props.classes ? this.props.classes.join(" ") : "",
             onChange: this.updateHandler.bind(this),
             type: type,
-            placeholder: this.props.placeholder || ""
+            placeholder: this.props.placeholder || "",
+            autocomplete: this.props.autocomplete || "off",
+            name: this.props.name || ""
         };
         switch (type) {
             case "bool":

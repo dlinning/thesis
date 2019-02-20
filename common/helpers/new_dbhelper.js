@@ -32,7 +32,7 @@ const createSensorsGroupsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
 );
 const createSettingsStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT PRIMARY KEY NOT NULL, "value" TEXT NOT NULL, "type" TEXT NOT NULL, "description" TEXT )`
+    `CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT PRIMARY KEY NOT NULL, "value" TEXT NOT NULL, "type" TEXT NOT NULL, "description" TEXT, "inGroup" TEXT )`
 );
 
 //TODO: Add create statement for Flows table
@@ -547,6 +547,16 @@ module.exports.getSpecificSetting = name => {
     return { status: 400, error: `Setting with name "${name}" does not exist` };
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
+
+module.exports.getSettingsByGroup = groupName => {
+    var res = getSettingByGroupStmt.get(groupName);
+    if (res) {
+        return { status: 200, value: res.value };
+    }
+    return { status: 400, error: `There are no settings in group ${groupName}` };
+};
+const getSettingByGroupStmt = db.prepare(`SELECT * FROM Settings WHERE inGroup = ?`);
+
 
 module.exports.modifySetting = (name, newValue) => {
     var res = modifySettingByNameStmt.run(newValue, name);

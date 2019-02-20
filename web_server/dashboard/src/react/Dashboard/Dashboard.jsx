@@ -46,6 +46,7 @@ class Dashboard extends React.Component {
                 <DashboardSidebar currentPage={s.page} pageChangeFunc={this.setPage} />
                 <div id="dashboard-content">
                     {s.page === "home" && <HomePage />}
+                    {s.page === "flows" && <FlowsPage />}
                     {s.page === "sensors" && <SensorsPage />}
                     {s.page === "groups" && <GroupsPage />}
                     {s.page === "settings" && <SettingsPage />}

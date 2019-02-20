@@ -10,10 +10,12 @@
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",
     "dependencies": {
+        "better-sqlite3": "5.0.1",
         "express": "^4.16.3",
         "express-handlebars": "^3.0.0",
         "memory-cache": "^0.2.0",
-        "better-sqlite3": "5.0.1",
+        "nodemailer": "^5.1.1",
+        "twilio": "^3.28.1",
         "uuid": "^3.3.2"
     },
     "devDependencies": {
