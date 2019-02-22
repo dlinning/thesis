@@ -1,0 +1,49 @@
+{
+    "name": "flowName",
+    "description": "flowDescription",
+    "activationCount": 100,
+
+    "trigger": {
+        "type": "sensor|group|time",
+        "value": "number|string|timestamp",
+        "comparison": "==|!=|>|<|etc."
+    },
+
+    "sends": [
+        {
+            "type": "sensor",
+
+            "data": {
+                "toSensor": "sensorId",
+                "payload": "payload",
+                "payloadType": "payloadType(custom)"
+            }
+        },
+        {
+            "type": "group",
+
+            "data": {
+                "toGroup": "groupId",
+                "payload": "payload",
+                "payloadType": "payloadType(custom)"
+            }
+        },
+        {
+            "type": "email",
+
+            "data": {
+                "toEmail": "emailAddress",
+                "subject": "emailSubject",
+                "body": "emailBody"
+            }
+        },
+        {
+            "type": "twilio",
+
+            "data": {
+                "toNumber": "phoneNumber",
+                "body": "messageBody"
+            }
+        }
+    ]
+}
