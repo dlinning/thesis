@@ -93,13 +93,13 @@ class SettingsPage extends React.Component {
             <>
                 <h1>Settings</h1>
                 <div id="settings-filter-box" className="flex-row aic">
-                    <i class="fas fa-search" />
+                    <i className="fas fa-search" />
                     <OnChangeInput
                         placeholder={"Search for a setting"}
                         type={"search"}
                         callback={this.searchTermUpdate.bind(this)}
                         delay={10}
-                        autocomplete={false}
+                        autoComplete={false}
                         name="settingsSearch"
                     />
                 </div>

@@ -1,164 +1,116 @@
 #dashboard {
-    display: grid;
-    height: 100vh;
+	position: relative;
 
-    grid-template-columns: 6rem 1fr;
-    grid-template-areas: "sidebar content";
-
-    &.changing {
-        #dashboard-content {
-            transition-timing-function: @entranceEase;
-            opacity: 0;
-        }
-    }
+	&.changing {
+		#dashboard-content {
+			transition-timing-function: @entranceEase;
+			opacity: 0;
+		}
+	}
 }
 
 #dashboard-sidebar {
-    grid-area: sidebar;
+	grid-area: sidebar;
 
-    display: flex;
-    flex-flow: column;
+	display: flex;
+	flex-flow: column;
 
-    border-right: 1px solid @divider;
+	border-right: 1px solid @divider;
 
-    ul {
-        list-style-type: none;
-    }
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 6rem;
+	background: @background;
 
-    li {
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
+	ul {
+		list-style-type: none;
+	}
 
-        height: 5rem;
+	li {
+		display: flex;
+		flex-flow: column;
+		align-items: center;
+		justify-content: center;
 
-        cursor: pointer;
+		height: 5rem;
 
-        border-left: 0.5rem solid transparent;
-        transition: border-color 350ms @stopToStopEase;
+		cursor: pointer;
 
-        span {
-            text-transform: uppercase;
-            font-weight: 700;
-            font-size: 11px;
+		border-left: 0.5rem solid transparent;
+		transition: border-color 350ms @stopToStopEase;
 
-            opacity: 0;
-            transform: translateY(0.25rem);
-            transition: all 100ms @exitEase;
+		span {
+			text-transform: uppercase;
+			font-weight: 700;
+			font-size: 11px;
 
-            user-select: none;
-            -webkit-user-select: none;
-        }
+			opacity: 0;
+			transform: translateY(0.25rem);
+			transition: all 100ms @exitEase;
 
-        i {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
+			user-select: none;
+			-webkit-user-select: none;
+		}
 
-            opacity: 0.6;
-        }
+		i {
+			font-size: 1.75rem;
+			margin-bottom: 0.5rem;
 
-        &:hover {
-            background: fadeout(@primaryLight1, 90);
+			opacity: 0.6;
+		}
 
-            span {
-                opacity: 1;
-                transform: translateY(0);
-                transition: all 150ms 150ms @entranceEase;
-            }
+		&:hover {
+			background: fadeout(@primaryLight1, 90);
 
-            &:not(.selected) i {
-                opacity: 0.8;
-            }
-        }
+			span {
+				opacity: 1;
+				transform: translateY(0);
+				transition: all 150ms 150ms @entranceEase;
+			}
 
-        &.selected {
-            border-color: @primary;
-            background: fadeout(@primaryLight1, 95);
+			&:not(.selected) i {
+				opacity: 0.8;
+			}
+		}
 
-            span {
-                opacity: 1;
-                transform: translateY(0);
-            }
+		&.selected {
+			border-color: @primary;
+			background: fadeout(@primaryLight1, 95);
 
-            i {
-                opacity: 1;
-            }
-        }
-    }
+			span {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			i {
+				opacity: 1;
+			}
+		}
+	}
 }
 #logo {
-    width: 4rem;
-    margin: 1rem auto;
+	width: 4rem;
+	margin: 1rem auto;
 }
 
 #dashboard-content {
-    grid-area: content;
+	display: flex;
+	flex-direction: column;
 
-    max-width: 1200px;
-    width: 90%;
-    margin: 0 auto 0 3rem;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: calc(100% ~"-" 9rem);
 
-    display: flex;
-    flex-direction: column;
+	padding: 1rem 1rem 0 0;
 
-    padding: 1rem;
+	opacity: 1;
+	transition: opacity 100ms @exitEase;
 
-    opacity: 1;
-    transition: opacity 100ms @exitEase;
-
-    h1 {
-        text-align: left;
-        margin-bottom: 0.5rem;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    #dashboard {
-        grid-template-areas:
-            "controls"
-            "content"
-            "nav";
-        grid-template-rows: 4rem auto 5rem;
-        grid-template-columns: 1fr;
-    }
-
-    #dashboard-content {
-        width: 98vw;
-        max-height: calc(100vh ~"-" 4rem);
-        overflow-y: auto;
-    }
-    .dashboard-tiles {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-nav {
-        z-index: 1;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        flex-flow: row;
-        border-top: 1px solid @divider;
-        border-right: none;
-        background: @background;
-        padding-top: 0;
-
-        ul {
-            display: flex;
-            width: 100%;
-        }
-        li {
-            width: 25%;
-            height: 15vw;
-            min-height: 3rem;
-
-            border-left: none;
-            border-bottom: 0.25rem solid transparent;
-
-            i {
-                font-size: 5vw;
-            }
-        }
-    }
+	h1 {
+		text-align: left;
+		margin-bottom: 0.5rem;
+	}
 }

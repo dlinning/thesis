@@ -33,11 +33,11 @@ class GroupList extends React.Component {
         return (
             <>
                 {groups.length > 0 && (
-                    <div className="dashboard-tiles">
+                    <div className="flex-grid cols-4">
                         {groups.map(group => {
                             let g = group;
                             return (
-                                <div className="g-tile flex-col" key={g.id}>
+                                <div className="tile" key={g.id}>
                                     <OnChangeInput
                                         initialValue={g.name}
                                         classes={["g-name"]}
