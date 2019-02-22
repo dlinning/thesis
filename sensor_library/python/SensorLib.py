@@ -1,7 +1,7 @@
 import socket
 import sys
 import json
-import time
+import datetime
 
 SERVER_ADDRESS = 'localhost'
 SERVER_PORT = 3000
@@ -41,14 +41,13 @@ def connect(n, dt):
         resp = sendMessage(payload)
         if (resp['status'] == 200):
             global sensorId
-            #sensorId = resp['uuid']
+            sensorId = resp['uuid']
 
 # Will log `value` to the previously setup socket.
 
-
 def log(value):
     if (sensorId != None):
-        ts = time.time()
+        ts = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         payload = '{"type": "log", "value": "%s", "sensorUUID":"%s", "timestamp":"%s", "authKey":"%s"}' % (
             str(value), sensorId, ts, AUTH_KEY)
         sendMessage(payload)

@@ -18,7 +18,7 @@ class GroupList extends React.Component {
                 this.setState({ groups: resp, error: undefined });
             })
             .catch(err => {
-                this.setState({ error: err });
+                messenger.notify("OpenToast", { msg: `Unable to fetch Groups`, warn: true });
                 console.error(err);
             });
     }

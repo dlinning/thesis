@@ -12,11 +12,21 @@ class SensorList extends React.Component {
         messenger.subscribe("SensorGroupsUpdated", obj => {
             this.updateLocalSensor(obj.id, obj.groups, "groups");
         });
+
+        this.interval = null;
     }
 
     componentDidMount() {
         this.updateSensorList();
         this.getGroupList();
+
+        // Set to pull new log counts every 30 seconds
+        this.interval = setInterval(() => {
+            this.updateLogCounts();
+        }, 30000);//TODO: Add this in to Settings?
+    }
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     updateSensorList() {
@@ -25,7 +35,7 @@ class SensorList extends React.Component {
                 this.setState({ sensors: res, error: null });
             })
             .catch(err => {
-                this.setState({ error: err });
+                messenger.notify("OpenToast", { msg: `Unable to fetch Sensors`, warn: true });
                 console.error(err);
             });
     }
@@ -36,6 +46,37 @@ class SensorList extends React.Component {
                 this.setState({ allGroups: res });
             })
             .catch(err => {
+                console.error(err);
+            });
+    }
+
+    updateLogCounts() {
+        jsonFetch("/api/sensors/logCounts")
+            .then(res => {
+                // Cause it's easy to work with like this
+                let easy = {};
+                if (res.length > 0) {
+                    for (let i = 0, len = res.length; i < len; i++) {
+                        easy[res[i].SensorId] = res[i].count;
+                    }
+                }
+
+                let sensors = this.state.sensors;
+                for (var n = 0, l = sensors.length; n < l; n++) {
+                    let newCount = easy[sensors[n].id];
+                    if (newCount) {
+                        sensors[n].logCount = newCount;
+                    }
+                }
+
+                this.setState((nextState, nextProps) => {
+                    return {
+                        sensors: nextState.sensors
+                    };
+                });
+            })
+            .catch(err => {
+                messenger.notify("OpenToast", { msg: `Unable to update sensor log counts`, warn: true });
                 console.error(err);
             });
     }
@@ -79,7 +120,7 @@ class SensorList extends React.Component {
         jsonFetch("/api/sensors/logs/" + sensorId)
             .then(resp => {
                 messenger.notify("OpenModal", {
-                    title: `Logs For Sensor: ${sensorId.substr(0, 7)}...`,
+                    title: `Logs For Sensor: ${sensorId.substr(0, 6)}...`,
                     content: <LogList entries={resp} />
                 });
             })
@@ -137,7 +178,7 @@ class SensorList extends React.Component {
                     )}
                     {sensors.map(s => {
                         return (
-                            <div className="tile" key={`sensor_${s.id}`}>
+                            <div className="tile" key={s.id}>
                                 <div className="title">{s.name}</div>
                                 <div className="desc">
                                     <span title={s.id}>({s.id.substr(0, 6)})</span>

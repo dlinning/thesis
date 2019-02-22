@@ -19,7 +19,7 @@ class SettingsPage extends React.Component {
                 this.setState({ allSettings: resp, matches: this.groupSettings(resp) });
             })
             .catch(err => {
-                this.setState({ error: err });
+                messenger.notify("OpenToast", { msg: `Unable to fetch Settings`, warn: true });
                 console.error(err);
             });
     }
@@ -51,7 +51,7 @@ class SettingsPage extends React.Component {
                     this.setState({ error: null });
                 })
                 .catch(err => {
-                    this.setState({ error: err });
+                    messenger.notify("OpenToast", { msg: `Unable to update Setting ${key} to ${newValue}`, warn: true });
                     console.error(err);
                 });
         }

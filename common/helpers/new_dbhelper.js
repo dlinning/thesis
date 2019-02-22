@@ -237,6 +237,14 @@ module.exports.getLogsForSensor = sensorId => {
     return getLogsForSensorStmt.all(sensorId);
 };
 
+// Simple wrapper around `getLogCountsForSensorsStmt` query above.
+//
+module.exports.getAllSensorLogCounts = () => {
+    let logCounts = getLogCountsForSensorsStmt.all();
+
+    return logCounts;
+}
+
 // Creates a new Sensor with the given `name` (or "New Sensor")
 // and `dataType` ("float","int","string","blob","uuid","datetime").
 //

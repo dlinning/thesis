@@ -21,7 +21,7 @@ class FlowList extends React.Component {
                 this.setState({ flows: res, error: null });
             })
             .catch(err => {
-                this.setState({ error: err });
+                messenger.notify("OpenToast", { msg: `Unable to fetch Flows`, warn: true });
                 console.error(err);
             });
     }

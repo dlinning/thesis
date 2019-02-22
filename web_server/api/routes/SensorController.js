@@ -83,6 +83,12 @@ router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) =>
     res.status(200).send(DBHelper.getLogsForSensor(p.sensorID));
 });
 
+router.get("/logCounts", (req, res) => {
+    let dbResp = DBHelper.getAllSensorLogCounts();
+
+    res.status(200).send(dbResp);
+});
+
 // Used for modifying the sensors via dashboard.
 // Provides data such as groups, name, data type, id.
 //
