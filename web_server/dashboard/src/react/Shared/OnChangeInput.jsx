@@ -18,8 +18,8 @@ class OnChangeInput extends React.Component {
 
         this.setState({ value: newValue });
 
-        // Make it so updates are only sent every 300ms,
-        // once the user has stopped updating.
+        // Make it so updates are only sent every `this.delay` milliseconds,
+        // after the user has stopped updating.
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(() => {
             this.props.callback(newValue);
@@ -46,6 +46,12 @@ class OnChangeInput extends React.Component {
                 break;
         }
 
+        if (type === "textarea") {
+            return <textarea {...props} />;
+        }
+        if (type === "select") {
+            return <select {...props}>{this.props.options}</select>;
+        }
         return <input {...props} />;
     }
 }

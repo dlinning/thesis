@@ -16,7 +16,11 @@ router.get("/getbyid/:id?", (req, res) => {
     res.status(data.status).send(data);
 });
 
-router.get("/create/:name", (req, res) => {
+router.post("/create/:name", (req, res) => {
+    let data = DBHelper.createFlow(req.params.name);
+    res.status(data.status).send(data);
+});
+router.post("/update/id", (req, res) => {
     let data = DBHelper.createFlow(req.params.name);
     res.status(data.status).send(data);
 });

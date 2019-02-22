@@ -18,7 +18,7 @@ class Dashboard extends React.Component {
             this.setPage(newPage, false);
         };
 
-        messenger.subscribe('ChangePage', toPage => {
+        messenger.subscribe("ChangePage", toPage => {
             this.setPage(toPage);
         });
     }
@@ -30,7 +30,7 @@ class Dashboard extends React.Component {
                     this.setState({ page: pageName }, () => {
                         pushHistory && history.pushState({ page: pageName }, pageName, "/" + (pageName === "home" ? "" : pageName));
 
-                        document.title = `Dashboard - ${pageName.capitalize()}`
+                        document.title = `Dashboard - ${pageName.capitalize()}`;
 
                         setTimeout(() => {
                             this.setState({ changing: false });
@@ -46,13 +46,14 @@ class Dashboard extends React.Component {
         return (
             <div id="dashboard" className={this.state.changing === true ? " changing" : ""} data-current-page={this.state.page}>
                 <DashboardSidebar currentPage={s.page} pageChangeFunc={this.setPage} />
-                <div id="dashboard-content">
+                <div id="dashboard-content" className={`container-${s.page}`}>
                     {s.page === "home" && <HomePage />}
                     {s.page === "flows" && <FlowsPage />}
                     {s.page === "sensors" && <SensorsPage />}
                     {s.page === "groups" && <GroupsPage />}
                     {s.page === "settings" && <SettingsPage />}
                 </div>
+                <Toast />
             </div>
         );
     }

@@ -1,42 +1,47 @@
 .flex-col,
 .flex-row {
-	display: flex;
+    display: flex;
 
-	&.sa {
-		justify-content: space-around;
-	}
-	&.sb {
-		justify-content: space-between;
-	}
-	&.se {
-		justify-content: space-evenly;
-	}
-	&.fe {
-		justify-content: flex-end;
-	}
-	&.jcc {
-		justify-content: center;
-	}
-	&.aic {
-		align-items: center;
-	}
+    &.sa {
+        justify-content: space-around;
+    }
+    &.sb {
+        justify-content: space-between;
+    }
+    &.se {
+        justify-content: space-evenly;
+    }
+    &.fe {
+        justify-content: flex-end;
+    }
+    &.jcc {
+        justify-content: center;
+    }
+    &.aic {
+        align-items: center;
+    }
 }
 .flex-col {
-	flex-direction: column;
+    flex-direction: column;
 }
 
 .flex-grid {
-	display: grid;
+    display: grid;
     grid-gap: 1rem;
-    
-    &.cols-4{
+
+    &.cols-4 {
         grid-template-columns: repeat(4, 1fr);
+
+        .tile {
+			width: 100%;
+			min-width: unset;
+        }
     }
-    &.cols-3{
+    &.cols-3 {
         grid-template-columns: repeat(3, 1fr);
     }
-    
-    .tile{
+
+    .tile {
         width: auto;
         max-width: initial;
         margin-bottom: 0;

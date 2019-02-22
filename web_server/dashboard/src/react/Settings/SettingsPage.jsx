@@ -104,7 +104,7 @@ class SettingsPage extends React.Component {
                     />
                 </div>
                 <ErrorCard error={s.error} />
-                <div className="list" id="settings-list">
+                <div className="list constrain" id="settings-list">
                     {s.matches &&
                         Object.keys(s.matches).map(key => {
                             return (

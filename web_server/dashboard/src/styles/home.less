@@ -1,12 +1,14 @@
 #home-lists {
-	display: flex;
-	flex-flow: row nowrap;
+    display: flex;
+    flex-flow: row nowrap;
 
-	> .flex-col:not(:last-of-type) {
-		margin-right: 3rem;
-	}
+    > .flex-col {
+        .title-row {
+            margin-bottom: 0.5rem;
+        }
 
-	.title-row {
-		margin-bottom: 1rem;
-	}
+        &:not(:last-of-type) {
+            margin-right: 3rem;
+        }
+    }
 }

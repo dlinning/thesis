@@ -1,29 +1,13 @@
-class HomePage extends React.Component {
-	constructor(p) {
-		super(p);
-
-		this.state = {};
-	}
-
-	componentDidMount() {
-		Promise.all([jsonFetch("/api/sensors/list"), jsonFetch("/api/flows/list")])
-			.then(res => {
-				this.setState({ sensors: res[0], flows: res[1], error: null });
-			})
-			.catch(err => {
-				this.setState({ error: err });
-				console.error(err);
-			});
-	}
+class HomePage extends React.PureComponent {
 
 	render() {
 		return (
 			<>
 				<h1>Home</h1>
 				<div id="home-lists">
-					<SensorList sensors={this.state.sensors} />
+					<SensorList />
 					<GroupList />
-					<FlowList flows={this.state.flows} />
+					<FlowList />
 				</div>
 			</>
 		);

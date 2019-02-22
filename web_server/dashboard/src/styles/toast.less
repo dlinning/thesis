@@ -1,0 +1,38 @@
+#toast {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+
+    z-index: 20;
+    .md-2();
+
+    padding: 0.25rem 1rem;
+    background: @primary;
+    color: @background;
+
+    border-radius: 0.25rem;
+
+    transform: translateY(5rem);
+    transition: transform 300ms 150ms @exitEase;
+
+    &.open {
+        transform: translateY(0);
+        transition: transform 150ms @entranceEase;
+    }
+
+    &.warn {
+        background: @warn;
+    }
+
+    span {
+        margin-right: 2rem;
+    }
+
+    button {
+        margin: 0.25rem 0;
+    }
+}

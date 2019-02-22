@@ -1,8 +1,4 @@
 {
-    "name": "flowName",
-    "description": "flowDescription",
-    "activationCount": 100,
-
     "trigger": {
         "type": "sensor|group|time",
         "value": "number|string|timestamp",

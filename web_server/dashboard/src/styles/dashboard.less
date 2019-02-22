@@ -1,116 +1,117 @@
 #dashboard {
-	position: relative;
+    position: relative;
 
-	&.changing {
-		#dashboard-content {
-			transition-timing-function: @entranceEase;
-			opacity: 0;
-		}
-	}
+    &.changing {
+        #dashboard-content {
+            transition-timing-function: @entranceEase;
+            opacity: 0;
+        }
+    }
 }
 
 #dashboard-sidebar {
-	grid-area: sidebar;
+    grid-area: sidebar;
 
-	display: flex;
-	flex-flow: column;
+    display: flex;
+    flex-flow: column;
 
-	border-right: 1px solid @divider;
+    border-right: 1px solid @divider;
 
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100vh;
-	width: 6rem;
-	background: @background;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 6rem;
+    background: @background;
 
-	ul {
-		list-style-type: none;
-	}
+    ul {
+        list-style-type: none;
+    }
 
-	li {
-		display: flex;
-		flex-flow: column;
-		align-items: center;
-		justify-content: center;
+    li {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
 
-		height: 5rem;
+        height: 5rem;
 
-		cursor: pointer;
+        cursor: pointer;
 
-		border-left: 0.5rem solid transparent;
-		transition: border-color 350ms @stopToStopEase;
+        border-left: 0.5rem solid transparent;
+        transition: border-color 350ms @stopToStopEase;
 
-		span {
-			text-transform: uppercase;
-			font-weight: 700;
-			font-size: 11px;
+        span {
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 11px;
 
-			opacity: 0;
-			transform: translateY(0.25rem);
-			transition: all 100ms @exitEase;
+            opacity: 0;
+            transform: translateY(0.25rem);
+            transition: all 100ms @exitEase;
 
-			user-select: none;
-			-webkit-user-select: none;
-		}
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-		i {
-			font-size: 1.75rem;
-			margin-bottom: 0.5rem;
+        i {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
 
-			opacity: 0.6;
-		}
+            opacity: 0.6;
+        }
 
-		&:hover {
-			background: fadeout(@primaryLight1, 90);
+        &:hover {
+            background: fadeout(@primaryLight1, 90);
 
-			span {
-				opacity: 1;
-				transform: translateY(0);
-				transition: all 150ms 150ms @entranceEase;
-			}
+            span {
+                opacity: 1;
+                transform: translateY(0);
+                transition: all 150ms 150ms @entranceEase;
+            }
 
-			&:not(.selected) i {
-				opacity: 0.8;
-			}
-		}
+            &:not(.selected) i {
+                opacity: 0.8;
+            }
+        }
 
-		&.selected {
-			border-color: @primary;
-			background: fadeout(@primaryLight1, 95);
+        &.selected {
+            border-color: @primary;
+            background: fadeout(@primaryLight1, 95);
 
-			span {
-				opacity: 1;
-				transform: translateY(0);
-			}
+            span {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-			i {
-				opacity: 1;
-			}
-		}
-	}
+            i {
+                opacity: 1;
+            }
+        }
+    }
 }
 #logo {
-	width: 4rem;
-	margin: 1rem auto;
+    width: 4rem;
+    margin: 1rem auto;
 }
 
 #dashboard-content {
-	display: flex;
-	flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: calc(100% ~"-" 9rem);
+    position: absolute;
+    top: 0;
 
-	padding: 1rem 1rem 0 0;
+    right: 6rem;
+    width: calc(100% ~"-" 15rem);
 
-	opacity: 1;
-	transition: opacity 100ms @exitEase;
+    padding: 1rem 1rem 5rem 0;
 
-	h1 {
-		text-align: left;
-		margin-bottom: 0.5rem;
-	}
+    opacity: 1;
+    transition: opacity 100ms @exitEase;
+
+    .constrain {
+        max-width: 50vw;
+        margin: 0 auto;
+    }
 }

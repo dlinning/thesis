@@ -2,182 +2,203 @@
 @import "./mixins.less";
 
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 html {
-	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-	text-align: center;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    text-align: center;
 
-	background-color: @background;
-	color: @text;
+    background-color: @background;
+    color: @text;
 }
 
 button {
-	line-height: 28px;
-	min-height: 28px;
-	padding: 0 16px;
-	min-width: 36px;
-	max-width: 250px;
+    line-height: 28px;
+    min-height: 28px;
+    padding: 0 16px;
+    min-width: 36px;
+    max-width: 250px;
 
-	margin: 0.5rem auto;
+    margin: 0.5rem auto;
 
-	border-radius: 3px;
-	border: 0;
+    border-radius: 3px;
+    border: 0;
 
-	font-weight: 700;
-	font-size: 0.7rem;
-	letter-spacing: 1px;
-	text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 
-	color: @background;
-	background-color: @primary;
-	border: none;
-	cursor: pointer;
+    color: @background;
+    background-color: @primary;
+    border: none;
+    cursor: pointer;
 
-	transition: background-color 75ms ease-in-out;
-	&:hover {
-		background-color: @primaryDark1;
-	}
-	&:active {
-		background-color: @primaryDark2;
-	}
+    transition: background-color 75ms ease-in-out;
+    &:hover {
+        background-color: @primaryDark1;
+    }
+    &:active {
+        background-color: @primaryDark2;
+    }
 
-	&.round {
-		width: 2rem;
-		height: 2rem;
-		padding: 0;
-		min-width: 0;
-		margin: 0;
-		border-radius: 50%;
-	}
+    &.round {
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        min-width: 0;
+        margin: 0;
+        border-radius: 50%;
+    }
 
-	&.floating {
-		background-color: @primaryDark1;
-		color: @text;
-		border-width: 0;
+    &.floating {
+        background-color: @primaryDark1;
+        color: @text;
+        border-width: 0;
 
-		transition: box-shadow 75ms @stopToStopEase;
+        transition: box-shadow 75ms @stopToStopEase;
 
-		&:hover {
-			.md-2();
-		}
-	}
+        &:hover {
+            .md-2();
+        }
+    }
 
-	&.overlay {
-		color: @text;
-		background: fadeout(@primaryDark1, 90);
+    &.overlay {
+        color: @text;
+        background: fadeout(@primaryDark1, 90);
 
-		&:hover {
-			background-color: fadeout(@primaryLight1, 70);
-		}
-		&:active {
-			background-color: fadeout(@primaryDark1, 70);
-		}
-	}
+        &:hover {
+            background-color: fadeout(@primaryLight1, 70);
+        }
+        &:active {
+            background-color: fadeout(@primaryDark1, 70);
+        }
+    }
 
-	&.warn {
-		background-color: @warnLight;
-		border-color: @warn;
+    &.warn {
+        background-color: @warnLight;
+        border-color: @warn;
 
-		&:hover {
-			background-color: @warn;
-		}
-		&.floating {
-			background-color: @warn;
-		}
+        &:hover {
+            background-color: @warn;
+        }
+        &.floating {
+            background-color: @warn;
+        }
 
-		&.overlay {
-			color: @background;
-			background-color: fadeout(saturate(@warn, 20), 70);
+        &.overlay {
+            color: @background;
+            background-color: fadeout(saturate(@warn, 20), 70);
 
-			&:hover {
-				background-color: @warnLight;
-			}
-			&:active {
-				background-color: @warn;
-			}
-		}
-	}
+            &:hover {
+                background-color: @warnLight;
+            }
+            &:active {
+                background-color: @warn;
+            }
+        }
+    }
 
-	i {
-		pointer-events: none;
-	}
+    i {
+        pointer-events: none;
+    }
 
-	i + span {
-		margin-left: 0.5rem;
-	}
+    i + span {
+        margin-left: 0.5rem;
+    }
 }
 
 input,
+select,
+textarea {
+    background: transparent;
+    color: @text;
+    border: 0;
+    border-bottom: 1px solid @primaryDark1;
+
+    margin: 0 1rem 0.5rem;
+    padding: 0.25rem 0.5rem 0;
+
+    &:valid,
+    &:focus {
+        outline: none;
+        border-bottom-color: @primary;
+    }
+}
+input,
 select {
-	background: transparent;
-	color: @text;
-	border: 0;
-	border-bottom: 1px solid @primaryDark1;
-	line-height: 2;
-	height: 2rem;
-	margin: 0 1rem 0.5rem;
-	padding: 0.25rem 0.5rem 0;
+    line-height: 2;
+    height: 2rem;
+}
+input {
+    &[type="checkbox"] {
+        margin-bottom: 0;
+    }
+}
+textarea {
+    line-height: 1.5;
+    min-height: 3rem;
 
-	&:valid,
-	&:focus {
-		outline: none;
-		border-bottom-color: @primary;
-	}
-
-	&[type="checkbox"] {
-		margin-bottom: 0;
-	}
+    resize: vertical;
 }
 option {
-	color: @background;
+    color: @text;
+}
+
+h1 {
+    text-align: left;
+    margin: 1rem 0;
+}
+h2 {
+    color: lighten(@text, 25);
+    font-weight: 600;
 }
 
 .table {
-	display: table;
-	overflow: auto;
-	table-layout: fixed;
-	width: 100%;
-	border: 2px solid @divider;
+    display: table;
+    overflow: auto;
+    table-layout: fixed;
+    width: 100%;
+    border: 2px solid @divider;
 
-	.tr {
-		display: table-row;
-		border-bottom: 1px solid;
-		transition: background-color 50ms ease;
-	}
-	.tr:nth-of-type(2n) {
-		background-color: rgba(0, 0, 0, 0.08);
-	}
-	.tr:not(:first-of-type):hover {
-		background-color: fadeout(@primaryLight1, 90);
-	}
+    .tr {
+        display: table-row;
+        border-bottom: 1px solid;
+        transition: background-color 50ms ease;
+    }
+    .tr:nth-of-type(2n) {
+        background-color: rgba(0, 0, 0, 0.08);
+    }
+    .tr:not(:first-of-type):hover {
+        background-color: fadeout(@primaryLight1, 90);
+    }
 
-	.td,
-	.th {
-		display: table-cell;
-	}
+    .td,
+    .th {
+        display: table-cell;
+    }
 
-	.td {
-		padding: 0.25rem;
-	}
+    .td {
+        padding: 0.25rem;
+    }
 
-	.th {
-		font-weight: 700;
-		padding: 0.5rem 0.25rem;
-		border-bottom: 2px solid @divider;
-	}
+    .th {
+        font-weight: 700;
+        padding: 0.5rem 0.25rem;
+        border-bottom: 2px solid @divider;
+    }
 }
 
 .clickable {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .errorCard {
-	.cardBase();
-	background: @warn;
-	font-size: 1.1rem;
-	margin-bottom: 1rem;
-	padding: 0.5rem 1rem;
+    .cardBase();
+    background: @warn;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
 }

@@ -294,7 +294,7 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
 
         // Will return a high-level `sensor` entry if the change was a success.
         if (updateSensorStmt.run(currentSensor).changes === 1) {
-            return { status: 200, meta: currentSensor };
+            return { status: 200, updatedSensor: getSensorByIdStmt.get(sensorId) };
         } else {
             return { status: 500, error: "Error updating sensor in DB" };
         }
