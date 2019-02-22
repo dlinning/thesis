@@ -55,6 +55,11 @@ class SensorList extends React.Component {
 			});
 	}
 
+	openAddSensorModal() {
+		//TODO: This
+		alert("Message about how to add a sensor into the system");
+	}
+
 	//
 
 	render() {
@@ -64,49 +69,61 @@ class SensorList extends React.Component {
 		}
 
 		return (
-			<div className="flex-grid cols-3">
-				{sensors.map(s => {
-					return (
-						<div className="tile" key={`sensor_${s.id}`}>
-							<div className="title">{s.name}</div>
-							<div className="desc">
-								<span title={s.id}>({s.id.substr(0, 6)})</span>
-								<span>{s.dataType}</span>
-							</div>
-							<div className="content">
-								<div
-                                    className="data-module clickable"
-                                    title="View logs"
-									onClick={() => this.openSensorLogModal(s.id)}
-								>
-									<span className="value">
-										{s.logCount > 999000
-											? "999k+"
-											: Number(s.logCount).toLocaleString()}
-									</span>
-									<span className="label">Log Count</span>
-								</div>
-								<div className="data-module">
-									<span className="value">{s.groups.length}</span>
-									<span className="label">Groups</span>
-								</div>
-								<div className="data-module">
-									<button onClick={() => this.openSensorSettingsModal(s.id)}>
-										Manage
-									</button>
-									<button className="warn overlay">Remove</button>
-								</div>
-							</div>
+			<>
+				<div
+					className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}
+				>
+					{!this.props.standalone && (
+						<div className="flex-row aic sb title-row">
+							<h2>Sensors</h2>
+							<button
+								className="round"
+								onClick={this.openAddSensorModal.bind(this)}
+							>
+								<i className="fas fa-plus" />
+							</button>
 						</div>
-					);
-				})}
-				{sensors.length === 0 && (
-					<p>
-						You have no sensors currently registered. Please do so before
-						viewing this page.
-					</p>
-				)}
-			</div>
+					)}
+					{sensors.map(s => {
+						return (
+							<div className="tile" key={`sensor_${s.id}`}>
+								<div className="title">{s.name}</div>
+								<div className="desc">
+									<span title={s.id}>({s.id.substr(0, 6)})</span>
+									<span>{s.dataType}</span>
+								</div>
+								<div className="content">
+									<div
+										className="data-module clickable"
+										title="View logs"
+										onClick={() => this.openSensorLogModal(s.id)}
+									>
+										<span className="value">
+											{s.logCount > 999000
+												? "999k+"
+												: Number(s.logCount).toLocaleString()}
+										</span>
+										<span className="label">Log Count</span>
+									</div>
+									<div className="data-module">
+										<span className="value">{s.groups.length}</span>
+										<span className="label">Groups</span>
+									</div>
+									<div className="data-module">
+										<button onClick={() => this.openSensorSettingsModal(s.id)}>
+											Manage
+										</button>
+										<button className="warn overlay">Remove</button>
+									</div>
+								</div>
+							</div>
+						);
+					})}
+					{sensors.length === 0 && (
+						<p>You have no sensors currently registered.</p>
+					)}
+				</div>
+			</>
 		);
 	}
 }

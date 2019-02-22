@@ -17,6 +17,10 @@ class Dashboard extends React.Component {
             }
             this.setPage(newPage, false);
         };
+
+        messenger.subscribe('ChangePage', toPage => {
+            this.setPage(toPage);
+        });
     }
 
     setPage(pageName, pushHistory = true, viewName = null) {
@@ -33,10 +37,6 @@ class Dashboard extends React.Component {
                 }, 110);
             });
         }
-    }
-
-    changeView(toViewName) {
-        this.setState({ view: toViewName });
     }
 
     render() {
