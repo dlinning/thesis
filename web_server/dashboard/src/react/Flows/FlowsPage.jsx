@@ -5,12 +5,12 @@ class FlowsPage extends React.Component {
         this.state = {};
     }
 
-
     render() {
         var s = this.state;
         return (
             <>
                 <h1>Manage Flows</h1>
+                <FlowList standalone={true} />
             </>
         );
     }
