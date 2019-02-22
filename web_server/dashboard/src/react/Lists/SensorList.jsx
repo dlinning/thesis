@@ -16,7 +16,6 @@ class SensorList extends React.Component {
 	}
 
 	openSensorLogModal(sensorId) {
-		console.log(sensorId);
 		jsonFetch("/api/sensors/logs/" + sensorId)
 			.then(resp => {
 				messenger.notify("OpenModal", {
@@ -75,7 +74,11 @@ class SensorList extends React.Component {
 								<span>{s.dataType}</span>
 							</div>
 							<div className="content">
-								<div className="data-module">
+								<div
+                                    className="data-module clickable"
+                                    title="View logs"
+									onClick={() => this.openSensorLogModal(s.id)}
+								>
 									<span className="value">
 										{s.logCount > 999000
 											? "999k+"
@@ -88,7 +91,9 @@ class SensorList extends React.Component {
 									<span className="label">Groups</span>
 								</div>
 								<div className="data-module">
-									<button>Manage</button>
+									<button onClick={() => this.openSensorSettingsModal(s.id)}>
+										Manage
+									</button>
 									<button className="warn overlay">Remove</button>
 								</div>
 							</div>
