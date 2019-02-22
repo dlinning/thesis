@@ -593,6 +593,9 @@ const getFlowByNameStmt = db.prepare(`SELECT * FROM Flows WHERE name = ?`);
 module.exports.getFlowById = id => {
     let res = getFlowByIdStmt.get(id);
     if (res) {
+        if (res.config) {
+            res.config = JSON.parse(res.config);
+        }
         return { status: 200, flow: res };
     }
     return { status: 400, error: `Flow with ID "${name}" does not exist` };
