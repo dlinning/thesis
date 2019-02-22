@@ -174,6 +174,7 @@ module.exports.logCountAndGroupsForAllSensors = () => {
         let data = groups[i];
         if (data.GroupId) {
             sensors[sensorIdx[data.SensorId]].groups.push(data);
+            delete data.SensorId;
         }
     }
 
@@ -557,7 +558,6 @@ module.exports.getSettingsByGroup = groupName => {
 };
 const getSettingByGroupStmt = db.prepare(`SELECT * FROM Settings WHERE inGroup = ?`);
 
-
 module.exports.modifySetting = (name, newValue) => {
     var res = modifySettingByNameStmt.run(newValue, name);
     if (res.changes === 1) {
@@ -623,10 +623,10 @@ module.exports.deleteFlowById = id => {
 
     if (flow !== undefined) {
         deleteFlowByIdStmt.run(id);
-            // The Flow should now be `undefined`,
-            // meaning the delte was a success
-            flow = getFlowByIdStmt.get(id);
-            return { status: 200, flow: flow };
+        // The Flow should now be `undefined`,
+        // meaning the delte was a success
+        flow = getFlowByIdStmt.get(id);
+        return { status: 200, flow: flow };
     } else {
         return { status: 400, error: `Flow does not exist with ID ${id}` };
     }
