@@ -23,7 +23,7 @@ class SensorList extends React.Component {
         // Set to pull new log counts every 30 seconds
         this.interval = setInterval(() => {
             this.updateLogCounts();
-        }, 30000);//TODO: Add this in to Settings?
+        }, 30000); //TODO: Add this in to Settings?
     }
     componentWillUnmount() {
         clearInterval(this.interval);
@@ -121,7 +121,7 @@ class SensorList extends React.Component {
             .then(resp => {
                 messenger.notify("OpenModal", {
                     title: `Logs For Sensor: ${sensorId.substr(0, 6)}...`,
-                    content: <LogList entries={resp} />
+                    content: <LogList entries={resp} exportTitle={`SensorLogs_${sensorId}`} />
                 });
             })
             .catch(err => {
@@ -144,7 +144,7 @@ class SensorList extends React.Component {
                 } else {
                     // Sensor was removed, either by previous prompt
                     // or it never had logs in the first place
-                    this.props.sensorRemoveCallback();
+                    this.updateSensorList();
                 }
             })
             .catch(err => {
@@ -195,7 +195,9 @@ class SensorList extends React.Component {
                                     </div>
                                     <div className="data-module">
                                         <button onClick={() => this.openSensorSettingsModal(s.id)}>Manage</button>
-                                        <button className="warn overlay">Remove</button>
+                                        <button onClick={() => this.removeSensor(s.id)} className="warn overlay">
+                                            Remove
+                                        </button>
                                     </div>
                                 </div>
                             </div>

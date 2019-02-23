@@ -42,46 +42,9 @@ router.get("/list/:page?/:limit?", (req, res) => {
 
 // Returns logEntries for all sensors within
 // a given group.
-router.get("/logs/:groupID/:page?/:limit?/:startTime?/:endTime?", (req, res) => {
+router.get("/logs/:groupID/:startTime?/:endTime?", (req, res) => {
     let p = req.params;
 
-    DBHelper.FindAndCountPaginated(
-        DBHelper.dbObjects["LogEntry"],
-        {
-            attributes: ["timestamp", "value"],
-            where: {
-                timestamp: {
-                    [Op.and]: {
-                        [Op.lte]: p.endTime || Date.now(),
-                        [Op.gte]: p.startTime || Date.UTC(1970, 0, 1)
-                    }
-                }
-            },
-            include: [
-                {
-                    model: DBHelper.dbObjects["Sensor"],
-                    attributes: ["name", "id", "dataType"],
-                    include: [
-                        {
-                            model: DBHelper.dbObjects["Group"],
-                            attributes: [],
-                            where: {
-                                id: { [Op.eq]: p.groupID }
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        p.page || 0,
-        p.limit || 100
-    )
-        .then(dbResp => {
-            res.status(200).send(dbResp);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send({ error: `Error getting logs for group ${p.groupID}.` });
-        });
+    res.status(200).send(DBHelper.getLogsForGroup(p.groupID, p.startTime, p.endTime));
 });
 module.exports = router;

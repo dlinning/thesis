@@ -118,36 +118,6 @@ function groupBy(rows, fieldName, asKey, appendTo = {}, skipNull = true, dropKey
     return res;
 }
 
-// Pull `columns` (array) from `table`, with a limit of `limit` per page,
-// starting from page `page` (0-indexed).
-//
-// TODO: Be able to "WHERE" this.
-//
-module.exports.findAndCountPaginated = (table, columns, where = [], page = 0, limit = 10) => {
-    var toPrepare = `SELECT ${columns.join(",")} FROM ${table} `;
-    if (where.length !== 0) {
-        toPrepare += "WHERE ";
-        for (var i = 0, l = where.length; i < l; i++) {
-            toPrepare += `${i > 0 ? " AND" : ""} ${where[i]}`;
-        }
-    }
-    toPrepare += ` LIMIT ${limit} OFFSET ${page * limit}`;
-    console.log(toPrepare);
-    var stmt = db.prepare(toPrepare);
-    var count = db.prepare(`SELECT COUNT(${columns[0]}) AS total FROM ${table}`);
-
-    var rows = stmt.all();
-
-    var totalRows = count.get().total;
-    return {
-        rows: rows,
-        total: totalRows,
-        totalPages: Math.ceil(totalRows / limit) - 1,
-        page: page,
-        limit: limit
-    };
-};
-
 // Returns all logs and groups for all sensors,
 // in an object keyed by each sensor's ID.
 //
@@ -217,8 +187,14 @@ const getGroupsforSensorStmt = db.prepare(
 );
 const getMetadataForSensorStmt = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensorStmt = db.prepare(
-    `SELECT id,timestamp,value,createdAt,SensorId FROM LogEntries
+    `SELECT id,timestamp,value,SensorId FROM LogEntries
     WHERE SensorId = ?`
+);
+// Expects (sensorId, startTime, endTime)
+const getLogsForSensorInRangeStmt = db.prepare(
+    `SELECT id,timestamp,value,SensorId FROM LogEntries
+    WHERE SensorId = ? AND createdAt >= ?
+	AND createdAt <= ?`
 );
 
 // Simple wrapper around `getGroupsforSensor` query above.
@@ -233,8 +209,12 @@ module.exports.getGroupsForSensor = sensorId => {
 // Returns data for all logs for the specific sensor
 // with ID `sensorId`
 //
-module.exports.getLogsForSensor = sensorId => {
-    return getLogsForSensorStmt.all(sensorId);
+module.exports.getLogsForSensor = (sensorId, start = undefined, end = undefined) => {
+    if (start && end) {
+        return getLogsForSensorInRangeStmt.all(sensorId, start, end);
+    } else {
+        return getLogsForSensorStmt.all(sensorId);
+    }
 };
 
 // Simple wrapper around `getLogCountsForSensorsStmt` query above.
@@ -243,7 +223,7 @@ module.exports.getAllSensorLogCounts = () => {
     let logCounts = getLogCountsForSensorsStmt.all();
 
     return logCounts;
-}
+};
 
 // Creates a new Sensor with the given `name` (or "New Sensor")
 // and `dataType` ("float","int","string","blob","uuid","datetime").
@@ -404,6 +384,7 @@ module.exports.deleteSensor = (sensorId, deleteWithLogs = false) => {
     }
 };
 const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
+
 //
 //
 //
@@ -421,12 +402,7 @@ const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
 module.exports.listAllGroups = () => {
     return listAllGroupsStmt.all();
 };
-const listAllGroupsStmt = db.prepare(`SELECT  g.id, g.name, g.updatedAt, count(sg.SensorId) as sensorCount
-FROM Groups as g
-LEFT JOIN SensorGroups as sg
-ON g.id = sg.GroupId
-GROUP BY g.id
-ORDER BY g.createdAt`);
+const listAllGroupsStmt = db.prepare(`SELECT * FROM GroupListWithSensorAndLogCount`);
 
 // "Helper" for both `createGroupFunc` and `updateGroupFunc`, so there
 // is only one entry point necessary for both
@@ -531,6 +507,49 @@ module.exports.deleteGroup = (groupId, deleteWithSensors = false) => {
     }
 };
 const deleteGroupStmt = db.prepare(`DELETE FROM Groups WHERE id = ?`);
+
+module.exports.getLogsForGroup = (groupId, start = undefined, end = undefined) => {
+    if (start && end) {
+        return getLogsForGroupInRangeStmt.all(groupId, start, end);
+    } else {
+        return getLogsForGroupStmt.all(groupId);
+    }
+};
+const getLogsForGroupStmt = db.prepare(
+    `SELECT
+    le.id as logId,
+    le.SensorId as sensorId,
+    s.dataType as dataType,
+	le.value as value,
+	le.timestamp as timestamp
+FROM
+	Sensors s,
+	SensorGroups sg,
+	(SELECT id, timestamp, createdAt, value, SensorId FROM LogEntries) le
+WHERE
+	sg.GroupId = ? AND
+	sg.SensorId = le.SensorId AND
+	s.id = sg.SensorId`
+);
+// Expects (sensorId, startTime, endTime)
+const getLogsForGroupInRangeStmt = db.prepare(
+    `SELECT
+	le.id as logId,
+    le.SensorId as sensorId,
+    s.dataType as dataType,
+	le.value as value,
+	le.timestamp as timestamp
+FROM
+	Sensors s,
+	SensorGroups sg,
+	(SELECT id, timestamp, createdAt, value, SensorId FROM LogEntries) le
+WHERE
+	sg.GroupId = ? AND
+	sg.SensorId = le.SensorId AND
+    s.id = sg.SensorId AND 
+    le.createdAt >= ? AND
+    le.createdAt <= ?`
+);
 
 //
 //
@@ -664,12 +683,11 @@ module.exports.logData = (value, sensorUUID, timestamp) => {
         );
         return;
     }
-    const currentTime = dateAsUnixTimestamp();
     const logEntry = {
         value: value,
-        timestamp: timestamp || currentTime,
+        timestamp: timestamp || new Date(),
         SensorId: sensorUUID,
-        createdAt: currentTime
+        createdAt: dateAsUnixTimestamp()
     };
     // Will return 1 if the change was a success.
     return insertLogEntryStmt.run(logEntry).changes;

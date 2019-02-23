@@ -75,12 +75,10 @@ router.delete("/delete/:id/:deleteWithLogs?", (req, res) => {
     }
 });
 
-router.get("/logs/:sensorID/:page?/:limit?/:startTime?/:endTime?", (req, res) => {
+router.get("/logs/:sensorID/:startTime?/:endTime?", (req, res) => {
     let p = req.params;
 
-    // TODO: Add paging/limiting/startTime/EndTime
-
-    res.status(200).send(DBHelper.getLogsForSensor(p.sensorID));
+    res.status(200).send(DBHelper.getLogsForSensor(p.sensorID, p.startTime, p.endTime));
 });
 
 router.get("/logCounts", (req, res) => {

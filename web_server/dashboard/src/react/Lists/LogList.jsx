@@ -1,29 +1,60 @@
 class LogList extends React.Component {
     render() {
         let p = this.props;
-        return (
-            <DataTable canExport={true}>
-                {p.title && <span className="title">{p.title}</span>}
-                <div className="table">
-                    <div className="tr">
-                        <div className="th">Time</div>
-                        <div className="th">Value</div>
-                    </div>
-                    {p.entries &&
-                        p.entries.map((entry, idx) => {
-                            let l = entry.value.length > 10;
-                            let formattedDate = new Date(entry.timestamp);
-                            return (
-                                <div className="tr" key={idx}>
-                                    <div className="td">{formattedDate.toLocaleString()}</div>
-                                    <div className="td" title={l ? entry.value : ""}>
-                                        {l ? entry.value.substr(0, 10) : entry.value}
+
+        if (p.entries && p.entries.length > 0) {
+            // Get all fields from the first key, will use later
+            let fields = Object.keys(p.entries[0]);
+
+            return (
+                <DataTable canExport={true} exportTitle={p.exportTitle || p.title}>
+                    {p.title && <span className="title">{p.title}</span>}
+                    <div className="table">
+                        <div className="tr header">
+                            {fields.map((f, idx) => {
+                                return (
+                                    <div className="th" key={idx}>
+                                        {f}
                                     </div>
-                                </div>
-                            );
-                        })}
-                </div>
-            </DataTable>
-        );
+                                );
+                            })}
+                        </div>
+                        {p.entries &&
+                            p.entries.map((entry, idx) => {
+                                let cells = fields.map((f, idx) => {
+                                    if (f == "sensorId") {
+                                        return (
+                                            <div className="td" key={idx} title={entry[f]}>
+                                                {entry[f].substring(0, 6)}
+                                            </div>
+                                        );
+                                    }
+                                    if (f == "timestamp") {
+                                        return (
+                                            <div className="td" key={idx} title={entry[f]}>
+                                                {new Date(entry.timestamp).concise()}
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <div className="td" key={idx}>
+                                            {entry[f]}
+                                        </div>
+                                    );
+                                });
+
+                                return (
+                                    <div className="tr" key={idx}>
+                                        {cells}
+                                    </div>
+                                );
+                            })}
+                    </div>
+                </DataTable>
+            );
+        }
+
+        //TODO: Handle no entries being passed
+        return null;
     }
 }

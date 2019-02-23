@@ -53,6 +53,19 @@ class GroupList extends React.Component {
         });
     }
 
+    onGroupLogModal(groupId) {
+        jsonFetch("/api/groups/logs/" + groupId)
+            .then(resp => {
+                messenger.notify("OpenModal", {
+                    title: `Logs For Group: ${groupId.substr(0, 6)}...`,
+                    content: <LogList entries={resp} exportTitle={`GroupLogs_${groupId}`} />
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
     //
 
     render() {
@@ -96,6 +109,10 @@ class GroupList extends React.Component {
                                         <span title={g.id}>({g.id.substr(0, 6)})</span>
                                     </div>
                                     <div className="content">
+                                        <div className="data-module clickable" onClick={() => this.onGroupLogModal(g.id)}>
+                                            <span className="value">{g.logCount}</span>
+                                            <span className="label">Log Count</span>
+                                        </div>
                                         <div className="data-module">
                                             <span className="value">{g.sensorCount}</span>
                                             <span className="label">Sensors</span>

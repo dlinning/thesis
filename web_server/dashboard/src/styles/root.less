@@ -162,6 +162,7 @@ h2 {
     table-layout: fixed;
     width: 100%;
     border: 2px solid @divider;
+    border-radius: 0.25rem;
 
     .tr {
         display: table-row;
@@ -169,15 +170,16 @@ h2 {
         transition: background-color 50ms ease;
     }
     .tr:nth-of-type(2n) {
-        background-color: rgba(0, 0, 0, 0.08);
+        background-color: rgba(0, 0, 0, 0.02);
     }
-    .tr:not(:first-of-type):hover {
+    .tr:not(.header):hover {
         background-color: fadeout(@primaryLight1, 90);
     }
 
     .td,
     .th {
         display: table-cell;
+        vertical-align: middle;
     }
 
     .td {

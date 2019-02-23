@@ -25,7 +25,7 @@
 
 				console.log(`CSV Generated in ${endTime}ms`);
 
-				var filename = title + ".csv";
+				var filename = `${title}_${new Date().getTime()}.csv`;
 				fileDownloader.downloadToDevice(
 					csv,
 					{ type: "text/plain;charset=utf-8" },

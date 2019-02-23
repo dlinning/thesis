@@ -1,14 +1,29 @@
 .datatable {
-	padding: 1rem 0;
-	.title {
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 3px 3px 0 0;
-		font-size: 13px;
-		font-weight: 700;
-	}
-	.controls {
-		padding-top: 0.5rem;
+    margin: 1rem;
+
+    position: relative;
+
+    display: flex;
+    flex-flow: column;
+
+    .title {
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px 3px 0 0;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    > .controls {
+        padding-top: 0.5rem;
 		width: 100%;
-	}
+		margin-bottom: 0.5rem;
+
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            margin: 0 0 0 1rem;
+        }
+    }
 }
