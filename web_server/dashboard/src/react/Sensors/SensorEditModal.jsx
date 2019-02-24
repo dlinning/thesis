@@ -125,13 +125,7 @@ class SensorEditModal extends React.Component {
                         initialValue={s.dataType}
                         callback={val => this.updateField("dataType", val)}
                         type="select"
-                        options={this.possibleDataTypes.map((dt, idx) => {
-                            return (
-                                <option value={dt} key={idx}>
-                                    {dt}
-                                </option>
-                            );
-                        })}
+                        options={this.possibleDataTypes}
                         name="dataType"
                     />
                 </div>

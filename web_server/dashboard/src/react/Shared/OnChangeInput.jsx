@@ -9,7 +9,7 @@ class OnChangeInput extends React.Component {
         this.state = {
             value: p.initialValue || ""
         };
-        this.delay = this.props.delay || 300;
+        this.delay = this.props.delay === undefined ? 300 : this.props.delay;
     }
 
     updateHandler(evt) {
@@ -30,12 +30,19 @@ class OnChangeInput extends React.Component {
         let type = this.props.type ? this.props.type.toLowerCase() : "text";
         let props = {
             className: this.props.classes ? this.props.classes.join(" ") : "",
-            onChange: this.updateHandler.bind(this),
             type: type,
-            placeholder: this.props.placeholder || "",
+            placeholder: this.props.placeholder || (this.props.name && this.props.name.capitalize()) || "",
             autoComplete: this.props.autocomplete || "off",
-            name: this.props.name || ""
+            name: this.props.name || "",
+            required: this.props.required ? true : false,
+            disabled: this.props.disabled ? true : false
         };
+        if (!this.props.submitText) {
+            props.onChange = this.updateHandler.bind(this);
+        }
+
+        let inputObj = null;
+
         switch (type) {
             case "bool":
                 props.type = "checkbox";
@@ -47,11 +54,40 @@ class OnChangeInput extends React.Component {
         }
 
         if (type === "textarea") {
-            return <textarea {...props} />;
+            inputObj = <textarea {...props} />;
+        } else if (type === "select") {
+            props.value = this.props.placeholder;
+            inputObj = (
+                <select {...props}>
+                    {this.props.options.map((val, idx) => {
+                        // Quick-return if we provide
+                        // display and "value" values
+                        if (val.display && val.value) {
+                            return (
+                                <option value={val.value} key={idx}>
+                                    {val.display}
+                                </option>
+                            );
+                        }
+                        // Otherwise assume `val` is both
+                        // display and "value"
+                        return (
+                            <option value={val} key={idx}>
+                                {val}
+                            </option>
+                        );
+                    })}
+                </select>
+            );
+        } else {
+            inputObj = <input {...props} />;
         }
-        if (type === "select") {
-            return <select {...props}>{this.props.options}</select>;
-        }
-        return <input {...props} />;
+
+        return (
+            <>
+                {inputObj}
+                {this.props.submitText && <button onClick={this.updateHandler.bind(this)}>{this.props.submitText}</button>}
+            </>
+        );
     }
 }

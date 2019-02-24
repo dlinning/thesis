@@ -1,9 +1,8 @@
 {
-    "trigger": {
-        "type": "sensor|group|time",
-        "value": "number|string|timestamp",
-        "comparison": "==|!=|>|<|etc."
-    },
+    "triggers": [
+        { "type": "number|text|time", "comparison": "==|!=|>=|<=", "value": "" },
+        { "type": "number|text|time", "comparison": "==|!=|>=|<=", "value": "" }
+    ],
 
     "sends": [
         {

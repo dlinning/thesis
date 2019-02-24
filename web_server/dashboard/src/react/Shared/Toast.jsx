@@ -10,7 +10,11 @@ class Toast extends React.Component {
         this.timer = null;
 
         messenger.subscribe("OpenToast", d => {
-            this.setState({ msg: d.message || d.msg, open: true, warn: d.warn || false });
+            this.setState({ msg: d.message || d.msg }, () => {
+                setTimeout(() => {
+                    this.setState({ open: true, warn: d.warn || false });
+                }, 10);
+            });
             clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 this.close();
@@ -31,6 +35,9 @@ class Toast extends React.Component {
 
     render() {
         let warnClass = this.state.warn ? "warn" : "";
+        if (this.state.msg === undefined) {
+            return null;
+        }
         return (
             <div id="toast" className={`${this.state.open ? "open" : ""} ${warnClass}`}>
                 <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />

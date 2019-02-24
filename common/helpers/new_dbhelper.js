@@ -606,12 +606,21 @@ const modifySettingByNameStmt = db.prepare(`UPDATE Settings SET value = ? WHERE 
 //
 
 module.exports.getAllFlows = () => {
-    return getAllFlowsStmt.all();
+    let allFlows = getAllFlowsStmt.all();
+    for (let i = 0, l = allFlows.length; i < l; i++) {
+        if (allFlows[i].config) {
+            allFlows[i].config = JSON.parse(allFlows[i].config);
+        }
+    }
+    return allFlows;
 };
 const getAllFlowsStmt = db.prepare(`SELECT id, name, description, activationCount FROM Flows`);
 module.exports.getFlowByName = name => {
     let res = getFlowByNameStmt.get(name);
     if (res) {
+        if (res.config) {
+            res.config = JSON.parse(res.config);
+        }
         return { status: 200, flow: res };
     }
     return { status: 400, error: `Flow with name "${name}" does not exist` };
@@ -628,25 +637,58 @@ module.exports.getFlowById = id => {
     return { status: 400, error: `Flow with ID "${name}" does not exist` };
 };
 const getFlowByIdStmt = db.prepare(`SELECT * FROM Flows WHERE id = ?`);
-module.exports.createFlow = name => {
+module.exports.createFlow = data => {
     var d1 = dateAsUnixTimestamp();
 
     const newFlow = {
         id: newUUID(),
-        name: name,
+        name: data.name,
+        description: data.description,
+        activationCount: 0,
+        config: JSON.stringify(data.config),
         createdAt: d1,
         updatedAt: d1
     };
 
-    if (makeNewFlowWithNameStmt.run(newFlow).changes === 1) {
+    if (makeNewFlowStmt.run(newFlow).changes === 1) {
         return { status: 200, group: newFlow };
     }
     // else
     return { status: 500, error: `The server was unable to create a new flow` };
 };
-const makeNewFlowWithNameStmt = db.prepare(
-    `INSERT INTO Flows(id,name,createdAt,updatedAt)
-    VALUES (@id,@name,@createdAt,@updatedAt)`
+const makeNewFlowStmt = db.prepare(
+    `INSERT INTO Flows(id,name,description,activationCount,config,createdAt,updatedAt)
+    VALUES (@id,@name,@description,@activationCount,@config,@createdAt,@updatedAt)`
+);
+
+module.exports.updateFlow = (id, data) => {
+    let originalFlow = getFlowByIdStmt.get(id);
+
+    if (originalFlow) {
+        originalFlow.name = data.name;
+        originalFlow.description = data.description;
+        originalFlow.config = JSON.stringify(data.config);
+        originalFlow.updatedAt = dateAsUnixTimestamp();
+        // Don't update activationCount or createdAt fields
+
+        if (updateFlowStmt.run(originalFlow).changes === 1) {
+            return { status: 200, flow: originalFlow };
+        }
+        // else
+        return { status: 500, error: `The server was unable to update Flow with ID ${id}` };
+    } else {
+        return { status: 400, error: `A Flow does not exist with ID ${id}` };
+    }
+};
+
+const updateFlowStmt = db.prepare(
+    `UPDATE Flows 
+        SET name = @name,
+            description = @description,
+            config = @config,
+            updatedAt = @updatedAt
+        WHERE id = @id
+    `
 );
 module.exports.deleteFlowById = id => {
     var flow = getFlowByIdStmt.get(id);
@@ -662,6 +704,16 @@ module.exports.deleteFlowById = id => {
     }
 };
 const deleteFlowByIdStmt = db.prepare(`DELETE FROM Flows WHERE id = ?`);
+
+
+module.exports.getGroupAndSensorDataForFlows = () => {
+    return {
+        sensors: getSensorDataForFlowsStmt.all(),
+        groups: getGroupDataForFlowsStmt.all(),
+    }
+}
+const getSensorDataForFlowsStmt = db.prepare(`SELECT id,name,dataType from Sensors`);
+const getGroupDataForFlowsStmt = db.prepare(`SELECT id,name from Groups`);
 
 //
 //

@@ -10,10 +10,13 @@ class FlowsPage extends React.Component {
         return (
             <>
                 <h1>Manage Flows</h1>
-                <FlowBuilder />
+                <div className="constrain">
+                    <FlowEditor />
+                </div>
+                <hr />
+                <br/>
                 <FlowList standalone={true} />
             </>
         );
     }
 }
-

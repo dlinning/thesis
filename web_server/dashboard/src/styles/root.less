@@ -7,7 +7,7 @@
     padding: 0;
 }
 html {
-    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-family: 'Roboto', "Helvetica Neue", Helvetica, sans-serif;
     text-align: center;
 
     background-color: @background;
@@ -115,22 +115,35 @@ select,
 textarea {
     background: transparent;
     color: @text;
-    border: 0;
-    border-bottom: 1px solid @primaryDark1;
+
+    border-radius: 0.25rem;
+    border: 2px solid @disabledBackground;
+    transition: border-color 100ms ease;
 
     margin: 0 1rem 0.5rem;
-    padding: 0.25rem 0.5rem 0;
+    padding: 0 0.5rem;
 
-    &:valid,
     &:focus {
         outline: none;
-        border-bottom-color: @primary;
+        border-color: @primary;
+    }
+
+    &:disabled {
+        background: @disabledBackground;
+
+        cursor: not-allowed;
+
+        color: @text;
+
+        &::placeholder {
+            color: @diabledPlaceholder;
+        }
     }
 }
 input,
 select {
-    line-height: 2;
-    height: 2rem;
+    line-height: 2.5rem;
+    height: 2.5rem;
 }
 input {
     &[type="checkbox"] {
@@ -139,7 +152,8 @@ input {
 }
 textarea {
     line-height: 1.5;
-    min-height: 3rem;
+    min-height: 5rem;
+    padding: 0.5rem 0.5rem;
 
     resize: vertical;
 }
