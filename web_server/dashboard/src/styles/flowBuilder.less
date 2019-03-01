@@ -1,5 +1,29 @@
 #flow-builder {
     width: 100%;
-    min-width: 50vw;
     max-width: unset;
+
+    textarea,
+    .name-input {
+        max-width: 50%;
+        min-width: 300px;
+    }
+
+    .sensor-data-col {
+        position: relative;
+    }
+
+    .sensor-data-type {
+        position: absolute;
+        bottom: -1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: @textLight;
+    }
+
+    .config {
+        select,
+        input {
+            margin-bottom: 0;
+        }
+    }
 }

@@ -7,7 +7,7 @@
     padding: 0;
 }
 html {
-    font-family: 'Roboto', "Helvetica Neue", Helvetica, sans-serif;
+    font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
     text-align: center;
 
     background-color: @background;
@@ -117,7 +117,7 @@ textarea {
     color: @text;
 
     border-radius: 0.25rem;
-    border: 2px solid @disabledBackground;
+    border: 2px solid @divider;
     transition: border-color 100ms ease;
 
     margin: 0 1rem 0.5rem;
@@ -136,7 +136,7 @@ textarea {
         color: @text;
 
         &::placeholder {
-            color: @diabledPlaceholder;
+            color: @disabledPlaceholder;
         }
     }
 }
@@ -150,6 +150,15 @@ input {
         margin-bottom: 0;
     }
 }
+
+select {
+    &.invalid {
+        color: @disabledPlaceholder;
+    }
+    option {
+        background: @background;
+    }
+}
 textarea {
     line-height: 1.5;
     min-height: 5rem;
@@ -159,6 +168,64 @@ textarea {
 }
 option {
     color: @text;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 0 1rem;
+
+    .radio-line {
+        display: flex;
+        align-items: center;
+        margin: 0.125rem 0;
+        border: 2px solid @divider;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem 0.25rem 1.5rem;
+        position: relative;
+
+        cursor: pointer;
+
+        span {
+            user-select: none;
+
+            &::before {
+                display: block;
+                content: " ";
+                color: #fff;
+                position: absolute;
+                left: 0.5rem;
+                top: 0.35rem;
+                width: 0.8rem;
+                height: 0.9rem;
+                background: fadeout(@divider, 80);
+                border-radius: 50%;
+            }
+        }
+
+        &:hover:not(.selected) {
+            span::before {
+                background: @primaryLight2;
+            }
+        }
+
+        &.selected {
+            border-color: @primary;
+
+            span::before {
+                background: @primaryDark1;
+            }
+        }
+
+        input {
+            margin: 0 0.25rem 0 0;
+            line-height: auto;
+            height: auto;
+            position: fixed;
+            top: -1rem;
+            left: -1rem;
+        }
+    }
 }
 
 h1 {

@@ -1,5 +1,5 @@
 {
-    "triggers": [
+    "trigger": [
         { "type": "number|text|time", "comparison": "==|!=|>=|<=", "value": "" },
         { "type": "number|text|time", "comparison": "==|!=|>=|<=", "value": "" }
     ],

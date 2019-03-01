@@ -9,6 +9,9 @@ class OnChangeInput extends React.Component {
         this.state = {
             value: p.initialValue || ""
         };
+        if (p.type === "select" && p.placeholder) {
+            this.state.value = "MUST_CHANGE";
+        }
         this.delay = this.props.delay === undefined ? 300 : this.props.delay;
     }
 
@@ -28,8 +31,14 @@ class OnChangeInput extends React.Component {
 
     render() {
         let type = this.props.type ? this.props.type.toLowerCase() : "text";
+
+        let classlist = this.props.classes || [];
+        if (this.state.value == "MUST_CHANGE" && type == "select") {
+            classlist.push("invalid");
+        }
+
         let props = {
-            className: this.props.classes ? this.props.classes.join(" ") : "",
+            className: classlist.join(" "),
             type: type,
             placeholder: this.props.placeholder || (this.props.name && this.props.name.capitalize()) || "",
             autoComplete: this.props.autocomplete || "off",
@@ -56,9 +65,13 @@ class OnChangeInput extends React.Component {
         if (type === "textarea") {
             inputObj = <textarea {...props} />;
         } else if (type === "select") {
-            props.value = this.props.placeholder;
             inputObj = (
                 <select {...props}>
+                    {this.props.placeholder && (
+                        <option value="MUST_CHANGE" disabled hidden>
+                            {this.props.placeholder}
+                        </option>
+                    )}
                     {this.props.options.map((val, idx) => {
                         // Quick-return if we provide
                         // display and "value" values
