@@ -8,15 +8,15 @@ class FlowEditor extends React.Component {
             name: fd.name || "Flow Name",
             description: fd.description || "Flow Description",
             trigger: {},
-            sends: [{}],
+            send: {},
             sgData: { sensors: [], groups: [] },
             validTriggerTypes: ["Time"]
         };
 
         this.triggerComparisons = {
-            Sensor: [
-                { value: "==", display: "Equal To" },
-                { value: "!=", display: "Not Equal To" },
+            Shared: [
+                { value: "==", display: "==" },
+                { value: "!=", display: "!=" },
                 { value: ">", display: ">" },
                 { value: ">=", display: ">=" },
                 { value: "<", display: "<" },
@@ -74,7 +74,26 @@ class FlowEditor extends React.Component {
         let newTrigger = this.state.trigger;
         newTrigger[field] = value;
 
+        //
+        //TODO: Have field == "type" changes update the trigger/send ID
+        //
+
         this.setState({ trigger: newTrigger });
+    }
+
+    updateSend(field, value) {
+        let newSend = this.state.send;
+        newSend[field] = value;
+
+        //
+        //TODO: Have field == "type" changes update the trigger/send ID
+        //
+
+        this.setState({ send: newSend });
+    }
+
+    updateSendData(data) {
+        this.setState({ send: JSON.stringify(data) });
     }
 
     render() {
@@ -116,7 +135,7 @@ class FlowEditor extends React.Component {
                 />
 
                 <div className="flex-col config">
-                    <div className="flex-row aic">
+                    <div className="section flex-row aic">
                         <span>When</span>
                         <RadioGroup
                             name="flow-editor-triggerType"
@@ -133,6 +152,7 @@ class FlowEditor extends React.Component {
                                 );
                             })}
                         </RadioGroup>
+
                         {s.sgData && s.trigger.type && s.trigger.type != "Time" && (
                             <>
                                 <div className="flex-col sensor-data-col">
@@ -149,10 +169,19 @@ class FlowEditor extends React.Component {
                                     {sensorDataType && <span className="sensor-data-type">({sensorDataType})</span>}
                                 </div>
                                 <span>Is</span>
+                                {s.trigger.type === "Group" && (
+                                    <OnChangeInput
+                                        placeholder={"Select..."}
+                                        type="select"
+                                        options={compOpts["Group"]}
+                                        callback={val => this.updateTrigger("comparison", val)}
+                                        delay={0}
+                                    />
+                                )}
                                 <OnChangeInput
                                     placeholder={"Select..."}
                                     type="select"
-                                    options={compOpts[s.trigger.type]}
+                                    options={compOpts["Shared"]}
                                     callback={val => this.updateTrigger("comparison", val)}
                                     delay={0}
                                 />
@@ -165,7 +194,45 @@ class FlowEditor extends React.Component {
                                 />
                             </>
                         )}
+
                         {s.trigger.type && s.trigger.type == "Time" && <FlowEditorTimeSelector />}
+                    </div>
+
+                    <div className="section flex-row aic">
+                        <span>Send</span>
+                        <FlowEditorJsonBuilder sendDataUpFunc={this.updateSendData.bind(this)} />
+                    </div>
+
+                    <div className="section flex-row aic">
+                        <span>To</span>
+
+                        <RadioGroup
+                            name="flow-editor-triggerType"
+                            value={s.send.type}
+                            handleChange={val => {
+                                this.updateSend("type", val);
+                            }}
+                        >
+                            {s.validTriggerTypes.slice(0, 2).map(type => {
+                                return (
+                                    <RadioOption key={type} value={type}>
+                                        {type}
+                                    </RadioOption>
+                                );
+                            })}
+                        </RadioGroup>
+
+                        {s.sgData && s.send.type && (
+                            <OnChangeInput
+                                placeholder={`Choose ${s.send.type}`}
+                                type="select"
+                                options={s.sgData[s.send.type].map(o => {
+                                    return { display: o.display, value: o.value };
+                                })}
+                                callback={val => this.updateSend("id", val)}
+                                delay={0}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -176,13 +243,154 @@ class FlowEditor extends React.Component {
 class FlowEditorTimeSelector extends React.PureComponent {
     constructor(p) {
         super(p);
+
+        this.state = {
+            h: 12,
+            m: 0,
+            s: 0,
+            days: [false, false, false, false, false, false, false]
+        };
+
+        this.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
+    }
+
+    bubbleUp() {
+        this.state.sendTimeUpFunc(this.state.data);
+    }
+
+    changeTime(key, evt) {
+        let temp = this.state;
+
+        temp[key] = Number(evt.target.value);
+
+        this.setState(temp);
+    }
+    toggleDay(dayIdx) {
+        let days = this.state.days;
+        days[dayIdx] = !days[dayIdx];
+        this.setState({ days: days });
     }
 
     render() {
         return (
-            <>
-                <span>[Time Selector]</span>
-            </>
+            <div className="flex-col">
+                <div className="flex-row aic">
+                    <input type="number" min="0" max="23" step="1" defaultValue="12" onChange={evt => this.changeTime("h", evt)} />
+                    <span>:</span>
+                    <input type="number" min="0" max="59" step="1" defaultValue="0" onChange={evt => this.changeTime("m", evt)} />
+                    <span>:</span>
+                    <input type="number" min="0" max="59" step="1" defaultValue="0" onChange={evt => this.changeTime("s", evt)} />
+                </div>
+                <div className="flex-row aic daypicker">
+                    {this.state.days.map((val, idx) => {
+                        return (
+                            <div className="flex-col tac" key={"day_" + idx}>
+                                <input
+                                    type="checkbox"
+                                    name={"cb_" + idx}
+                                    checked={val === true ? "true" : undefined}
+                                    onChange={() => this.toggleDay(idx)}
+                                />
+                                <label className="label" htmlFor={"cb_" + idx}>
+                                    {this.daysOfWeek[idx]}
+                                </label>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+}
+
+class FlowEditorJsonBuilder extends React.Component {
+    constructor(p) {
+        super(p);
+
+        this.state = {
+            // Will just be a bunch of K/V pairs
+            data: {}
+        };
+    }
+
+    bubbleUp() {
+        this.sendDataUpFunc(this.state.data);
+    }
+
+    // Removes `oldKey` from the current data,
+    // copying the data into `this.state.data[newKey]`
+    updateKeyName(oldKey, newKey) {
+        let current = this.state.data;
+
+        if (current[newKey] == undefined && newKey != "") {
+            current[newKey] = "";
+
+            // Delete `oldKey` if provided.
+            if (oldKey !== undefined) {
+                delete Object.assign(current, { [newKey]: current[oldKey] })[oldKey];
+            }
+            this.setState({ data: current });
+        } else if (newKey === "") {
+            messenger.notify("OpenToast", { msg: `Cannot set an empty Key`, warn: true });
+        } else {
+            messenger.notify("OpenToast", { msg: `Cannot set key ${oldKey} to ${newKey} as it already exists.`, warn: true });
+        }
+    }
+    deleteKey(toDelete) {
+        let current = this.state.data;
+        delete current[toDelete];
+
+        this.setState({ data: current });
+    }
+
+    updateField(key, value) {
+        let current = this.state.data;
+        current[key] = value;
+
+        this.setState({ data: current });
+    }
+
+    renderKeyValuePair(key, index) {
+        return (
+            <div className="flex-row aic" key={index}>
+                <input placeholder="Key" key={index + "_k"} value={key} onChange={evt => this.updateKeyName(key, evt.target.value)} />
+                <input
+                    placeholder="Value"
+                    key={index + "_v"}
+                    value={this.state.data[key] || ""}
+                    required={key != ""}
+                    title={key != "" ? `Set a value for key ${key}` : ""}
+                    onChange={evt => this.updateField(key, evt.target.value)}
+                />
+                <button className="round" onClick={() => this.deleteKey(key)}>
+                    <i className="fas fa-times" />
+                </button>
+            </div>
+        );
+    }
+
+    render() {
+        let currentKeys = Object.keys(this.state.data),
+            lastKeyData = this.state.data[currentKeys[currentKeys.length - 1]];
+
+        // Add a new "empty" KVPair if the 'last' one isn't
+        // doesn't have an empty value. This forces
+        // all Keys to have values before adding another.
+
+        if (currentKeys.length == 0 || lastKeyData !== undefined || lastKeyData !== "") {
+            currentKeys.push("");
+        }
+
+        return (
+            <div className="flex-col json-kvpairs">
+                <p className="label">
+                    These Key Value pairs represent a JSON object that will be send to the corresponding sensor or group.
+                </p>
+                <p className="label">%VALUE%, %SENSORID%, %GROUPID% and %TIME% are all available to send in Value fields.</p>
+                {currentKeys.map((key, idx) => {
+                    return this.renderKeyValuePair(key, idx);
+                })}
+            </div>
         );
     }
 }

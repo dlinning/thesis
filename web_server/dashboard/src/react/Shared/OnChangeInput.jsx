@@ -77,7 +77,7 @@ class OnChangeInput extends React.Component {
                         // display and "value" values
                         if (val.display && val.value) {
                             return (
-                                <option value={val.value} key={idx}>
+                                <option value={val.value} key={val+"__"+idx}>
                                     {val.display}
                                 </option>
                             );
@@ -85,7 +85,7 @@ class OnChangeInput extends React.Component {
                         // Otherwise assume `val` is both
                         // display and "value"
                         return (
-                            <option value={val} key={idx}>
+                            <option value={val} key={val+"__"+idx}>
                                 {val}
                             </option>
                         );

@@ -25,5 +25,31 @@
         input {
             margin-bottom: 0;
         }
+
+        > .section + .section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid @divider;
+        }
+    }
+
+    .daypicker {
+        margin-top: 2rem;
+        
+        input {
+            height: 1rem;
+        }
+    }
+
+    .json-kvpairs {
+        .label {
+            font-size: 0.85rem;
+            padding-left: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        > .flex-row + .flex-row {
+            margin-top: 0.5rem;
+        }
     }
 }
