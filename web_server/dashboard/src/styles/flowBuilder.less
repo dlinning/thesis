@@ -2,11 +2,7 @@
     width: 100%;
     max-width: unset;
 
-    textarea,
-    .name-input {
-        max-width: 50%;
-        min-width: 300px;
-    }
+    padding: 1rem;
 
     .sensor-data-col {
         position: relative;
@@ -33,19 +29,27 @@
         }
     }
 
+    .section {
+        .title {
+            font-size: 1.2rem;
+            text-align: left;
+            padding-left: 1rem;
+        }
+    }
+
     .daypicker {
-        margin-top: 2rem;
-        
         input {
-            height: 1rem;
+            height: 2rem;
         }
     }
 
     .json-kvpairs {
-        .label {
+        p {
             font-size: 0.85rem;
             padding-left: 1rem;
             margin-bottom: 0.25rem;
+            text-align: left;
+            opacity: 0.9;
         }
 
         > .flex-row + .flex-row {

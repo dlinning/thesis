@@ -3,7 +3,7 @@
 
 const RadioGroup = props => {
     return (
-        <div className="radio-group">
+        <div className={"radio-group " + (props.classes ? props.classes.join(" ") : "")}>
             {props.children.map(child => {
                 if (child.type === RadioOption) {
                     return React.cloneElement(child, {
@@ -20,7 +20,7 @@ const RadioGroup = props => {
 
 const RadioOption = props => {
     return (
-        <label className={`radio-line ${props.checked ? "selected" : ""}`}>
+        <label className={`radio-item ${props.checked ? "selected" : ""}`}>
             <input type="radio" name={props.name} onChange={() => props.onChange(props.value)} checked={props.checked} />
             <span>{props.children}</span>
         </label>
