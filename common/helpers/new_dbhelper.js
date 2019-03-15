@@ -645,10 +645,15 @@ module.exports.createFlow = data => {
         name: data.name,
         description: data.description,
         activationCount: 0,
-        config: JSON.stringify(data.config),
         createdAt: d1,
         updatedAt: d1
     };
+
+    delete data.name;
+    delete data.description;
+    delete data.id;
+
+    newFlow.config = JSON.stringify(data);
 
     if (makeNewFlowStmt.run(newFlow).changes === 1) {
         return { status: 200, group: newFlow };
@@ -661,13 +666,20 @@ const makeNewFlowStmt = db.prepare(
     VALUES (@id,@name,@description,@activationCount,@config,@createdAt,@updatedAt)`
 );
 
-module.exports.updateFlow = (id, data) => {
-    let originalFlow = getFlowByIdStmt.get(id);
+module.exports.updateFlow = (data) => {
+    let originalFlow = getFlowByIdStmt.get(data.id);
 
     if (originalFlow) {
         originalFlow.name = data.name;
         originalFlow.description = data.description;
-        originalFlow.config = JSON.stringify(data.config);
+    
+        // No longer needed
+        delete data.name;
+        delete data.description;
+        delete data.id;
+    
+        originalFlow.config = JSON.stringify(data);
+
         originalFlow.updatedAt = dateAsUnixTimestamp();
         // Don't update activationCount or createdAt fields
 

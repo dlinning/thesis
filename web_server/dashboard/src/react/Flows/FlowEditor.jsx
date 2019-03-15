@@ -2,15 +2,17 @@ class FlowEditor extends React.Component {
     constructor(p) {
         super(p);
 
-        let fd = this.props.flow || {};
         this.state = {
-            id: fd.id,
-            name: fd.name || "Flow Name",
-            description: fd.description || "Flow Description",
+            id: this.props.flowId || -1,
+            name: "",
+            description: "",
             trigger: {},
-            send: {},
+            payload: {},
+            to: {},
             sgData: { Sensor: [], Group: [] }
         };
+
+        this.formRef = React.createRef();
     }
 
     componentDidMount() {
@@ -33,6 +35,30 @@ class FlowEditor extends React.Component {
                 messenger.notify("OpenToast", { msg: `Unable to fetch Sensor and Group data`, warn: true });
                 console.error(err);
             });
+
+        // Load flow data if `this.props.flowId` was provided
+        if (this.props.flowId) {
+            jsonFetch("/api/flows/getbyid/" + this.props.flowId)
+                .then(res => {
+                    let stateCopy = this.state;
+
+                    let flowData = res.flow;
+                    if (flowData) {
+                        stateCopy.name = flowData.name;
+                        stateCopy.description = flowData.description;
+                        stateCopy.trigger = flowData.config.trigger;
+                        stateCopy.payload = flowData.config.payload;
+                        stateCopy.to = flowData.config.to;
+                        stateCopy.lastModDate = Date(flowData.updatedAt).toLocaleString();
+                    }
+
+                    this.setState(stateCopy);
+                })
+                .catch(err => {
+                    messenger.notify("OpenToast", { msg: `Unable to fetch Flow Data.`, warn: true });
+                    console.error(err);
+                });
+        }
     }
 
     updateRootField(field, value) {
@@ -42,28 +68,99 @@ class FlowEditor extends React.Component {
         this.setState(newState);
     }
 
-    updateSendData(data) {
-        this.setState({ send: JSON.stringify(data) });
+    updateTriggerData(data) {
+        this.setState({ trigger: data });
+    }
+    updatePayloadData(data) {
+        this.setState({ payload: data });
+    }
+    updateToData(data) {
+        this.setState({ to: data });
+    }
+
+    submitForm(evt) {
+        evt.preventDefault();
+
+        if (!this.checkSendEnabled()) {
+            messenger.notify("OpenToast", { msg: `Error creating flow. Please fill out all fields.`, warn: true });
+            return;
+        }
+
+        let newFlow = {
+            id: this.state.id,
+            name: this.state.name,
+            description: this.state.description,
+            trigger: this.state.trigger,
+            payload: this.state.payload,
+            to: this.state.to
+        };
+
+        // Try to convert the trigger value to a number
+        let valAsNum = Number(newFlow.trigger.value);
+        newFlow.trigger.value = isNaN(valAsNum) ? newFlow.trigger.value : valAsNum;
+
+        jsonFetch("/api/flows/addOrEdit", newFlow, "POST")
+            .then(resp => {
+                console.log(resp);
+                messenger.notify("RefreshFlowList");
+                //messenger.notify("CloseModal", { force: true });
+            })
+            .catch(err => {
+                messenger.notify("OpenToast", { msg: `Error submitting Flow. Please try again.`, warn: true });
+                console.error(err);
+            });
+    }
+
+    checkSendEnabled() {
+        let s = this.state;
+
+        if (!s.name || s.name.length == 0) {
+            return false;
+        }
+
+        if (s.trigger.type === "Time" && s.trigger.value && s.trigger.value.time == "") {
+            return false;
+        }
+
+        if (!s.trigger.type || !s.trigger.comparison || !s.trigger.value) {
+            return false;
+        }
+        if (s.trigger.type === "Group" && !s.trigger.id) {
+            return false;
+        }
+        if (s.trigger.type === "Group" && (!s.trigger.aggregateType || !s.trigger.id)) {
+            return false;
+        }
+        if (!s.to.id || !s.to.type) {
+            return false;
+        }
+
+        return true;
     }
 
     render() {
         let s = this.state;
 
+        console.log('Rendering with state', s);
+
         return (
-            <div id="flow-builder">
-                {this.props.flowId && <span>Last Changed {"DATE"}</span>}
+            <form id="flow-builder" ref={this.formRef} onSubmit={this.submitForm.bind(this)}>
+                {this.state.lastModDate && <span>Last Changed {this.state.lastModDate}</span>}
                 <div className="flex-col">
                     <OnChangeInput
-                        placeholder={this.state.name}
+                        placeholder="Flow Name"
+                        value={this.state.name}
                         type="text"
                         classes={["name-input"]}
                         callback={val => this.updateRootField("name", val)}
                         delay={0}
                         autoComplete={false}
+                        required
                         name="flowName"
                     />
                     <OnChangeInput
-                        placeholder={this.state.description}
+                        placeholder="Flow Description"
+                        value={this.state.description}
                         type="textarea"
                         callback={val => this.updateRootField("description", val)}
                         delay={0}
@@ -75,20 +172,25 @@ class FlowEditor extends React.Component {
                 <div className="config flex-col">
                     <div className="section flex-col">
                         <span className="title">When</span>
-                        <FlowEditorTriggerBuilder sensorGroupData={this.state.sgData} />
+                        <FlowEditorTriggerBuilder sensorGroupData={this.state.sgData} updateFunc={this.updateTriggerData.bind(this)} />
                     </div>
 
                     <div className="section flex-col">
                         <span className="title">Send</span>
-                        <FlowEditorJsonBuilder sendDataUpFunc={this.updateSendData.bind(this)} />
+                        <FlowEditorJsonBuilder updateFunc={this.updatePayloadData.bind(this)} />
                     </div>
 
                     <div className="section flex-col">
                         <span className="title">To</span>
-                        <FlowEditorSendBuilder sensorGroupData={this.state.sgData} />
+                        <FlowEditorToBuilder sensorGroupData={this.state.sgData} updateFunc={this.updateToData.bind(this)} />
                     </div>
                 </div>
-            </div>
+                <div className="flex-row fe ">
+                    <button type="submit" className="big" disabled={!this.checkSendEnabled()}>
+                        {this.props.flowId ? "Save" : "Create"}
+                    </button>
+                </div>
+            </form>
         );
     }
 }
@@ -124,15 +226,16 @@ class FlowEditorTriggerBuilder extends React.Component {
         let s = this.state;
         s[key] = val;
 
+        // Reset other values when changing type
         if (key === "type") {
             delete s["id"];
+            delete s["value"];
+            delete s["comparison"];
         }
 
-        this.setState(s);
-    }
-
-    bubbleUp() {
-        this.state.sendTimeUpFunc(this.state.data);
+        this.setState(s, () => {
+            this.props.updateFunc(s);
+        });
     }
 
     getValidTriggerTypes() {
@@ -163,9 +266,11 @@ class FlowEditorTriggerBuilder extends React.Component {
             <>
                 <div className="flex-row">
                     <RadioGroup
+                        key={`ttRoot_${this.state.type}`}
                         name="flow-editor-triggerType"
                         classes={["flex-row aic sb"]}
                         value={this.state.type}
+                        required
                         handleChange={val => {
                             this.updateRootField("type", val);
                         }}
@@ -185,6 +290,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                     <div className="flex-row aic">
                         <div className="flex-col sensor-data-col">
                             <OnChangeInput
+                                key={`triggerType_${this.state.type}`}
                                 placeholder={`Choose ${this.state.type}`}
                                 type="select"
                                 disabled={this.state.type == "Time"}
@@ -193,37 +299,46 @@ class FlowEditorTriggerBuilder extends React.Component {
                                 })}
                                 callback={val => this.updateRootField("id", val)}
                                 delay={0}
+                                required
                             />
                             {sensorDataType && <span className="sensor-data-type">({sensorDataType})</span>}
                         </div>
                         <span>Is</span>
                         {this.state.type === "Group" && (
                             <OnChangeInput
+                                key={`groupAggType_${this.state.type}`}
                                 placeholder={"Select..."}
                                 type="select"
                                 options={this.triggerComparisons["Group"]}
-                                callback={val => this.updateRootField("comparison_type", val)}
+                                callback={val => this.updateRootField("aggregateType", val)}
                                 delay={0}
+                                required
                             />
                         )}
                         <OnChangeInput
+                            key={`compType_${this.state.type}`}
                             placeholder={"Select..."}
                             type="select"
                             options={this.triggerComparisons["Shared"]}
                             callback={val => this.updateRootField("comparison", val)}
                             delay={0}
+                            required
                         />
                         <OnChangeInput
+                            key={`triggerValue_${this.state.type}`}
                             placeholder="Value"
                             required
                             type="text"
                             callback={val => this.updateRootField("value", val)}
                             delay={0}
+                            required
                         />
                     </div>
                 )}
 
-                {this.state.type && this.state.type == "Time" && <FlowEditorTimeSelector />}
+                {this.state.type && this.state.type == "Time" && (
+                    <FlowEditorTimeSelector updateFunc={val => this.updateRootField("value", val)} />
+                )}
             </>
         );
     }
@@ -234,26 +349,26 @@ class FlowEditorTimeSelector extends React.PureComponent {
         super(p);
 
         this.state = {
-            time: undefined,
+            time: "",
             days: [false, false, false, false, false, false, false]
         };
 
         this.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
     }
 
-    bubbleUp() {
-        this.state.sendTimeUpFunc(this.state.data);
-    }
-
     changeTime(evt) {
-        this.setState({ time: evt.target.value });
+        this.setState({ time: evt.target.value }, () => {
+            this.props.updateFunc(this.state);
+        });
     }
 
     toggleDay(dayIdx) {
         let days = this.state.days;
         days[dayIdx] = !days[dayIdx];
 
-        this.setState({ days: days });
+        this.setState({ days: days }, () => {
+            this.props.updateFunc(this.state);
+        });
     }
 
     render() {
@@ -265,17 +380,13 @@ class FlowEditorTimeSelector extends React.PureComponent {
                     onChange={evt => {
                         this.changeTime(evt);
                     }}
+                    required
                 />
                 <div className="flex-row aic daypicker">
                     {this.state.days.map((val, idx) => {
                         return (
                             <div className="flex-col tac" key={"day_" + idx}>
-                                <input
-                                    type="checkbox"
-                                    name={"cb_" + idx}
-                                    checked={val === true ? "true" : undefined}
-                                    onChange={() => this.toggleDay(idx)}
-                                />
+                                <input type="checkbox" name={"cb_" + idx} checked={val === true} onChange={() => this.toggleDay(idx)} />
                                 <label className="label" htmlFor={"cb_" + idx}>
                                     {this.daysOfWeek[idx]}
                                 </label>
@@ -298,10 +409,6 @@ class FlowEditorJsonBuilder extends React.Component {
         };
     }
 
-    bubbleUp() {
-        this.sendDataUpFunc(this.state.data);
-    }
-
     // Removes `oldKey` from the current data,
     // copying the data into `this.state.data[newKey]`
     updateKeyName(oldKey, newKey) {
@@ -314,25 +421,32 @@ class FlowEditorJsonBuilder extends React.Component {
             if (oldKey !== undefined) {
                 delete Object.assign(current, { [newKey]: current[oldKey] })[oldKey];
             }
-            this.setState({ data: current });
+            this.setState({ data: current }, () => {
+                this.props.updateFunc(this.state.data);
+            });
         } else if (newKey === "") {
             messenger.notify("OpenToast", { msg: `Cannot set an empty Key`, warn: true });
         } else {
             messenger.notify("OpenToast", { msg: `Cannot set key ${oldKey} to ${newKey} as it already exists.`, warn: true });
         }
     }
+
     deleteKey(toDelete) {
         let current = this.state.data;
         delete current[toDelete];
 
-        this.setState({ data: current });
+        this.setState({ data: current }, () => {
+            this.props.updateFunc(this.state.data);
+        });
     }
 
     updateField(key, value) {
         let current = this.state.data;
         current[key] = value;
 
-        this.setState({ data: current });
+        this.setState({ data: current }, () => {
+            this.props.updateFunc(this.state.data);
+        });
     }
 
     renderKeyValuePair(key, index) {
@@ -380,7 +494,7 @@ class FlowEditorJsonBuilder extends React.Component {
     }
 }
 
-class FlowEditorSendBuilder extends React.Component {
+class FlowEditorToBuilder extends React.Component {
     constructor(p) {
         super(p);
 
@@ -398,11 +512,9 @@ class FlowEditorSendBuilder extends React.Component {
             delete s["id"];
         }
 
-        this.setState(s);
-    }
-
-    bubbleUp() {
-        this.state.sendTimeUpFunc(this.state.data);
+        this.setState(s, () => {
+            this.props.updateFunc(this.state);
+        });
     }
 
     getValidSendTypes() {
@@ -428,6 +540,7 @@ class FlowEditorSendBuilder extends React.Component {
                     handleChange={val => {
                         this.updateRootField("type", val);
                     }}
+                    required
                 >
                     {this.getValidSendTypes().map(type => {
                         return (
@@ -442,6 +555,7 @@ class FlowEditorSendBuilder extends React.Component {
 
                 {this.state.type && this.state.type !== "Email" && (
                     <OnChangeInput
+                        key={`toType_${this.state.type}`}
                         placeholder={`Choose ${this.state.type}`}
                         type="select"
                         initialValue={this.state.id}
@@ -450,6 +564,7 @@ class FlowEditorSendBuilder extends React.Component {
                         })}
                         callback={val => this.updateRootField("id", val)}
                         delay={0}
+                        required
                     />
                 )}
             </div>

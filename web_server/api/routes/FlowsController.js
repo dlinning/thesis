@@ -16,14 +16,15 @@ router.get("/getbyid/:id?", (req, res) => {
     res.status(data.status).send(data);
 });
 
-router.post("/create/", (req, res) => {
-    let data = DBHelper.createFlow(req.body);
-    res.status(data.status).send(data);
-});
-router.post("/update/:id", (req, res) => {
-    let body = req.body;
+router.post("/addOrEdit", (req, res) => {
+    let data = { status: 400 };
+    console.log(req.body);
 
-    let data = DBHelper.updateFlow(req.params.id, body);
+    if (req.body.id !== -1) {
+        data = DBHelper.updateFlow(req.params.id, req.body);
+    } else {
+        data = DBHelper.createFlow(req.body);
+    }
     res.status(data.status).send(data);
 });
 
@@ -31,7 +32,6 @@ router.delete("/:id", (req, res) => {
     let data = DBHelper.deleteFlowById(req.params.id);
     res.status(data.status).send(data);
 });
-
 
 // Helper for loading only necessary data for
 // setting up Flows for Groups/Sensors

@@ -6,8 +6,8 @@ class FlowList extends React.Component {
 
         // Handles updating the "background" list
         // when using SensorEditModal component.
-        messenger.subscribe("FlowUpdated", newFlow => {
-            this.replaceFlowInList(newFlow);
+        messenger.subscribe("RefreshFlowList", () => {
+            this.updateFlowList()
         });
     }
 
@@ -39,8 +39,11 @@ class FlowList extends React.Component {
         }
     }
 
-    openFlowsPage() {
-        messenger.notify("ChangePage", "flows");
+    openFlowsEditor(flowId = undefined) {
+        messenger.notify("OpenModal", {
+            title: `Create New Flow`,
+            content: <FlowEditor flowId={flowId}/>
+        });
     }
 
     render() {
@@ -53,7 +56,7 @@ class FlowList extends React.Component {
                 {!p.standalone && (
                     <div className="flex-row aic sb title-row">
                         <h2>Flows</h2>
-                        <button className="round" onClick={this.openFlowsPage.bind(this)}>
+                        <button className="round" onClick={this.openFlowsEditor}>
                             <i className="fas fa-plus" />
                         </button>
                     </div>
@@ -74,8 +77,8 @@ class FlowList extends React.Component {
                                         <span className="label">Activation Count</span>
                                     </div>
                                     <div className="data-module">
-                                        <button>Manage</button>
-                                        <button className="warn overlay">Remove</button>
+                                        <button className="small" onClick={()=>this.openFlowsEditor(flow.id)}>Manage</button>
+                                        <button className="warn overlay small">Remove</button>
                                     </div>
                                 </div>
                             </div>
