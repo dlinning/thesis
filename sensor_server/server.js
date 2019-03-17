@@ -1,7 +1,7 @@
 const config = require("./config.json");
 const debug = process.env.NODE_ENV != "production";
 
-var DBHelper = require("../common/helpers/new_dbhelper");
+var DBHelper = require("../common/helpers/dbhelper");
 
 const MessageSenderBuilder = require("../common/helpers/messagehandler"),
     MessageSender = new MessageSenderBuilder();

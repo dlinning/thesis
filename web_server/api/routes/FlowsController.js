@@ -1,7 +1,7 @@
 const express = require("express"),
     router = express.Router();
 
-var DBHelper = require("../../../common/helpers/new_dbhelper");
+var DBHelper = require("../../../common/helpers/dbhelper");
 
 router.get("/list", (req, res) => {
     res.status(200).send(DBHelper.getAllFlows());

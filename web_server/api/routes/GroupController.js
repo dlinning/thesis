@@ -1,7 +1,7 @@
 const express = require("express"),
     router = express.Router();
 
-var DBHelper = require("../../../common/helpers/new_dbhelper");
+var DBHelper = require("../../../common/helpers/dbhelper");
 
 // Expects {groupName:STRING, [uuid:UUID]}
 // Only provide `uuid` if updating `groupName`

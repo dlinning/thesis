@@ -1,7 +1,7 @@
 const config = require("./config.json");
 const debug = process.env.NODE_ENV != "production";
 
-const DBHelper = require("../common/helpers/new_dbhelper");
+const DBHelper = require("../common/helpers/dbhelper");
 
 var taskRunner = null;
 

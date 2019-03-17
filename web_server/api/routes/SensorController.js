@@ -2,7 +2,7 @@ const express = require("express"),
     router = express.Router(),
     cache = require("../../../common/middleware/memorycache");
 
-var DBHelper = require("../../../common/helpers/new_dbhelper");
+var DBHelper = require("../../../common/helpers/dbhelper");
 
 // Will return a paginated list of Sensors
 // By default, will get the first page.

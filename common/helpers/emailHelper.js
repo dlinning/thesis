@@ -1,4 +1,4 @@
-const DBHelper = require("../common/helpers/new_dbhelper");
+const DBHelper = require("../common/helpers/dbhelper");
 
 const nodeMailer = require('nodemailer');
 

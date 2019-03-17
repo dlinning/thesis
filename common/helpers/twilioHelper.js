@@ -1,4 +1,4 @@
-const DBHelper = require("../common/helpers/new_dbhelper");
+const DBHelper = require("../common/helpers/dbhelper");
 let twilioSidData = DBHelper.getSpecificSetting("twilioSid");
 let twilioAuthData = DBHelper.getSpecificSetting("twilioAuthToken");
 let twilioNumberData = DBHelper.getSpecificSetting("twilioFromNumber");
