@@ -70,24 +70,25 @@ class GroupList extends React.Component {
 
     render() {
         let groups = this.state.groups;
-        if (groups === undefined || groups.length === 0) {
+        if (groups === undefined) {
             return null;
         }
 
         return (
             <>
                 {this.props.standalone && <button onClick={this.openAddGroupModal.bind(this)}>Create New Group</button>}
-                {groups.length > 0 && (
-                    <div className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}>
-                        {!this.props.standalone && (
-                            <div className="flex-row aic sb title-row">
-                                <h2>Groups</h2>
-                                <button className="round" onClick={this.openAddGroupModal.bind(this)}>
-                                    <i className="fas fa-plus" />
-                                </button>
-                            </div>
-                        )}
-                        {groups.map(group => {
+                <div className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}>
+                    {!this.props.standalone && (
+                        <div className="flex-row aic sb title-row">
+                            <h2>Groups</h2>
+                            <button className="round" onClick={this.openAddGroupModal.bind(this)}>
+                                <i className="fas fa-plus" />
+                            </button>
+                        </div>
+                    )}
+                    {groups &&
+                        groups.length > 0 &&
+                        groups.map(group => {
                             let g = group;
                             return (
                                 <div className="tile" key={`group_${g.id}`}>
@@ -126,17 +127,16 @@ class GroupList extends React.Component {
                                 </div>
                             );
                         })}
-                    </div>
-                )}
-                {groups.length === 0 && (
-                    <div className="tile">
-                        <div className="title">No Groups Created</div>
-                        <br />
-                        <div className="content">
-                            <p>Groups are used to organize your Sensors. Groups can also be used in Flows.</p>
+                    {groups.length === 0 && (
+                        <div className="tile">
+                            <div className="title">No Groups Created</div>
+                            <br />
+                            <div className="content">
+                                <p>Groups are used to organize your Sensors. Groups can also be used in Flows.</p>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </>
         );
     }
@@ -156,10 +156,12 @@ class GroupAddForm extends React.Component {
             .then(resp => {
                 console.log(resp);
                 if (resp.status === 200) {
-                    messenger.notify("CloseModal");
+                    messenger.notify("CloseModal",true);
+                    messenger.notify("OpenToast", { msg: `Created Group "${payload.groupName}"` });
                     this.props.groupAddCallback();
                 } else {
                     console.error("Error creating group:", resp);
+                    messenger.notify("OpenToast", { msg: `Unable to create Group "${payload.groupName}"`, warn:true });
                 }
             })
             .catch(err => {

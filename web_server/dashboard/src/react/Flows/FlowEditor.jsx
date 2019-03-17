@@ -107,7 +107,7 @@ class FlowEditor extends React.Component {
                 messenger.notify("OpenToast", { msg: `Flow ${newFlow.name} successfully updated.` });
 
                 // Close the modal, since we want the user to see their updates on the list.
-                messenger.notify("CloseModal", { force: true });
+                messenger.notify("CloseModal", true);
             })
             .catch(err => {
                 messenger.notify("OpenToast", { msg: `Error submitting Flow. Please try again.`, warn: true });

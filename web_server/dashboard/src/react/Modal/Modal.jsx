@@ -12,18 +12,18 @@ class Modal extends React.Component {
             });
         });
 
-        messenger.subscribe("CloseModal", opts => {
-            this.close(opts.force);
+        messenger.subscribe("CloseModal", force => {
+            this.close(force);
         });
 
-        document.addEventListener('keyup', (evt) => {
+        document.addEventListener("keyup", evt => {
             if (evt.keyCode == 27 && this.state.open) {
                 this.close(true);
             }
-        })
+        });
     }
 
-    close(force) {
+    close(force = false) {
         if (force || confirm(`Are you sure to want to close the popup${this.state.title ? ` "${this.state.title}"` : ""}?`)) {
             this.setState({ open: false, content: null, title: undefined });
         }
