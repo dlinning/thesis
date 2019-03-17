@@ -10,8 +10,6 @@
 }
 
 #dashboard-sidebar {
-    grid-area: sidebar;
-
     display: flex;
     flex-flow: column;
 
@@ -113,5 +111,94 @@
     .constrain {
         max-width: 50vw;
         margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    #dashboard-sidebar {
+        flex-flow: row nowrap;
+
+        position: fixed;
+        bottom: 0;
+        top: unset;
+        left: 0;
+        height: 8vh;
+        min-height: 64px;
+
+        width: 100vw;
+        min-width: 360px;
+
+        z-index: 1;
+
+        ul {
+            display: flex;
+            flex-flow: row nowrap;
+            width: 90vw;
+            min-width: 360px;
+            margin: 0 auto;
+        }
+
+        li {
+            width: 20%;
+            height: 100%;
+
+            border-left: 0px;
+            border-bottom: 0.5vh solid transparent;
+
+            i {
+                font-size: 2.5vh;
+                margin-bottom: 1rem;
+            }
+
+            span {
+                opacity: 0.3;
+                transform: none;
+            }
+    
+            &:hover {
+                span {
+                    transform: none;
+                    transition: all 150ms @entranceEase;
+                }
+            }
+    
+            &.selected {
+                border-color: @primary;
+    
+                span {
+                    opacity: 1;
+                }
+    
+                i {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    #logo {
+        display: none;
+    }
+
+    #dashboard-content {
+        display: flex;
+        flex-direction: column;
+
+        position: absolute;
+        top: 0;
+
+        right: 0;
+        left: 0;
+        margin: 0 auto;
+
+        min-width: 360px;
+        width: 87.5vw;
+
+        padding: 1rem 1rem 12vh;
+
+        .constrain {
+            max-width: 70vw;
+            margin: 0 auto;
+        }
     }
 }

@@ -32,9 +32,11 @@
 	min-width: 40vw;
 	max-width: 60vw;
 
+	overscroll-behavior: contain;
+
 	@media screen and(max-width:600px) {
 		position: absolute;
-		top: 2.5vh;
+		top: auto;
 		left: 2.5vw;
 		max-width: 95vw;
 		min-width: 95vw;
@@ -76,9 +78,4 @@
 	min-height: 40vh;
 	max-height: 70vh;
 	overflow-y: auto;
-
-	@media screen and (max-width: 600px) {
-		min-height: 80vh;
-		max-height: 80vh;
-	}
 }

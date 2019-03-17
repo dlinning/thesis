@@ -105,7 +105,9 @@ class FlowEditor extends React.Component {
                 console.log(resp);
                 messenger.notify("RefreshFlowList");
                 messenger.notify("OpenToast", { msg: `Flow ${newFlow.name} successfully updated.` });
-                //messenger.notify("CloseModal", { force: true });
+
+                // Close the modal, since we want the user to see their updates on the list.
+                messenger.notify("CloseModal", { force: true });
             })
             .catch(err => {
                 messenger.notify("OpenToast", { msg: `Error submitting Flow. Please try again.`, warn: true });
@@ -384,8 +386,8 @@ class FlowEditorTimeSelector extends React.PureComponent {
         super(p);
 
         this.state = {
-            time: p.triggerData ? p.triggerData.value.time : "",
-            days: p.triggerData ? p.triggerData.value.days : [false, false, false, false, false, false, false]
+            time: p.timeData ? p.timeData.value.time : "",
+            days: p.timeData ? p.timeData.value.days : [false, false, false, false, false, false, false]
         };
 
         this.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
