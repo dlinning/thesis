@@ -31,6 +31,11 @@ server.on("message", (rawMessage, rinfo) => {
     }
 
     if (msg.type === "connect") {
+        // Have to deal with Python being weird
+        if (msg.id === 'None') {
+            msg.id = undefined;
+        }
+        
         var res = DBHelper.addSensor(msg.name, msg.dataType, msg.id);
         if (res === null) {
             //Error adding to DB. See console.
@@ -38,6 +43,7 @@ server.on("message", (rawMessage, rinfo) => {
                 status: 500
             });
         } else {
+            console.log(`Connect request answered for ID ${res}`);
             MessageSender.sendMessage(server, rinfo.address, rinfo.port, {
                 status: 200,
                 uuid: res

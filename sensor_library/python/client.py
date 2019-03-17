@@ -16,6 +16,6 @@ n = 0
 while 1:
     #SensorLib.log(randomColor())
     SensorLib.log(round(random.uniform(1.0, 20),5))
-    n = n + 1
+    #n = n + 1
     time.sleep(random.randint(1, 5))
 

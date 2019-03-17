@@ -2,29 +2,30 @@ import socket
 import sys
 import json
 import datetime
+import os
 
 SERVER_ADDRESS = 'localhost'
 SERVER_PORT = 3000
 AUTH_KEY = '1234AUTHKEY4321'
 
-# TODO: Allow this to use pre-existing sensorID values
-
 # Connect to a UDP socket
 sock = None
 server_obj = None
 
-# To Store for later
+# Attempt to load a saved UUID from disk
 sensorId = None
+if(os.path.isfile('./uuid.dat')):
+    f = open('./uuid.dat', 'r')
+    sensorId = f.read()
 
-# Creates a socket, runs `connect()`.
-
-
-def create(name, dataType, addr='localhost', port='3000'):
+# Creates a socket, runs `connect()`.ff
+def create(name, dataType, addr, port):
     SERVER_ADDRESS = addr
     SERVER_PORT = port
 
     global sock
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     global server_obj
     server_obj = (SERVER_ADDRESS, SERVER_PORT)
 
@@ -32,19 +33,20 @@ def create(name, dataType, addr='localhost', port='3000'):
 
 # Will attempt to connect to the socket
 # with info from `create`.
-
-
 def connect(n, dt):
     if (sock != None and server_obj != None):
-        payload = '{"type": "connect", "name": "%s", "dataType": "%s", "authKey":"%s"}' % (
-            n, dt, AUTH_KEY)
+        global sensorId
+
+        payload = '{"type":"connect","name": "%s","dataType": "%s","id":"%s","authKey":"%s"}' % (
+            n, dt, sensorId, AUTH_KEY)
         resp = sendMessage(payload)
         if (resp['status'] == 200):
-            global sensorId
             sensorId = resp['uuid']
+            # Save to disk for consistency
+            f = open('./uuid.dat', 'w+')
+            f.write(resp['uuid'])
 
 # Will log `value` to the previously setup socket.
-
 def log(value):
     if (sensorId != None):
         ts = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')

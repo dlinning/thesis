@@ -238,7 +238,7 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
     // Check to see if it already exists,
     // return early.
     var current = getSensorByIdStmt.get(id);
-    if (current && current.id !== undefined) {
+    if (current !== undefined) {
         return id;
     }
 
