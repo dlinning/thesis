@@ -18,7 +18,6 @@ class SensorList extends React.Component {
 
     componentDidMount() {
         this.updateSensorList();
-        this.getGroupList();
 
         // Set to pull new log counts every 30 seconds
         this.interval = setInterval(() => {
@@ -36,16 +35,6 @@ class SensorList extends React.Component {
             })
             .catch(err => {
                 messenger.notify("OpenToast", { msg: `Unable to fetch Sensors`, warn: true });
-                console.error(err);
-            });
-    }
-
-    getGroupList() {
-        jsonFetch("/api/groups/list")
-            .then(res => {
-                this.setState({ allGroups: res });
-            })
-            .catch(err => {
                 console.error(err);
             });
     }
@@ -103,12 +92,14 @@ class SensorList extends React.Component {
     }
 
     openSensorSettingsModal(sensorId) {
-        jsonFetch("/api/sensors/settings/" + sensorId)
-            .then(resp => {
-                resp.sensorId = sensorId;
+        Promise.all([jsonFetch("/api/sensors/settings/" + sensorId), jsonFetch("/api/groups/list")])
+            .then(values => {
+                // values[0] is the sensor data,
+                // values[1] is all groups
+                values[0].sensorId = sensorId;
                 messenger.notify("OpenModal", {
                     title: `Settings for Sensor ${sensorId.substr(0, 7)}`,
-                    content: <SensorEditModal data={resp} allGroups={this.state.allGroups} />
+                    content: <SensorEditModal data={values[0]} allGroups={values[1]} />
                 });
             })
             .catch(err => {
@@ -194,7 +185,9 @@ class SensorList extends React.Component {
                                         <span className="label">In Groups</span>
                                     </div>
                                     <div className="data-module">
-                                        <button className="small" onClick={() => this.openSensorSettingsModal(s.id)}>Manage</button>
+                                        <button className="small" onClick={() => this.openSensorSettingsModal(s.id)}>
+                                            Manage
+                                        </button>
                                         <button className="warn overlay small" onClick={() => this.removeSensor(s.id)}>
                                             Delete
                                         </button>
