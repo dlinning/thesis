@@ -386,8 +386,8 @@ class FlowEditorTimeSelector extends React.PureComponent {
         super(p);
 
         this.state = {
-            time: p.timeData ? p.timeData.value.time : "",
-            days: p.timeData ? p.timeData.value.days : [false, false, false, false, false, false, false]
+            time: p.timeData.value ? p.timeData.value.time : "",
+            days: p.timeData.value ? p.timeData.value.days : [false, false, false, false, false, false, false]
         };
 
         this.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
