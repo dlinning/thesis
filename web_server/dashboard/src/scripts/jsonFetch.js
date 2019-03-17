@@ -12,7 +12,6 @@ window.jsonFetch = (route, payload, method = "GET") => {
 
         // Only check the cache for GET requests.
         if (method == "GET" && jsonCache[route] != undefined) {
-            console.log("HIT FROm CACHE", route);
             resolve(jsonCache[route]);
         }
 
