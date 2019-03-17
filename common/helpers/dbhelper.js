@@ -35,7 +35,7 @@ const createSettingsStmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT PRIMARY KEY NOT NULL, "value" TEXT NOT NULL, "type" TEXT NOT NULL, "description" TEXT, "inGroup" TEXT )`
 );
 
-//TODO: Add create statement for Flows table
+//TODO: Re-do all create statements
 
 const setupTransaction = db.transaction(() => {
     createSensorsStmt.run();
@@ -46,7 +46,7 @@ const setupTransaction = db.transaction(() => {
 
     createSettingsStmt.run();
 
-    //TODO: Run create statement for Flows table
+    //TODO: Re-do all create statements
 });
 setupTransaction();
 

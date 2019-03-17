@@ -35,8 +35,7 @@ router.delete("/delete/:id/:deleteWithSensors?", (req, res) => {
 // (UUID, Name).
 // By default, will get the first page.
 //
-router.get("/list/:page?/:limit?", (req, res) => {
-    //TODO: Add proper pagination
+router.get("/list", (req, res) => {
     res.status(200).send(DBHelper.listAllGroups());
 });
 
