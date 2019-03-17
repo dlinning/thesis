@@ -92,18 +92,17 @@ class SettingsPage extends React.Component {
         return (
             <>
                 <h1>Settings</h1>
-                <div id="settings-filter-box" className="flex-row aic">
-                    <i className="fas fa-search" />
-                    <OnChangeInput
-                        placeholder={"Search for a setting"}
-                        type={"search"}
-                        callback={this.searchTermUpdate.bind(this)}
-                        delay={10}
-                        autoComplete={false}
-                        name="settingsSearch"
-                    />
-                </div>
                 <div className="list constrain" id="settings-list">
+                    <div id="settings-filter-box" className="flex-row aic">
+                        <OnChangeInput
+                            placeholder={"Search for a setting"}
+                            type={"search"}
+                            callback={this.searchTermUpdate.bind(this)}
+                            delay={10}
+                            autoComplete={false}
+                            name="settingsSearch"
+                        />
+                    </div>
                     {s.matches &&
                         Object.keys(s.matches).map(key => {
                             return (
@@ -112,7 +111,7 @@ class SettingsPage extends React.Component {
                                     {s.matches[key].map(setting => {
                                         return (
                                             <div className="item flex-col" key={setting.key}>
-                                                <div className="flex-row aic">
+                                                <div className="name-value">
                                                     <span className="s-name">{setting.key}:</span>
                                                     <OnChangeInput
                                                         value={setting.value}

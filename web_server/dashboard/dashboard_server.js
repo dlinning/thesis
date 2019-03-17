@@ -22,7 +22,7 @@ server.use("/dist", express.static(path.join(__dirname, "./dist")));
 
 server.get("/:page?", (req, res) => {
     let page = req.params.page || "home";
-    res.render("home", { title: `Dashboard - ${page.charAt(0).toUpperCase() + page.substr(1)}`, page: page });
+    res.render("home", { title: `Iot Board - ${page.charAt(0).toUpperCase() + page.substr(1)}`, page: page });
 });
 
 module.exports = {

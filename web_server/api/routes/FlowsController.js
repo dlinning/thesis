@@ -19,12 +19,16 @@ router.get("/getbyid/:id?", (req, res) => {
 router.post("/addOrEdit", (req, res) => {
     let data = { status: 400 };
 
-    if (req.body.id !== undefined) {
-        data = DBHelper.updateFlow(req.body);
+    if (req.body.id && typeof req.body.id != "string") {
+        data = { status: 400, error: "Must provide a 'string' value for `body.id`." };
     } else {
-        data = DBHelper.createFlow(req.body);
+        if (req.body.id !== undefined) {
+            data = DBHelper.updateFlow(req.body);
+        } else {
+            data = DBHelper.createFlow(req.body);
+        }
     }
-    
+
     res.status(data.status).send(data);
 });
 

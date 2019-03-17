@@ -3,7 +3,8 @@ const gulp = require("gulp"),
     rename = require("gulp-rename"),
     concat = require("gulp-concat"),
     uglify = require("gulp-uglify-es").default,
-    babel = require("gulp-babel");
+    babel = require("gulp-babel"),
+    combineMq = require("gulp-combine-mq");
 
 const path = require("path");
 
@@ -51,6 +52,7 @@ gulp.task("styles", function() {
         .pipe(gulp.dest(paths.styles.out))
         .pipe(rename({ suffix: ".min" }))
         .pipe(minifycss())
+        .pipe(combineMq())
         .pipe(gulp.dest(paths.styles.out));
 });
 

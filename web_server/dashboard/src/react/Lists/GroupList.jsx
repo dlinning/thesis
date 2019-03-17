@@ -76,7 +76,7 @@ class GroupList extends React.Component {
 
         return (
             <>
-                {this.props.standalone && <button onClick={this.openAddGroupModal.bind(this)}>Create Group</button>}
+                {this.props.standalone && <button onClick={this.openAddGroupModal.bind(this)}>Create New Group</button>}
                 {groups.length > 0 && (
                     <div className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}>
                         {!this.props.standalone && (

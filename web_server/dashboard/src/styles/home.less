@@ -12,3 +12,19 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    #home-lists {
+        flex-flow: column;
+
+        > .flex-col {
+            &:not(:last-of-type) {
+                margin: 0 0 2rem 0;
+            }
+        }
+
+        .tile {
+            width: 100%;
+        }
+    }
+}

@@ -38,7 +38,7 @@ class FlowEditor extends React.Component {
             });
 
         // Load flow data if `this.props.flowId` was provided
-        if (this.props.flowId) {
+        if (this.props.flowId && typeof this.props.flowId == "string") {
             jsonFetch("/api/flows/getbyid/" + this.props.flowId)
                 .then(res => {
                     let stateCopy = this.state;
