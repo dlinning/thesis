@@ -2,12 +2,15 @@ class FlowList extends React.Component {
     constructor(p) {
         super(p);
 
-        this.state = {};
+        this.state = {
+            flows: [],
+            error: null
+        };
 
         // Handles updating the "background" list
         // when using SensorEditModal component.
         messenger.subscribe("RefreshFlowList", () => {
-            this.updateFlowList()
+            this.updateFlowList();
         });
     }
 
@@ -18,7 +21,10 @@ class FlowList extends React.Component {
     updateFlowList() {
         jsonFetch("/api/flows/list")
             .then(res => {
-                this.setState({ flows: res, error: null });
+                this.setState({
+                    flows: res,
+                    error: null
+                });
             })
             .catch(err => {
                 messenger.notify("OpenToast", { msg: `Unable to fetch Flows`, warn: true });
@@ -26,24 +32,36 @@ class FlowList extends React.Component {
             });
     }
 
-    replaceFlowInList(newFlow) {
-        let flows = this.state.flows;
-        if (flows) {
-            for (var n = 0, l = flows.length; n < l; n++) {
-                if (flow[n].id === newFlow.id) {
-                    flow[n] = newFlow;
-                    this.setState({ flows: flows, error: null });
-                    break;
-                }
-            }
-        }
-    }
-
-    openFlowsEditor(flowId = undefined) {
+    openFlowsEditor(flowId) {
         messenger.notify("OpenModal", {
             title: `Create New Flow`,
-            content: <FlowEditor flowId={flowId}/>
+            content: <FlowEditor flowId={flowId} />
         });
+    }
+
+    removeFlow(flowId, flowName) {
+        if (confirm(`Delete flow "${flowName}"?`)) {
+            jsonFetch("/api/flows/" + flowId, null, "DELETE")
+                .then(res => {
+                    if (res.status === 200) {
+                        // Delete the flow locally instead of calling updateFlowList()
+                        // since we don't need any extra data
+                        let allFlows = this.state.flows;
+                        for (let i = 0, l = allFlows.length; i < l; i++) {
+                            if (allFlows[i].id === flowId) {
+                                allFlows.splice(i, 1);
+                                break;
+                            }
+                        }
+
+                        this.setState({ flows: allFlows });
+                    }
+                })
+                .catch(err => {
+                    messenger.notify("OpenToast", { msg: `Unable to delete Flow "${flowName}`, warn: true });
+                    console.error(err);
+                });
+        }
     }
 
     render() {
@@ -77,8 +95,12 @@ class FlowList extends React.Component {
                                         <span className="label">Activation Count</span>
                                     </div>
                                     <div className="data-module">
-                                        <button className="small" onClick={()=>this.openFlowsEditor(flow.id)}>Manage</button>
-                                        <button className="warn overlay small">Remove</button>
+                                        <button className="small" onClick={() => this.openFlowsEditor(flow.id)}>
+                                            Manage
+                                        </button>
+                                        <button className="warn overlay small" onClick={() => this.removeFlow(flow.id, flow.name)}>
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
                             </div>

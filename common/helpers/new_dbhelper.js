@@ -656,7 +656,7 @@ module.exports.createFlow = data => {
     newFlow.config = JSON.stringify(data);
 
     if (makeNewFlowStmt.run(newFlow).changes === 1) {
-        return { status: 200, group: newFlow };
+        return { status: 200, flow: newFlow };
     }
     // else
     return { status: 500, error: `The server was unable to create a new flow` };
@@ -674,9 +674,9 @@ module.exports.updateFlow = (data) => {
         originalFlow.description = data.description;
     
         // No longer needed
+        delete data.id;
         delete data.name;
         delete data.description;
-        delete data.id;
     
         originalFlow.config = JSON.stringify(data);
 

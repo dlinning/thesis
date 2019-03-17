@@ -19,7 +19,7 @@ router.get("/getbyid/:id?", (req, res) => {
 router.post("/addOrEdit", (req, res) => {
     let data = { status: 400 };
 
-    if (req.body.id !== -1) {
+    if (req.body.id !== undefined) {
         data = DBHelper.updateFlow(req.body);
     } else {
         data = DBHelper.createFlow(req.body);

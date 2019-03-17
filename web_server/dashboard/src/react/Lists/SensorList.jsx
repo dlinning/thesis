@@ -196,7 +196,7 @@ class SensorList extends React.Component {
                                     <div className="data-module">
                                         <button className="small" onClick={() => this.openSensorSettingsModal(s.id)}>Manage</button>
                                         <button className="warn overlay small" onClick={() => this.removeSensor(s.id)}>
-                                            Remove
+                                            Delete
                                         </button>
                                     </div>
                                 </div>

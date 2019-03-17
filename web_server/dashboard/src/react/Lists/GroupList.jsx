@@ -119,7 +119,7 @@ class GroupList extends React.Component {
                                         </div>
                                         <div className="data-module">
                                             <button className="warn overlay small" onClick={() => this.removeGroup(g.id)}>
-                                                Remove
+                                                Delete
                                             </button>
                                         </div>
                                     </div>

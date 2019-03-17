@@ -3,7 +3,7 @@ class FlowEditor extends React.Component {
         super(p);
 
         this.state = {
-            id: this.props.flowId || -1,
+            id: this.props.flowId || undefined,
             name: "",
             description: "",
             trigger: {},
@@ -23,7 +23,7 @@ class FlowEditor extends React.Component {
 
                 stateCopy.sgData = {
                     Sensor: res.sensors.map(s => {
-                        return { value: s.id, display: `${s.name} (${s.dataType})`};
+                        return { value: s.id, display: `${s.name} (${s.dataType})` };
                     }),
                     Group: res.groups.map(g => {
                         return { value: g.id, display: g.name };
@@ -104,7 +104,7 @@ class FlowEditor extends React.Component {
             .then(resp => {
                 console.log(resp);
                 messenger.notify("RefreshFlowList");
-                messenger.notify("OpenToast", { msg: `Flow ${newFlow.name} successfully updated.`,});
+                messenger.notify("OpenToast", { msg: `Flow ${newFlow.name} successfully updated.` });
                 //messenger.notify("CloseModal", { force: true });
             })
             .catch(err => {
@@ -116,23 +116,42 @@ class FlowEditor extends React.Component {
     checkSendEnabled() {
         let s = this.state;
 
+        // A name must always be set to a non-empty value
         if (!s.name || s.name.length == 0) {
             return false;
         }
 
-        if (s.trigger.type === "Time" && s.trigger.value && s.trigger.value.time == "") {
+        // We must have defined a trigger type
+        if (!s.trigger.type) {
             return false;
         }
 
-        if (!s.trigger.type || !s.trigger.comparison || !s.trigger.value) {
-            return false;
+        // if{}else{} is necessary, since `type` == "Time"
+        // doesn't require a `comparison` value.
+        if (s.trigger.type === "Time") {
+            // Time must have a value, and it must be non-empty.
+            // Also, at least one `day` must be set to true
+            if (!s.trigger.value || s.trigger.value.time == "" || !s.trigger.value.days.includes(true)) {
+                return false;
+            }
+        } else {
+            // "Sensor" and "Group" types must have both of these.
+            if (!s.trigger.comparison || !s.trigger.value) {
+                return false;
+            }
         }
-        if (s.trigger.type === "Group" && !s.trigger.id) {
-            return false;
+        
+        // Groups will fail if the GroupId is not set, or if the 
+        // aggregate type is not set.
+        // (No need to check `type`, `comparison`, or `value` since that
+        // is handled in the else{} above)
+        if (s.trigger.type === "Group") {
+            if (!s.trigger.id || !s.trigger.aggregateType) {
+                return false;
+            }
         }
-        if (s.trigger.type === "Group" && (!s.trigger.aggregateType || !s.trigger.id)) {
-            return false;
-        }
+        
+        // We must define a type and ID to send to.
         if (!s.to.id || !s.to.type) {
             return false;
         }
@@ -149,7 +168,7 @@ class FlowEditor extends React.Component {
         // Not the best way of checking to see if data is all
         // set, but since `trigger.type` is mandatory, this should
         // generall work.
-        if (this.state.id && !this.state.trigger.type) {
+        if (this.state.id !== undefined && !this.state.trigger.type) {
             return <Loader message="Loading Flow Data..." />;
         }
 
@@ -221,7 +240,11 @@ class FlowEditorTriggerBuilder extends React.Component {
             type: p.triggerData.type || undefined,
             id: p.triggerData.id || undefined,
             comparison: p.triggerData.comparison || undefined,
-            value: p.triggerData.value || undefined
+            value: p.triggerData.value || undefined,
+
+            // Only used for "Group" `type`'d Flows,
+            // still needs to be set though.
+            aggregateType: p.triggerData.aggregateType || undefined
         };
 
         this.triggerComparisons = {
@@ -305,7 +328,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                                 type="select"
                                 disabled={this.state.type == "Time"}
                                 options={this.props.sensorGroupData[this.state.type].map(o => {
-                                    return { display: o.display , value: o.value };
+                                    return { display: o.display, value: o.value };
                                 })}
                                 callback={val => this.updateRootField("id", val)}
                                 delay={0}
@@ -349,7 +372,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                 )}
 
                 {this.state.type && this.state.type == "Time" && (
-                    <FlowEditorTimeSelector updateFunc={val => this.updateRootField("value", val)} />
+                    <FlowEditorTimeSelector timeData={this.props.triggerData} updateFunc={val => this.updateRootField("value", val)} />
                 )}
             </>
         );
@@ -361,8 +384,8 @@ class FlowEditorTimeSelector extends React.PureComponent {
         super(p);
 
         this.state = {
-            time: "",
-            days: [false, false, false, false, false, false, false]
+            time: p.triggerData ? p.triggerData.value.time : "",
+            days: p.triggerData ? p.triggerData.value.days : [false, false, false, false, false, false, false]
         };
 
         this.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
