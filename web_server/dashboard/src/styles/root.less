@@ -30,7 +30,6 @@ button {
     letter-spacing: 1px;
     text-transform: uppercase;
 
-
     color: @background;
     background-color: @primary;
     border: none;
@@ -102,11 +101,11 @@ button {
         }
     }
 
-    &.small{
+    &.small {
         line-height: 28px;
         font-size: 0.75rem;
 
-        &.round{
+        &.round {
             line-height: 28px;
             width: 28px;
             height: 28px;
@@ -118,7 +117,6 @@ button {
         cursor: default;
 
         color: @text;
-
     }
 
     i {
@@ -307,10 +305,25 @@ h2 {
     text-align: center;
 }
 
-.errorCard {
-    .cardBase();
-    background: @warn;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
+.ReactLoader {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+
+    i {
+        font-size: 2rem;
+        margin: 1rem;
+        color: @primary;
+        animation: rotate-center 2s steps(8, end) infinite both;
+    }
+}
+@keyframes rotate-center {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

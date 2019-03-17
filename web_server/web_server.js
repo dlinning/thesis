@@ -12,5 +12,5 @@ app.use("/assets", express.static(path.join(__dirname, "dashboard/assets")));
 
 // Start the server listening
 app.listen(config.port, () => {
-    console.log(`\n\n\nDashboard and API servers Running on port ${config.port}\n\n\n`);
+    console.log(`\nDashboard and API servers Running on port ${config.port}\n`);
 });

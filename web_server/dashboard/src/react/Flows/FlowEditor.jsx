@@ -16,13 +16,14 @@ class FlowEditor extends React.Component {
     }
 
     componentDidMount() {
+        // Load current Sensor and Group metadata to populate the selections
         jsonFetch("/api/flows/simpleGroupSensorData")
             .then(res => {
                 let stateCopy = this.state;
 
                 stateCopy.sgData = {
                     Sensor: res.sensors.map(s => {
-                        return { value: s.id, display: s.name, dataType: s.dataType };
+                        return { value: s.id, display: `${s.name} (${s.dataType})`};
                     }),
                     Group: res.groups.map(g => {
                         return { value: g.id, display: g.name };
@@ -103,6 +104,7 @@ class FlowEditor extends React.Component {
             .then(resp => {
                 console.log(resp);
                 messenger.notify("RefreshFlowList");
+                messenger.notify("OpenToast", { msg: `Flow ${newFlow.name} successfully updated.`,});
                 //messenger.notify("CloseModal", { force: true });
             })
             .catch(err => {
@@ -141,7 +143,15 @@ class FlowEditor extends React.Component {
     render() {
         let s = this.state;
 
-        console.log('Rendering with state', s);
+        // Display a loader while we wait for the flow's data
+        // to be pulled in during componentDidMount().
+        //
+        // Not the best way of checking to see if data is all
+        // set, but since `trigger.type` is mandatory, this should
+        // generall work.
+        if (this.state.id && !this.state.trigger.type) {
+            return <Loader message="Loading Flow Data..." />;
+        }
 
         return (
             <form id="flow-builder" ref={this.formRef} onSubmit={this.submitForm.bind(this)}>
@@ -172,17 +182,25 @@ class FlowEditor extends React.Component {
                 <div className="config flex-col">
                     <div className="section flex-col">
                         <span className="title">When</span>
-                        <FlowEditorTriggerBuilder sensorGroupData={this.state.sgData} updateFunc={this.updateTriggerData.bind(this)} />
+                        <FlowEditorTriggerBuilder
+                            triggerData={this.state.trigger}
+                            sensorGroupData={this.state.sgData}
+                            updateFunc={this.updateTriggerData.bind(this)}
+                        />
                     </div>
 
                     <div className="section flex-col">
                         <span className="title">Send</span>
-                        <FlowEditorJsonBuilder updateFunc={this.updatePayloadData.bind(this)} />
+                        <FlowEditorJsonBuilder payloadData={this.state.payload} updateFunc={this.updatePayloadData.bind(this)} />
                     </div>
 
                     <div className="section flex-col">
                         <span className="title">To</span>
-                        <FlowEditorToBuilder sensorGroupData={this.state.sgData} updateFunc={this.updateToData.bind(this)} />
+                        <FlowEditorToBuilder
+                            toData={this.state.to}
+                            sensorGroupData={this.state.sgData}
+                            updateFunc={this.updateToData.bind(this)}
+                        />
                     </div>
                 </div>
                 <div className="flex-row fe ">
@@ -200,10 +218,10 @@ class FlowEditorTriggerBuilder extends React.Component {
         super(p);
 
         this.state = {
-            type: undefined,
-            id: undefined,
-            comparison: undefined,
-            value: undefined
+            type: p.triggerData.type || undefined,
+            id: p.triggerData.id || undefined,
+            comparison: p.triggerData.comparison || undefined,
+            value: p.triggerData.value || undefined
         };
 
         this.triggerComparisons = {
@@ -253,15 +271,6 @@ class FlowEditorTriggerBuilder extends React.Component {
     }
 
     render() {
-        let sensorDataType = undefined;
-        if (this.state.type === "Sensor" && this.state.id !== undefined) {
-            this.props.sensorGroupData["Sensor"].forEach(sensor => {
-                if (sensor.id == this.state.id) {
-                    sensorDataType = sensors.dataType;
-                }
-            });
-        }
-
         return (
             <>
                 <div className="flex-row">
@@ -292,22 +301,23 @@ class FlowEditorTriggerBuilder extends React.Component {
                             <OnChangeInput
                                 key={`triggerType_${this.state.type}`}
                                 placeholder={`Choose ${this.state.type}`}
+                                value={this.state.id}
                                 type="select"
                                 disabled={this.state.type == "Time"}
                                 options={this.props.sensorGroupData[this.state.type].map(o => {
-                                    return { display: o.display, value: o.value };
+                                    return { display: o.display , value: o.value };
                                 })}
                                 callback={val => this.updateRootField("id", val)}
                                 delay={0}
                                 required
                             />
-                            {sensorDataType && <span className="sensor-data-type">({sensorDataType})</span>}
                         </div>
                         <span>Is</span>
                         {this.state.type === "Group" && (
                             <OnChangeInput
                                 key={`groupAggType_${this.state.type}`}
                                 placeholder={"Select..."}
+                                value={this.state.aggregateType}
                                 type="select"
                                 options={this.triggerComparisons["Group"]}
                                 callback={val => this.updateRootField("aggregateType", val)}
@@ -318,6 +328,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                         <OnChangeInput
                             key={`compType_${this.state.type}`}
                             placeholder={"Select..."}
+                            value={this.state.comparison}
                             type="select"
                             options={this.triggerComparisons["Shared"]}
                             callback={val => this.updateRootField("comparison", val)}
@@ -327,6 +338,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                         <OnChangeInput
                             key={`triggerValue_${this.state.type}`}
                             placeholder="Value"
+                            value={this.state.value}
                             required
                             type="text"
                             callback={val => this.updateRootField("value", val)}
@@ -405,7 +417,7 @@ class FlowEditorJsonBuilder extends React.Component {
 
         this.state = {
             // Will just be a bunch of K/V pairs
-            data: {}
+            data: p.payloadData || {}
         };
     }
 
@@ -499,8 +511,8 @@ class FlowEditorToBuilder extends React.Component {
         super(p);
 
         this.state = {
-            type: undefined,
-            id: undefined
+            type: p.toData.type || undefined,
+            id: p.toData.id || undefined
         };
     }
 
@@ -558,7 +570,7 @@ class FlowEditorToBuilder extends React.Component {
                         key={`toType_${this.state.type}`}
                         placeholder={`Choose ${this.state.type}`}
                         type="select"
-                        initialValue={this.state.id}
+                        value={this.state.id}
                         options={this.props.sensorGroupData[this.state.type].map(o => {
                             return { display: o.display, value: o.value };
                         })}

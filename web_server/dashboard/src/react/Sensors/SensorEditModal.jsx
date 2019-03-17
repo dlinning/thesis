@@ -120,9 +120,9 @@ class SensorEditModal extends React.Component {
         return (
             <div className="editSensorModal">
                 <div className="flex-col">
-                    <OnChangeInput initialValue={s.name} callback={val => this.updateField("name", val)} type="text" name="name" />
+                    <OnChangeInput value={s.name} callback={val => this.updateField("name", val)} type="text" name="name" />
                     <OnChangeInput
-                        initialValue={s.dataType}
+                        value={s.dataType}
                         callback={val => this.updateField("dataType", val)}
                         type="select"
                         options={this.possibleDataTypes}

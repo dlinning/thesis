@@ -18,13 +18,13 @@ router.get("/getbyid/:id?", (req, res) => {
 
 router.post("/addOrEdit", (req, res) => {
     let data = { status: 400 };
-    console.log(req.body);
 
     if (req.body.id !== -1) {
-        data = DBHelper.updateFlow(req.params.id, req.body);
+        data = DBHelper.updateFlow(req.body);
     } else {
         data = DBHelper.createFlow(req.body);
     }
+    
     res.status(data.status).send(data);
 });
 

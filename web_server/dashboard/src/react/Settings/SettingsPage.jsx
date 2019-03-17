@@ -103,7 +103,6 @@ class SettingsPage extends React.Component {
                         name="settingsSearch"
                     />
                 </div>
-                <ErrorCard error={s.error} />
                 <div className="list constrain" id="settings-list">
                     {s.matches &&
                         Object.keys(s.matches).map(key => {
@@ -116,7 +115,7 @@ class SettingsPage extends React.Component {
                                                 <div className="flex-row aic">
                                                     <span className="s-name">{setting.key}:</span>
                                                     <OnChangeInput
-                                                        initialValue={setting.value}
+                                                        value={setting.value}
                                                         callback={this.updateSetting.bind(this, setting.key)}
                                                         type={setting.type}
                                                     />

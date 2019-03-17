@@ -10,7 +10,6 @@ class GroupsPage extends React.Component {
 		return (
 			<>
 				<h1>Manage Groups</h1>
-				<ErrorCard error={s.error} />
 				<GroupList standalone={true} />
 			</>
 		);

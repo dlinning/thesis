@@ -92,7 +92,7 @@ class GroupList extends React.Component {
                             return (
                                 <div className="tile" key={`group_${g.id}`}>
                                     <OnChangeInput
-                                        initialValue={g.name}
+                                        value={g.name}
                                         classes={["g-name"]}
                                         callback={newValue => {
                                             if (newValue.length > 0) {

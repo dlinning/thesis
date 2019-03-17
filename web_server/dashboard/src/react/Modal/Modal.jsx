@@ -15,6 +15,12 @@ class Modal extends React.Component {
         messenger.subscribe("CloseModal", opts => {
             this.close(opts.force);
         });
+
+        document.addEventListener('keyup', (evt) => {
+            if (evt.keyCode == 27 && this.state.open) {
+                this.close(true);
+            }
+        })
     }
 
     close(force) {
@@ -26,7 +32,7 @@ class Modal extends React.Component {
     render() {
         let s = this.state;
         return (
-            <div id="modal-scrim" className={s.open === true ? "open" : ""} onClick={() => this.close()}>
+            <div id="modal-scrim" className={s.open === true ? "open" : ""}>
                 <div id="modal" onClick={e => e.stopPropagation()}>
                     <div className="controls">
                         <span className="title">{s.title}</span>

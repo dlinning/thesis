@@ -1,0 +1,5 @@
+{
+    "watch": ["./web_server"],
+    "ignore": ["./web_server/dashboard"],
+    "ext":"js"
+}

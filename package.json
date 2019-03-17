@@ -5,7 +5,7 @@
     "main": "ERROR",
     "scripts": {
         "start": "node ./web_server/web_server.js",
-        "dev": "nodemon ./web_server/web_server.js -i ./web_server/dashboard/"
+        "dev": "nodemon --config nodemon.json ./web_server/web_server.js "
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",

@@ -7,16 +7,25 @@ class OnChangeInput extends React.Component {
         this.updateTimer = null;
 
         this.state = {
-            value: p.initialValue || ""
+            value: p.value || p.initialValue || ""
         };
-        if (p.type === "select" && p.placeholder) {
+
+        if (!p.value && p.type === "select" && p.placeholder) {
             this.state.value = "MUST_CHANGE";
         }
+
         this.delay = this.props.delay === undefined ? 300 : this.props.delay;
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.value !== this.props.value || nextState.value !== this.state.value) {
+            return true;
+        }
+        return false;
+    }
+
     updateHandler(evt) {
-        // Have to handle checboxes differently. What are "standards" anyways?
+        // Have to handle checkboxes differently. What are "standards" anyways?
         var newValue = evt.target.type === "checkbox" ? (evt.target.checked === true ? "on" : "off") : evt.target.value || "";
 
         this.setState({ value: newValue });
@@ -77,7 +86,7 @@ class OnChangeInput extends React.Component {
                         // display and "value" values
                         if (val.display && val.value) {
                             return (
-                                <option value={val.value} key={val+"__"+idx}>
+                                <option value={val.value} key={val + "__" + idx}>
                                     {val.display}
                                 </option>
                             );
@@ -85,7 +94,7 @@ class OnChangeInput extends React.Component {
                         // Otherwise assume `val` is both
                         // display and "value"
                         return (
-                            <option value={val} key={val+"__"+idx}>
+                            <option value={val} key={val + "__" + idx}>
                                 {val}
                             </option>
                         );
