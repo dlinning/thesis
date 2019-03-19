@@ -1,5 +1,5 @@
 {
-    "watch": ["./web_server"],
+    "watch": ["./web_server", "./common"],
     "ignore": ["./web_server/dashboard"],
-    "ext":"js"
+    "ext": "js"
 }

@@ -396,9 +396,6 @@ const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);
 //
 //
 
-// Creates a new Group with the given `name` (or "New Group").
-//
-//
 module.exports.listAllGroups = () => {
     return listAllGroupsStmt.all();
 };
