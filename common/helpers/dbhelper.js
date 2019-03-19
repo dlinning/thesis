@@ -23,26 +23,11 @@ const createStmts = require("./dbCreateStatements");
 const setupDBTransaction = db.transaction(() => {
     Object.keys(createStmts).forEach(stmt => {
         db.prepare(createStmts[stmt]).run();
-    })
+    });
 });
 setupDBTransaction();
 
 ///////
-
-// Checks to see if all entries in `toCheck` exist in the DB.
-//
-// `toCheck` is an array with the format of [{table: TABLE_NAME,id: PRIMARY_KEY_VALUE},...]
-//
-function checkExists(toCheck) {
-    for (var i = 0, l = toCheck.length; i < l; i++) {
-        var t = toCheck[i];
-        if (db.prepare(`SELECT id from ${t.table} WHERE id = '${t.id}'`).get() === undefined) {
-            return false;
-        }
-    }
-    return true;
-}
-module.exports.checkExists = checkExists;
 
 // Checks an object (or returned DB row) to
 // see if all of its values are null.
@@ -281,44 +266,36 @@ const updateSensorStmt = db.prepare(
 // If successful, will return all groups for the given sensor.
 //
 module.exports.addSensorToGroup = (sensorId, groupId) => {
-    var now = dateAsUnixTimestamp();
-
-    if (checkExists([{ table: "Sensors", id: sensorId }, { table: "Groups", id: groupId }])) {
-        var newLink = {
+    if (
+        addSensorToGroupStmt.run({
             SensorId: sensorId,
             GroupId: groupId,
-            createdAt: now
-        };
-        if (addSensorToGroupStmt.run(newLink).changes === 1) {
-            // Link was created
-            return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
-        } else {
-            return { status: 500, error: "Error adding sensor to group in DB" };
-        }
+            createdAt: dateAsUnixTimestamp()
+        }).changes === 1
+    ) {
+        // Link was created
+        return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
     } else {
-        return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
+        return { status: 500, error: "Error adding sensor to group in DB" };
     }
 };
-const addSensorToGroupStmt = db.prepare(`INSERT INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
+const addSensorToGroupStmt = db.prepare(`INSERT OR REPLACE INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
 
 // For removing a sensor from a given group.
 //
 // If successful, will return all groups for the given sensor.
 //
 module.exports.removeSensorFromGroup = (sensorId, groupId) => {
-    if (checkExists([{ table: "Sensors", id: sensorId }, { table: "Groups", id: groupId }])) {
-        var link = {
+    if (
+        removeSensorFromGroupStmt.run({
             SensorId: sensorId,
             GroupId: groupId
-        };
-        if (removeSensorFromGroupStmt.run(link).changes === 1) {
-            // Link was removed
-            return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
-        } else {
-            return { status: 500, error: "Error removing sensor from group in DB" };
-        }
+        }).changes === 1
+    ) {
+        // Link was removed
+        return { status: 200, groups: getGroupsforSensorStmt.all(sensorId) };
     } else {
-        return { status: 500, error: "SENSOR_OR_GROUP_DOES_NOT_EXIST" };
+        return { status: 500, error: "Error removing sensor from group in DB" };
     }
 };
 const removeSensorFromGroupStmt = db.prepare(`DELETE FROM SensorGroups WHERE SensorId = @SensorId AND GroupId = @GroupId`);
