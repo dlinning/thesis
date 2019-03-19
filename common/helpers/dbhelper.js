@@ -19,36 +19,13 @@ process.on("exit", () => db.close());
 // Will build the tables of the database
 // if they do not exist.
 //
-const createSensorsStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "Sensors" ( "id" UUID PRIMARY KEY, "name" TEXT NOT NULL, "dataType" TEXT NOT NULL, "createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL )`
-);
-const createGroupsStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "Groups" ("id" UUID PRIMARY KEY, "name" TEXT NOT NULL, "createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL)`
-);
-const createLogEntriesStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "LogEntries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "timestamp" DATETIME NOT NULL, "value" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "SensorId" UUID REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`
-);
-const createSensorsGroupsStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "SensorGroups" ("createdAt" DATETIME NOT NULL, "SensorId" UUID NOT NULL REFERENCES "Sensors" ("id") ON DELETE CASCADE ON UPDATE CASCADE, "GroupId" UUID NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("SensorId", "GroupId"))`
-);
-const createSettingsStmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS "Settings" ( "key" TEXT PRIMARY KEY NOT NULL, "value" TEXT NOT NULL, "type" TEXT NOT NULL, "description" TEXT, "inGroup" TEXT )`
-);
-
-//TODO: Re-do all create statements
-
-const setupTransaction = db.transaction(() => {
-    createSensorsStmt.run();
-    createGroupsStmt.run();
-
-    createSensorsGroupsStmt.run();
-    createLogEntriesStmt.run();
-
-    createSettingsStmt.run();
-
-    //TODO: Re-do all create statements
+const createStmts = require("./dbCreateStatements");
+const setupDBTransaction = db.transaction(() => {
+    Object.keys(createStmts).forEach(stmt => {
+        db.prepare(createStmts[stmt]).run();
+    })
 });
-setupTransaction();
+setupDBTransaction();
 
 ///////
 
@@ -663,18 +640,18 @@ const makeNewFlowStmt = db.prepare(
     VALUES (@id,@name,@description,@activationCount,@config,@createdAt,@updatedAt)`
 );
 
-module.exports.updateFlow = (data) => {
+module.exports.updateFlow = data => {
     let originalFlow = getFlowByIdStmt.get(data.id);
 
     if (originalFlow) {
         originalFlow.name = data.name;
         originalFlow.description = data.description;
-    
+
         // No longer needed
         delete data.id;
         delete data.name;
         delete data.description;
-    
+
         originalFlow.config = JSON.stringify(data);
 
         originalFlow.updatedAt = dateAsUnixTimestamp();
@@ -714,13 +691,12 @@ module.exports.deleteFlowById = id => {
 };
 const deleteFlowByIdStmt = db.prepare(`DELETE FROM Flows WHERE id = ?`);
 
-
 module.exports.getGroupAndSensorDataForFlows = () => {
     return {
         sensors: getSensorDataForFlowsStmt.all(),
-        groups: getGroupDataForFlowsStmt.all(),
-    }
-}
+        groups: getGroupDataForFlowsStmt.all()
+    };
+};
 const getSensorDataForFlowsStmt = db.prepare(`SELECT id,name,dataType from Sensors`);
 const getGroupDataForFlowsStmt = db.prepare(`SELECT id,name from Groups`);
 
