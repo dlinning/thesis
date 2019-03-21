@@ -83,11 +83,12 @@ class SensorEditModal extends React.Component {
 
         jsonFetch("/api/sensors/addToGroup", payload, "POST")
             .then(resp => {
+                this.updateGroups(resp.groups);
+                
                 messenger.notify("SensorGroupsUpdated", {
                     id: payload.sensorID,
                     groups: resp.groups
                 });
-                this.updateGroups(resp.groups);
             })
             .catch(err => {
                 console.error(err);
