@@ -365,7 +365,7 @@ module.exports.createOrUpdateGroup = (groupId = newUUID(), name) => {
         return createGroupFunc(groupId, name);
     }
 };
-const getGroupByIdStmt = db.prepare("SELECT * FROM Groups WHERE id = ?");
+const getGroupByIdStmt = db.prepare("SELECT * FROM GroupListWithSensorAndLogCount WHERE id = ?");
 
 // Allows updating of a groups's `name`.
 //
