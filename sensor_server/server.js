@@ -1,7 +1,8 @@
 const config = require("./config.json");
 const debug = process.env.NODE_ENV != "production";
 
-var DBHelper = require("../common/helpers/dbhelper");
+var DBHelper = require("../common/helpers/dbhelper"),
+    flowRunner = require('../flow_runner/flowRunner');
 
 const MessageSenderBuilder = require("../common/helpers/messagehandler"),
     MessageSender = new MessageSenderBuilder();
@@ -58,6 +59,8 @@ server.on("message", (rawMessage, rinfo) => {
         var didChange = DBHelper.logData(msg.value, msg.sensorUUID, msg.timestamp) === 1;
 
         if (didChange) {
+            flowRunner.handleSensorUpdate(msg.sensorUUID, msg.value);
+
             MessageSender.sendMessage(server, rinfo.address, rinfo.port, {
                 type: "logack",
                 for: msg.timestamp

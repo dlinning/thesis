@@ -502,6 +502,13 @@ WHERE
     le.createdAt <= ?`
 );
 
+// Used by flowRunner
+module.exports.getSensorIdsForAllGroups = () => {
+    return getSensorIdsForAllGroupsStmt.all();
+};
+const getSensorIdsForAllGroupsStmt = db.prepare('SELECT sg.GroupId, sg.SensorId FROM Groups as g INNER JOIN SensorGroups as sg ON sg.GroupId = g.id');
+
+
 //
 //
 //
@@ -527,10 +534,18 @@ module.exports.getSpecificSetting = name => {
 };
 const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
 
+// This only returns the specific values for the settings
+// in the given group.
 module.exports.getSettingsByGroup = groupName => {
-    var res = getSettingByGroupStmt.get(groupName);
+    var res = getSettingByGroupStmt.all(groupName);
     if (res) {
-        return { status: 200, value: res.value };
+        
+        let settings = {};
+        res.forEach(s => {
+            settings[s.key] = s.value;
+        });
+
+        return { status: 200, group: groupName, settings: settings };
     }
     return { status: 400, error: `There are no settings in group ${groupName}` };
 };
@@ -647,7 +662,6 @@ module.exports.updateFlow = data => {
         return { status: 400, error: `A Flow does not exist with ID ${id}` };
     }
 };
-
 const updateFlowStmt = db.prepare(
     `UPDATE Flows 
         SET name = @name,
@@ -659,6 +673,23 @@ const updateFlowStmt = db.prepare(
         WHERE id = @id
     `
 );
+
+// Will increase the Flow's activation count by 1
+module.exports.activateFlow = id => {
+    let flow = getFlowByIdStmt.run(id);
+
+    if (flow) {
+        if (updateFlowActivationStmt({ newCount: flow.activationCount++, id: id }).changes === 1) {
+            return { status: 200, flow: originalFlow };
+        } else {
+            return { status: 500, error: `The server was unable to update Flow with ID ${id}` };
+        }
+    } else {
+        return { status: 400, error: `A Flow does not exist with ID ${id}` };
+    }
+}
+const updateFlowActivationStmt = db.prepare('UPDATE Flows SET activationCount = @newCount WHERE id = @id');
+
 module.exports.deleteFlowById = id => {
     var flow = getFlowByIdStmt.get(id);
 
