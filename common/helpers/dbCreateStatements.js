@@ -24,7 +24,7 @@ module.exports = {
     LogEntries:
         'CREATE TABLE IF NOT EXISTS "LogEntries" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `timestamp` DATETIME NOT NULL, `value` VARCHAR ( 255 ) NOT NULL, `createdAt` DATETIME NOT NULL, `SensorId` UUID, FOREIGN KEY(`SensorId`) REFERENCES `Sensors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE )',
     Flows:
-        'CREATE TABLE IF NOT EXISTS "Flows" ( `id` UUID NOT NULL UNIQUE, `name` TEXT NOT NULL, `description` TEXT, `config` TEXT, `activationCount` INTEGER DEFAULT 0, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY(`id`) )',
+        'CREATE TABLE IF NOT EXISTS "Flows" ( `id` UUID NOT NULL UNIQUE, `name` TEXT NOT NULL, `description` TEXT, `triggerType` TEXT NOT NULL, `triggerId` TEXT NOT NULL, `config` TEXT, `activationCount` INTEGER DEFAULT 0, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY(`id`) )',
     Settings:
         'CREATE TABLE IF NOT EXISTS "Settings" ( `key` TEXT NOT NULL, `value` TEXT NOT NULL, `type` TEXT NOT NULL, `description` TEXT, `inGroup` TEXT, PRIMARY KEY(`key`) )',
 

@@ -565,7 +565,7 @@ module.exports.getAllFlows = () => {
     }
     return allFlows;
 };
-const getAllFlowsStmt = db.prepare(`SELECT id, name, description, activationCount FROM Flows`);
+const getAllFlowsStmt = db.prepare(`SELECT id, name, description, triggerType, triggerId, activationCount FROM Flows`);
 module.exports.getFlowByName = name => {
     let res = getFlowByNameStmt.get(name);
     if (res) {
@@ -595,6 +595,8 @@ module.exports.createFlow = data => {
         id: newUUID(),
         name: data.name,
         description: data.description,
+        triggerType: data.trigger.type,
+        triggerId: data.trigger.id,
         activationCount: 0,
         createdAt: d1,
         updatedAt: d1
@@ -613,8 +615,8 @@ module.exports.createFlow = data => {
     return { status: 500, error: `The server was unable to create a new flow` };
 };
 const makeNewFlowStmt = db.prepare(
-    `INSERT INTO Flows(id,name,description,activationCount,config,createdAt,updatedAt)
-    VALUES (@id,@name,@description,@activationCount,@config,@createdAt,@updatedAt)`
+    `INSERT INTO Flows(id,name,description,triggerType,triggerId,activationCount,config,createdAt,updatedAt)
+    VALUES (@id,@name,@description,@triggerType,@triggerId,@activationCount,@config,@createdAt,@updatedAt)`
 );
 
 module.exports.updateFlow = data => {
@@ -623,6 +625,8 @@ module.exports.updateFlow = data => {
     if (originalFlow) {
         originalFlow.name = data.name;
         originalFlow.description = data.description;
+        originalFlow.triggerType = data.trigger.type;
+        originalFlow.triggerId = data.trigger.id;
 
         // No longer needed
         delete data.id;
@@ -649,6 +653,8 @@ const updateFlowStmt = db.prepare(
         SET name = @name,
             description = @description,
             config = @config,
+            triggerType = @triggerType,
+            triggerId = @triggerId,
             updatedAt = @updatedAt
         WHERE id = @id
     `
