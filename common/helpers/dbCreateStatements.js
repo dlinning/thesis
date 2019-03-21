@@ -8,8 +8,8 @@
 // initial implementation. Object.keys() is used to
 // simply iterate over all keys.
 //
-// NOTE: It is important to use the synatax
-// "CREATE TABLE[VIEW] IF NOT EXISTS ..."
+// NOTE: It is important to use the syntax
+// "CREATE (TABLE|VIEW) IF NOT EXISTS ..."
 // for all of these, as they are run every time the
 // server is booted.
 
