@@ -355,6 +355,39 @@ module.exports.listAllGroups = () => {
 };
 const listAllGroupsStmt = db.prepare(`SELECT * FROM GroupListWithSensorAndLogCount`);
 
+// Used mainly by the flowRunner, but also exposed via API.
+// Used for analysis of aggregate group data.
+module.exports.getLatestGroupSumAndAvg = (groupId = undefined) => {
+    let groups = getLatestGroupSumAndAvgStmt.all();
+    let res = { atTime: new Date() };
+
+    // Looking for all group data, so add the necessary
+    // property to the response object.
+    if (!groupId) {
+        res.groups = {};
+    }
+
+    for (let i = 0, l = groups.length; i < l; i++) {
+        let g = groups[i];
+        if (groupId && groupId == g.id ) {
+            res.group = g;
+            break;
+        } else if (!groupId) {
+            // Trying to get all data
+            res.groups[g.id] = {
+                name: g.name,
+                sum: g.sum,
+                avg: g.avg,
+                count: g.valueCount
+            };
+        }
+    }
+
+    return res;
+};
+const getLatestGroupSumAndAvgStmt = db.prepare("SELECT * FROM GroupLatestSumAndAvg");
+
+
 // "Helper" for both `createGroupFunc` and `updateGroupFunc`, so there
 // is only one entry point necessary for both
 module.exports.createOrUpdateGroup = (groupId = newUUID(), name) => {
@@ -611,7 +644,9 @@ module.exports.createFlow = data => {
         name: data.name,
         description: data.description,
         triggerType: data.trigger.type,
-        triggerId: data.trigger.id,
+        // Have to account for Time type
+        triggerId: data.trigger.type !== "Time" ? data.trigger.id : data.trigger.value.time,
+
         activationCount: 0,
         createdAt: d1,
         updatedAt: d1
@@ -641,7 +676,9 @@ module.exports.updateFlow = data => {
         originalFlow.name = data.name;
         originalFlow.description = data.description;
         originalFlow.triggerType = data.trigger.type;
-        originalFlow.triggerId = data.trigger.id;
+
+        // Have to account for Time type
+        originalFlow.triggerId = data.trigger.type !== "Time" ? data.trigger.id : data.trigger.value.time;
 
         // No longer needed
         delete data.id;

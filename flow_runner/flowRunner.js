@@ -2,131 +2,112 @@ const debug = process.env.NODE_ENV != "production";
 
 const DBHelper = require("../common/helpers/dbhelper");
 
-var taskRunnerTimer = null,
-    allFlows = null,
-    flowsForSensorById = {},
-    sensorIdsByGroupId = null;
+let flowIntervalTimer = null,
+    flowsByType = null;
 
-// Used internally to start the TaskRunner,
-// and also able to be triggered externally via module.exports.
-const startTaskRunner = () => {
-    let settingsReq = DBHelper.getSettingsByGroup("flows");
+let settings = DBHelper.getSettingsByGroup("flows");
 
-    allFlows = DBHelper.getAllFlows();
+// Returns a 24-hour formatted (ex. "17:04");
+const getCurrentTime = () => {
+    let d = new Date();
+    return `${d
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${d
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
+};
 
-    sensorIdsByGroupId = buildSensorsByGroup();
+const start = () => {
+    settings = DBHelper.getSettingsByGroup("flows").settings;
 
-    buildFlowsAsPerSensor();
+    flowsByType = organizeFlowsByType(DBHelper.getAllFlows());
 
-    if (settingsReq.status === 200) {
-        let SETTINGS = settingsReq.settings;
-        SETTINGS["flowInterval"] = Number(SETTINGS["flowInterval"]) * 1000; // Convert `flowInterval` to seconds
+    if (settings["flowsEnabled"] == "on") {
+        // Begin running the interval "flow checker"
 
-        debug && console.log("TASK RUNNER STARTED");
+        // Run every minute
+        flowIntervalTimer = setInterval(checkFlows, 60 * 1000);
 
-        //runFlows(); // Initial Call to run tasks
-        //taskRunnerTimer = setInterval(runFlows, SETTINGS["flowInterval"]);
-    } else {
-        console.error("Unable to start task runner. Check DB for `flowInterval` setting.");
+        // Immediately do first check
+        checkFlows();
     }
 };
-module.exports.startTaskRunner = startTaskRunner;
 
+const stop = () => {
+    console.log("stopping");
+    // Not null so that something like `settings["abc"]`
+    // will return undefined instead of erroring
+    settings = {};
+    flowsByType = {};
 
-
-
-
-
-
-
-
-
-const stopTaskRunner = () => {
-    clearInterval(taskRunnerTimer);
-    allFlows = null;
-    flowIndexesBySensorId = {};
+    // Clear the interval
+    clearInterval(flowIntervalTimer);
 };
-module.exports.stopTaskRunner = stopTaskRunner;
 
-
-
-
-
-
-
-
-const restartTaskRunner = () => {
-    stopTaskRunner();
-    startTaskRunner();
+const restart = () => {
+    stop();
+    start();
 };
-module.exports.restartTaskRunner = restartTaskRunner;
 
+//////////
 
+// Will run the provided flow proper.
+const runFlow = (flow, newValue) => {};
 
+//////////
 
+// Returns an object keyed by the different types of Flow triggers
+// (Group, Sensor, Time). Used throughout the file in order to not
+// have to iterate over all flows constantly. (For example, only checking)
+// Sensor flows when a sensor updates.
+const organizeFlowsByType = flows => {
+    let res = { Group: [], Sensor: [], Time: [] };
 
+    for (let i = 0, l = flows.length; i < l; i++) {
+        res[flows[i].triggerType].push(flows[i]);
+    }
 
+    return res;
+};
+
+// Checks all "Group" and "Time" flows at an interval
+// (as started in `start()`).
+const checkFlows = () => {
+    let currentTime = getCurrentTime();
+    let groupAggregate = DBHelper.getLatestGroupSumAndAvg();
+
+    let flowsToCheck = flowsByType["Time"].concat(flowsByType["Group"]);
+
+    for (let i = 0, l = flowsToCheck.length; i < l; i++) {
+        let flow = flowsToCheck[i];
+
+        if (flow.triggerType === "Time" && flow.triggerId == currentTime) {
+            runFlow(flow, currentTime);
+        } else {
+            // Group flows
+        }
+
+        if (flowsToCheck[i].triggerId == sensorId) {
+            runFlow(flowsToCheck[i], newValue);
+        }
+    }
+};
 
 // Not exported since this should only be
 // called directly from `startTaskRunner()` or `stopTaskRunner()`
 const handleSensorUpdate = (sensorId, newValue) => {
     console.log(`Processing new value [${newValue}] for sensor ${sensorId}`);
-    let flowsToRun = flowsForSensorById[sensorId];
+    let flowsToCheck = flowsByType["Sensor"];
 
-    if (flowsToRun.length > 0) {
-        console.log("\n\nNeed to run " + flowsToRun.length + " Flows\n\n");
+    for (let i = 0, l = flowsToCheck.length; i < l; i++) {
+        if (flowsToCheck[i].triggerId == sensorId) {
+            runFlow(flowsToCheck[i], newValue);
+        }
     }
 };
 module.exports.handleSensorUpdate = handleSensorUpdate;
 
-
-
-
-
-
-const buildSensorsByGroup = () => {
-    res = {};
-
-    let all = DBHelper.getSensorIdsForAllGroups();
-
-    all.forEach(row => {
-        if (res[row.GroupId] === undefined) {
-            res[row.GroupId] = [];
-        }
-        res[row.GroupId].push(row.SensorId);
-    });
-
-    return res;
-};
-
-const buildFlowsAsPerSensor = () => {
-    if (allFlows !== null && sensorIdsByGroupId !== null) {
-        allFlows.forEach(flow => {
-            if (flow.triggerType === "Sensor") {
-                // As `flow.triggerId` holds a SensorId,
-                // add the flow to this specific sensor.
-                addFlowToSensor(flow.triggerId, flow);
-
-            } else if (flow.triggerType === "Group") {
-                // Get all sensors that are in the group
-                let allSensors = sensorIdsByGroupId[flow.triggerId];
-
-                // Add the flow to each sensor
-                if (allSensors !== undefined) {
-                    allSensors.forEach(sensorId => {
-                        addFlowToSensor(sensorId, flow);
-                    });
-                }
-            }
-        });
-    }
-};
-const addFlowToSensor = (sensorId, flow) => {
-    if (!flowsForSensorById[sensorId]) {
-        flowsForSensorById[sensorId] = [];
-    }
-    flowsForSensorById[sensorId].push(flow);
-};
-
-///////////////
-startTaskRunner();
+////////////////
+start();

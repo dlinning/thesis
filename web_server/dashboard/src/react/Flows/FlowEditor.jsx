@@ -274,6 +274,7 @@ class FlowEditorTriggerBuilder extends React.Component {
             delete s["id"];
             delete s["value"];
             delete s["comparison"];
+            delete s["aggregateType"];
         }
 
         this.setState(s, () => {
@@ -374,7 +375,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                 )}
 
                 {this.state.type && this.state.type == "Time" && (
-                    <FlowEditorTimeSelector timeData={this.props.triggerData} updateFunc={val => this.updateRootField("value", val)} />
+                    <FlowEditorTimeSelector timeData={this.state} updateFunc={val => this.updateRootField("value", val)} />
                 )}
             </>
         );
@@ -384,6 +385,8 @@ class FlowEditorTriggerBuilder extends React.Component {
 class FlowEditorTimeSelector extends React.PureComponent {
     constructor(p) {
         super(p);
+
+        console.log(p);
 
         this.state = {
             time: p.timeData.value ? p.timeData.value.time : "",

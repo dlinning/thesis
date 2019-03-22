@@ -46,4 +46,10 @@ router.get("/logs/:groupID/:startTime?/:endTime?", (req, res) => {
 
     res.status(200).send(DBHelper.getLogsForGroup(p.groupID, p.startTime, p.endTime));
 });
+
+// Returns latest aggregate data for all groups.
+router.get("/aggregate/:groupId?", (req, res) => {
+    res.status(200).send(DBHelper.getLatestGroupSumAndAvg(req.params.groupId));
+});
+
 module.exports = router;
