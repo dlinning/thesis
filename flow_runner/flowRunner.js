@@ -54,7 +54,13 @@ const restart = () => {
 //////////
 
 // Will run the provided flow proper.
-const runFlow = (flow, newValue) => {};
+const runFlow = (flow, newValue, atTime) => { 
+    console.log('Time/sensor flow', flow);
+};
+
+const runGroupFlow = (flow, aggregateData, atTime) =>{
+    console.log('Group flow', flow);
+};
 
 //////////
 
@@ -76,7 +82,7 @@ const organizeFlowsByType = flows => {
 // (as started in `start()`).
 const checkFlows = () => {
     let currentTime = getCurrentTime();
-    let groupAggregate = DBHelper.getLatestGroupSumAndAvg();
+    let groupAggregate = DBHelper.getLatestGroupSumAndAvg().groups;
 
     let flowsToCheck = flowsByType["Time"].concat(flowsByType["Group"]);
 
@@ -84,13 +90,10 @@ const checkFlows = () => {
         let flow = flowsToCheck[i];
 
         if (flow.triggerType === "Time" && flow.triggerId == currentTime) {
-            runFlow(flow, currentTime);
-        } else {
+            runFlow(flow, currentTime, currentTime);
+        } else{
             // Group flows
-        }
-
-        if (flowsToCheck[i].triggerId == sensorId) {
-            runFlow(flowsToCheck[i], newValue);
+            runGroupFlow(flow, groupAggregate[flow.triggerId], currentTime);
         }
     }
 };
@@ -98,12 +101,12 @@ const checkFlows = () => {
 // Not exported since this should only be
 // called directly from `startTaskRunner()` or `stopTaskRunner()`
 const handleSensorUpdate = (sensorId, newValue) => {
-    console.log(`Processing new value [${newValue}] for sensor ${sensorId}`);
+    let currentTime = getCurrentTime();
     let flowsToCheck = flowsByType["Sensor"];
 
     for (let i = 0, l = flowsToCheck.length; i < l; i++) {
         if (flowsToCheck[i].triggerId == sensorId) {
-            runFlow(flowsToCheck[i], newValue);
+            runFlow(flowsToCheck[i], newValue, currentTime);
         }
     }
 };
