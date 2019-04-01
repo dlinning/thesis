@@ -156,12 +156,12 @@ class GroupAddForm extends React.Component {
             .then(resp => {
                 console.log(resp);
                 if (resp.status === 200) {
-                    messenger.notify("CloseModal",true);
+                    messenger.notify("CloseModal", true);
                     messenger.notify("OpenToast", { msg: `Created Group "${payload.groupName}"` });
                     this.props.groupAddCallback();
                 } else {
                     console.error("Error creating group:", resp);
-                    messenger.notify("OpenToast", { msg: `Unable to create Group "${payload.groupName}"`, warn:true });
+                    messenger.notify("OpenToast", { msg: `Unable to create Group "${payload.groupName}"`, warn: true });
                 }
             })
             .catch(err => {
@@ -172,6 +172,9 @@ class GroupAddForm extends React.Component {
         return (
             <form className="flex-col aic group-add-form" onSubmit={this.createGroup.bind(this)}>
                 <h3>Create New Group</h3>
+                <p>Groups are used as logical organizers for Sensors.</p>
+                <p>A Sensor can belong to zero or more Groups. There is no extra setup needed on the individual Sensors.</p>
+                <p>The name of a Group can be changed at any time without removing Sensors from the group.</p>
                 <input type="text" placeholder="Group Name" name="name" />
                 <button>
                     <i className="fas fa-plus" />

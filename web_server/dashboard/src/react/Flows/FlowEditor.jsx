@@ -142,8 +142,8 @@ class FlowEditor extends React.Component {
                 return false;
             }
         }
-        
-        // Groups will fail if the GroupId is not set, or if the 
+
+        // Groups will fail if the GroupId is not set, or if the
         // aggregate type is not set.
         // (No need to check `type`, `comparison`, or `value` since that
         // is handled in the else{} above)
@@ -152,7 +152,7 @@ class FlowEditor extends React.Component {
                 return false;
             }
         }
-        
+
         // We must define a type and ID to send to.
         if (!s.to.id || !s.to.type) {
             return false;
@@ -162,8 +162,6 @@ class FlowEditor extends React.Component {
     }
 
     render() {
-        let s = this.state;
-
         // Display a loader while we wait for the flow's data
         // to be pulled in during componentDidMount().
         //
@@ -176,7 +174,11 @@ class FlowEditor extends React.Component {
 
         return (
             <form id="flow-builder" ref={this.formRef} onSubmit={this.submitForm.bind(this)}>
-                {this.state.lastModDate && <span>Last Changed {this.state.lastModDate}</span>}
+                <p>Flows are a way to react to incoming data from either individual Sensors or an entire Group.</p>
+                <p>
+                    When a value meets the requirement defined in the Flow, data (in a JSON object) will be sent down to the configured
+                    Sensor or Group.
+                </p>
                 <div className="flex-col">
                     <OnChangeInput
                         placeholder="Flow Name"
@@ -522,10 +524,8 @@ class FlowEditorJsonBuilder extends React.Component {
 
         return (
             <div className="flex-col json-kvpairs">
-                <p>
-                    These Key Value pairs represent a JSON object that will be sent to the corresponding sensor or group. <br />
-                    %VALUE%, %SENSORID%, %GROUPID% and %TIME% are all available to send in Value fields.
-                </p>
+                <p>These Key Value pairs represent a JSON object that will be sent to the corresponding sensor or group.</p>
+                <p>%VALUE%, %SENSORID%, %GROUPID% and %TIME% are all available to send in Value fields.</p>
                 {currentKeys.map((key, idx) => {
                     return this.renderKeyValuePair(key, idx);
                 })}
