@@ -111,8 +111,8 @@ class SensorList extends React.Component {
         jsonFetch("/api/sensors/logs/" + sensorId)
             .then(resp => {
                 messenger.notify("OpenModal", {
-                    title: `Logs For Sensor: ${sensorId.substr(0, 6)}...`,
-                    content: <LogList entries={resp} exportTitle={`SensorLogs_${sensorId}`} />
+                    title: `Logs For Sensor: ${sensorId}...`,
+                    content: <LogList entries={resp} exportTitle={`SensorLogs_${sensorId}`} hideSensorColumn={true} />
                 });
             })
             .catch(err => {

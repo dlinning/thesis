@@ -1,7 +1,7 @@
 class DataTable extends React.Component {
     constructor(p) {
         super(p);
-        this.tableID = Math.random();
+        this.tableID = Math.random().toString().substring(3);
     }
 
     render() {
@@ -20,8 +20,6 @@ class DataTable extends React.Component {
     }
 
     export() {
-        console.log("Exporting table as csv", this.tableID);
-
         var el = document.getElementById(`datatable_${this.tableID}`);
 
         csvBuilder.build(el, this.props.exportTitle);

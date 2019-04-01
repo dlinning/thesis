@@ -12,30 +12,39 @@ class LogList extends React.Component {
                     <div className="table">
                         <div className="tr header">
                             {fields.map((f, idx) => {
-                                return (
-                                    <div className="th" key={idx}>
-                                        {f}
-                                    </div>
-                                );
+                                if (f == "SensorId" && p.hideSensorColumn === true) {
+                                    return null;
+                                } else {
+                                    return (
+                                        <div className="th" key={idx}>
+                                            {f}
+                                        </div>
+                                    );
+                                }
                             })}
                         </div>
                         {p.entries &&
                             p.entries.map((entry, idx) => {
                                 let cells = fields.map((f, idx) => {
-                                    if (f == "sensorId") {
+                                    // Handle special-case column
+                                    if (f == "SensorId") {
+                                        if (p.hideSensorColumn === true) {
+                                            return null;
+                                        }
                                         return (
                                             <div className="td" key={idx} title={entry[f]}>
                                                 {entry[f].substring(0, 6)}
                                             </div>
                                         );
-                                    }
-                                    if (f == "timestamp") {
+                                    } else if (f == "timestamp") {
                                         return (
                                             <div className="td" key={idx} title={entry[f]}>
                                                 {new Date(entry.timestamp).concise()}
                                             </div>
                                         );
                                     }
+
+                                    // Any other column
                                     return (
                                         <div className="td" key={idx}>
                                             {entry[f]}
