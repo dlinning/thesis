@@ -1,4 +1,4 @@
-@import "./variables.less";
+@import "./variables_light.less";
 @import "./mixins.less";
 
 * {
@@ -10,7 +10,7 @@ html {
     font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
     text-align: center;
 
-    background-color: @background;
+    background-color: @backgroundBody;
     color: @text;
 }
 
@@ -30,17 +30,17 @@ button {
     letter-spacing: 1px;
     text-transform: uppercase;
 
-    color: @background;
+    color: @buttonText;
     background-color: @primary;
     border: none;
     cursor: pointer;
 
     transition: background-color 75ms ease-in-out;
     &:hover {
-        background-color: @primaryDark1;
+        background-color: @primaryDark2;
     }
     &:active {
-        background-color: @primaryDark2;
+        background-color: @primaryDark3;
     }
 
     &.round {
@@ -66,7 +66,7 @@ button {
     }
 
     &.overlay {
-        color: @text;
+        color: @buttonText;
         background: fadeout(@primaryDark1, 90);
 
         &:hover {
@@ -89,7 +89,7 @@ button {
         }
 
         &.overlay {
-            color: @background;
+            color: @buttonText;
             background-color: fadeout(saturate(@warn, 20), 70);
 
             &:hover {
@@ -257,8 +257,11 @@ h1 {
     margin: 1rem 0;
 }
 h2 {
-    color: lighten(@text, 25);
+    color: lighten(@text, 10);
     font-weight: 600;
+}
+h3{
+    margin: 1rem 0;
 }
 
 .table {
@@ -273,12 +276,14 @@ h2 {
         display: table-row;
         border-bottom: 1px solid;
         transition: background-color 50ms ease;
-    }
-    .tr:nth-of-type(2n) {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-    .tr:not(.header):hover {
-        background-color: fadeout(@primaryLight1, 90);
+
+        &:nth-of-type(2n) {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        &:not(.header):hover {
+            background-color: fadeout(@primaryLight1, 90);
+        }
     }
 
     .td,
