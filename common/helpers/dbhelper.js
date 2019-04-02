@@ -1,7 +1,6 @@
 // Import the config file
 const config = require("../../web_server/config.json");
 const path = require("path");
-const dataTypes = require("./dataTypeHelper");
 
 // Import and Setup helper functions
 const uuidv4 = require("uuid/v4");
@@ -112,7 +111,7 @@ module.exports.logCountAndGroupsForAllSensors = () => {
 
     return sensors;
 };
-const getAllSensorsMetadataStmt = db.prepare(`SELECT id, name, dataType, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
+const getAllSensorsMetadataStmt = db.prepare(`SELECT id, name, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
 const getLogCountsForSensorsStmt = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
 const getSensorsForGroupsStmt = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
@@ -147,16 +146,10 @@ module.exports.logsAndGroupsForSensorId = sensorId => {
 const getGroupsforSensorStmt = db.prepare(
     `SELECT g.id, g.name FROM Sensors as s INNER JOIN SensorGroups as sg ON s.id = sg.SensorId INNER JOIN Groups as g ON g.id = sg.GroupId WHERE s.id = ? ORDER BY g.createdAt`
 );
-const getMetadataForSensorStmt = db.prepare(`SELECT name, dataType, updatedAt FROM Sensors WHERE id = ?`);
+const getMetadataForSensorStmt = db.prepare(`SELECT name, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensorStmt = db.prepare(
-    `SELECT id,timestamp,value,SensorId FROM LogEntries
+    `SELECT * FROM LogEntries
     WHERE SensorId = ?`
-);
-// Expects (sensorId, startTime, endTime)
-const getLogsForSensorInRangeStmt = db.prepare(
-    `SELECT id,timestamp,value,SensorId FROM LogEntries
-    WHERE SensorId = ? AND createdAt >= ?
-	AND createdAt <= ?`
 );
 
 // Simple wrapper around `getGroupsforSensor` query above.
@@ -169,14 +162,10 @@ module.exports.getGroupsForSensor = sensorId => {
 
 // Simple wrapper around `getLogsForSensor` query above.
 // Returns data for all logs for the specific sensor
-// with ID `sensorId`
+// with ID `sensorId`.
 //
-module.exports.getLogsForSensor = (sensorId, start = undefined, end = undefined) => {
-    if (start && end) {
-        return getLogsForSensorInRangeStmt.all(sensorId, start, end);
-    } else {
-        return getLogsForSensorStmt.all(sensorId);
-    }
+module.exports.getLogsForSensor = sensorId => {
+    return getLogsForSensorStmt.all(sensorId);
 };
 
 // Simple wrapper around `getLogCountsForSensorsStmt` query above.
@@ -187,15 +176,12 @@ module.exports.getAllSensorLogCounts = () => {
     return logCounts;
 };
 
-// Creates a new Sensor with the given `name` (or "New Sensor")
-// and `dataType` ("float","int","string","blob","uuid","datetime").
+// Creates a new Sensor.
 //
 // Will return the new sensor's ID if successful or already exists.
 //
-module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
+module.exports.addSensor = (id = undefined) => {
     var d1 = dateAsUnixTimestamp();
-
-    dataType = dataType.toLowerCase();
 
     // Check to see if it already exists,
     // return early.
@@ -204,15 +190,9 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
         return id;
     }
 
-    // Validate data types
-    if (!dataTypes.possibleDataTypes.includes(dataType)) {
-        return `ERROR:: Invalid dataType field, must be one of: ${dataTypes.possibleDataTypes.join(",")}.`;
-    }
-
     const newSensor = {
         id: id || newUUID(),
-        name: name,
-        dataType: dataType,
+        name: "Sensor_" + d1.toString().substring(4),
         createdAt: d1,
         updatedAt: d1
     };
@@ -222,23 +202,22 @@ module.exports.addSensor = (name = "New Sensor", dataType, id = undefined) => {
     }
 };
 const insertSensorStmt = db.prepare(
-    `INSERT INTO Sensors(id,name,dataType,createdAt,updatedAt)
-    VALUES (@id,@name,@dataType,@createdAt,@updatedAt)`
+    `INSERT INTO Sensors(id,name,createdAt,updatedAt)
+    VALUES (@id,@name,@createdAt,@updatedAt)`
 );
 const getSensorByIdStmt = db.prepare("SELECT * FROM Sensors WHERE id = ?");
 
-// Allows updating of a sensor's `name` and `dataType` columns.
+// Allows updating of a sensor's `name` column.
 //
 // Will return an error (as a string) if the `sensorId` does
 // not exist, or a 1 if the changes were a success.
 //
-module.exports.updateSensor = (sensorId, name, dataType) => {
+module.exports.updateSensor = (sensorId, name) => {
     var d1 = dateAsUnixTimestamp();
 
     var currentSensor = getSensorByIdStmt.get(sensorId);
     if (currentSensor !== undefined) {
         currentSensor.name = name || currentSensor.name;
-        currentSensor.dataType = dataType || currentSensor.dataType;
 
         // Change `updatedAt` always.
         currentSensor.updatedAt = d1;
@@ -255,8 +234,7 @@ module.exports.updateSensor = (sensorId, name, dataType) => {
 };
 const updateSensorStmt = db.prepare(
     `UPDATE Sensors
-    SET dataType = @dataType,
-        name = @name,
+    SET name = @name,
         updatedAt = @updatedAt
     WHERE id = @id`
 );
@@ -279,7 +257,9 @@ module.exports.addSensorToGroup = (sensorId, groupId) => {
         return { status: 500, error: "Error adding sensor to group in DB" };
     }
 };
-const addSensorToGroupStmt = db.prepare(`INSERT OR REPLACE INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`);
+const addSensorToGroupStmt = db.prepare(
+    `INSERT OR REPLACE INTO SensorGroups(SensorId,GroupId,createdAt) VALUES (@SensorId,@GroupId,@createdAt)`
+);
 
 // For removing a sensor from a given group.
 //
@@ -369,15 +349,15 @@ module.exports.getLatestGroupSumAndAvg = (groupId = undefined) => {
 
     for (let i = 0, l = groups.length; i < l; i++) {
         let g = groups[i];
-        if (groupId && groupId == g.id ) {
+        if (groupId && groupId == g.id) {
             res.group = g;
             break;
         } else if (!groupId) {
             // Trying to get all data
             res.groups[g.id] = {
                 name: g.name,
-                sum: g.sum,
-                avg: g.avg,
+                sum: g.valueSum,
+                avg: g.valueAvg,
                 count: g.valueCount
             };
         }
@@ -386,7 +366,6 @@ module.exports.getLatestGroupSumAndAvg = (groupId = undefined) => {
     return res;
 };
 const getLatestGroupSumAndAvgStmt = db.prepare("SELECT * FROM GroupLatestSumAndAvg");
-
 
 // "Helper" for both `createGroupFunc` and `updateGroupFunc`, so there
 // is only one entry point necessary for both
@@ -436,7 +415,7 @@ const updateGroupStmt = db.prepare(
 // Will return the new group's ID, or if one with the same
 // `id` already exists, will just return the ID.
 //
-createGroupFunc = (id, name) => {
+const createGroupFunc = (id, name) => {
     var d1 = dateAsUnixTimestamp();
 
     // Check to see if it already exists,
@@ -492,55 +471,32 @@ module.exports.deleteGroup = (groupId, deleteWithSensors = false) => {
 };
 const deleteGroupStmt = db.prepare(`DELETE FROM Groups WHERE id = ?`);
 
-module.exports.getLogsForGroup = (groupId, start = undefined, end = undefined) => {
-    if (start && end) {
-        return getLogsForGroupInRangeStmt.all(groupId, start, end);
-    } else {
-        return getLogsForGroupStmt.all(groupId);
-    }
+module.exports.getLogsForGroup = groupId => {
+    return getLogsForGroupStmt.all(groupId);
 };
 const getLogsForGroupStmt = db.prepare(
     `SELECT
     le.id as logId,
     le.SensorId as sensorId,
-    s.dataType as dataType,
 	le.value as value,
 	le.timestamp as timestamp
 FROM
 	Sensors s,
 	SensorGroups sg,
-	(SELECT id, timestamp, createdAt, value, SensorId FROM LogEntries) le
+	(SELECT * FROM LogEntries) le
 WHERE
 	sg.GroupId = ? AND
 	sg.SensorId = le.SensorId AND
 	s.id = sg.SensorId`
-);
-// Expects (sensorId, startTime, endTime)
-const getLogsForGroupInRangeStmt = db.prepare(
-    `SELECT
-	le.id as logId,
-    le.SensorId as sensorId,
-    s.dataType as dataType,
-	le.value as value,
-	le.timestamp as timestamp
-FROM
-	Sensors s,
-	SensorGroups sg,
-	(SELECT id, timestamp, createdAt, value, SensorId FROM LogEntries) le
-WHERE
-	sg.GroupId = ? AND
-	sg.SensorId = le.SensorId AND
-    s.id = sg.SensorId AND 
-    le.createdAt >= ? AND
-    le.createdAt <= ?`
 );
 
 // Used by flowRunner
 module.exports.getSensorIdsForAllGroups = () => {
     return getSensorIdsForAllGroupsStmt.all();
 };
-const getSensorIdsForAllGroupsStmt = db.prepare('SELECT sg.GroupId, sg.SensorId FROM Groups as g INNER JOIN SensorGroups as sg ON sg.GroupId = g.id');
-
+const getSensorIdsForAllGroupsStmt = db.prepare(
+    "SELECT sg.GroupId, sg.SensorId FROM Groups as g INNER JOIN SensorGroups as sg ON sg.GroupId = g.id"
+);
 
 //
 //
@@ -572,7 +528,6 @@ const getSettingByNameStmt = db.prepare(`SELECT * FROM Settings WHERE key = ?`);
 module.exports.getSettingsByGroup = groupName => {
     var res = getSettingByGroupStmt.all(groupName);
     if (res) {
-        
         let settings = {};
         res.forEach(s => {
             settings[s.key] = s.value;
@@ -724,8 +679,8 @@ module.exports.activateFlow = id => {
     } else {
         return { status: 400, error: `A Flow does not exist with ID ${id}` };
     }
-}
-const updateFlowActivationStmt = db.prepare('UPDATE Flows SET activationCount = @newCount WHERE id = @id');
+};
+const updateFlowActivationStmt = db.prepare("UPDATE Flows SET activationCount = @newCount WHERE id = @id");
 
 module.exports.deleteFlowById = id => {
     var flow = getFlowByIdStmt.get(id);
@@ -748,7 +703,7 @@ module.exports.getGroupAndSensorDataForFlows = () => {
         groups: getGroupDataForFlowsStmt.all()
     };
 };
-const getSensorDataForFlowsStmt = db.prepare(`SELECT id,name,dataType from Sensors`);
+const getSensorDataForFlowsStmt = db.prepare(`SELECT id,name from Sensors`);
 const getGroupDataForFlowsStmt = db.prepare(`SELECT id,name from Groups`);
 
 //
@@ -764,23 +719,17 @@ const getGroupDataForFlowsStmt = db.prepare(`SELECT id,name from Groups`);
 
 // Logs data for a sensors with sensorId `id`
 //
-module.exports.logData = (value, sensorUUID, timestamp) => {
-    if (timestamp === undefined && config.allowEmptyTimestamp === false) {
-        console.error(
-            `Timestamp was not provided for LogEntry when required by the server.\n\nNot logging: {value: ${value}, sensorUUID: ${sensorUUID}}`
-        );
-        return;
-    }
+module.exports.logData = (value, sensorUUID, dataType, timestamp) => {
     const logEntry = {
         value: value,
-        timestamp: timestamp || new Date(),
+        timestamp: timestamp || new Date().toString(),
         SensorId: sensorUUID,
-        createdAt: dateAsUnixTimestamp()
+        dataType: dataType
     };
     // Will return 1 if the change was a success.
     return insertLogEntryStmt.run(logEntry).changes;
 };
 const insertLogEntryStmt = db.prepare(
-    `INSERT INTO LogEntries(value,timestamp,SensorId,createdAt)
-    VALUES (@value,@timestamp,@SensorId,@createdAt)`
+    `INSERT INTO LogEntries(value,timestamp,SensorId,dataType)
+    VALUES (@value,@timestamp,@SensorId,@dataType)`
 );

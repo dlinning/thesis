@@ -10,8 +10,8 @@ router.post("/createorupdate", (req, res) => {
     var groupName = req.body.groupName;
 
     if (groupName && groupName.length > 0) {
-            var resp = DBHelper.createOrUpdateGroup(req.body.uuid, groupName);
-            res.status(resp.status).send(resp)
+        var resp = DBHelper.createOrUpdateGroup(req.body.uuid, groupName);
+        res.status(resp.status).send(resp);
     } else {
         res.status(400).send("Must send `groupName` on body");
     }
@@ -41,10 +41,8 @@ router.get("/list", (req, res) => {
 
 // Returns logEntries for all sensors within
 // a given group.
-router.get("/logs/:groupID/:startTime?/:endTime?", (req, res) => {
-    let p = req.params;
-
-    res.status(200).send(DBHelper.getLogsForGroup(p.groupID, p.startTime, p.endTime));
+router.get("/logs/:groupID", (req, res) => {
+    res.status(200).send(DBHelper.getLogsForGroup(req.params.groupID));
 });
 
 // Returns latest aggregate data for all groups.

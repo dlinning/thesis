@@ -75,10 +75,8 @@ router.delete("/delete/:id/:deleteWithLogs?", (req, res) => {
     }
 });
 
-router.get("/logs/:sensorID/:startTime?/:endTime?", (req, res) => {
-    let p = req.params;
-
-    res.status(200).send(DBHelper.getLogsForSensor(p.sensorID, p.startTime, p.endTime));
+router.get("/logs/:sensorID", (req, res) => {
+    res.status(200).send(DBHelper.getLogsForSensor(req.params.sensorID));
 });
 
 router.get("/logCounts", (req, res) => {

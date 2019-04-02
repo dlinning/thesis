@@ -16,13 +16,13 @@
 module.exports = {
     // Tables
     Sensors:
-        'CREATE TABLE IF NOT EXISTS "Sensors" ( `id` UUID, `name` TEXT NOT NULL, `dataType` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY(`id`) )',
+        'CREATE TABLE IF NOT EXISTS "Sensors" ( `id` TEXT NOT NULL, `name` TEXT, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY(`id`) )',
     Groups:
         'CREATE TABLE IF NOT EXISTS "Groups" ("id" UUID PRIMARY KEY, "name" VARCHAR(255) NOT NULL, "createdAt" DATETIME NOT NULL, "updatedAt" DATETIME NOT NULL)',
     SensorGroups:
         'CREATE TABLE IF NOT EXISTS "SensorGroups" ( `createdAt` DATETIME NOT NULL, `SensorId` UUID NOT NULL, `GroupId` UUID NOT NULL, PRIMARY KEY(`SensorId`,`GroupId`), FOREIGN KEY(`GroupId`) REFERENCES `Groups`(`id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`SensorId`) REFERENCES `Sensors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE )',
     LogEntries:
-        'CREATE TABLE IF NOT EXISTS "LogEntries" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `timestamp` DATETIME NOT NULL, `value` VARCHAR ( 255 ) NOT NULL, `createdAt` DATETIME NOT NULL, `SensorId` UUID, FOREIGN KEY(`SensorId`) REFERENCES `Sensors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE )',
+        'CREATE TABLE IF NOT EXISTS "LogEntries" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `SensorId` TEXT NOT NULL, `value` TEXT NOT NULL, `dataType` TEXT NOT NULL, `timestamp` DATETIME NOT NULL, FOREIGN KEY(`SensorId`) REFERENCES `Sensors`(`id`) ON DELETE CASCADE ON UPDATE CASCADE )',
     Flows:
         'CREATE TABLE IF NOT EXISTS "Flows" ( `id` UUID NOT NULL UNIQUE, `name` TEXT NOT NULL, `description` TEXT, `triggerType` TEXT NOT NULL, `triggerId` TEXT, `config` TEXT, `activationCount` INTEGER DEFAULT 0, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY(`id`) )',
     Settings:
@@ -32,5 +32,5 @@ module.exports = {
     GroupView:
         "CREATE VIEW IF NOT EXISTS GroupListWithSensorAndLogCount AS SELECT g.id, g.name, g.updatedAt, count(sg.SensorId) as sensorCount, lc.logCount FROM Groups as g LEFT JOIN SensorGroups AS sg ON sg.GroupId = g.id LEFT JOIN (SELECT g.id, count(le.id) AS logCount FROM Groups AS g LEFT JOIN SensorGroups AS sg ON sg.GroupId = g.id LEFT JOIN LogEntries AS le ON sg.SensorId = le.SensorId GROUP BY g.id) AS lc ON lc.id = g.id GROUP BY g.id ORDER BY g.createdAt",
     GroupLatestSumAndAvg:
-        "CREATE VIEW IF NOT EXISTS GroupLatestSumAndAvg AS SELECT g.id, g.name, sum(le.value) as sum, avg(le.value) as avg, count(le.value) as valueCount FROM Groups AS g LEFT JOIN SensorGroups AS sg ON g.id = sg.GroupId LEFT JOIN (SELECT id FROM Sensors WHERE dataType IN ('float', 'int') ) as s ON s.id = sg.SensorId LEFT JOIN (SELECT value, SensorId FROM LogEntries WHERE CAST(value AS INTEGER) > 0 GROUP BY SensorId ORDER BY id DESC) as le ON le.SensorId = s.id GROUP BY g.id"
+        "CREATE VIEW IF NOT EXISTS GroupLatestSumAndAvg AS SELECT g.id, g.name, COALESCE(SUM(le.VALUE),0) AS valueSum, COALESCE(AVG(le.VALUE),0) AS valueAvg, COUNT(le.VALUE) AS valueCount FROM GROUPS AS g LEFT JOIN SensorGroups AS sg ON g.id = sg.GroupId LEFT JOIN ( SELECT id FROM Sensors ) AS s ON s.id = sg.SensorId LEFT JOIN ( SELECT VALUE, SensorId FROM LogEntries WHERE CAST(VALUE AS INTEGER) > 0 GROUP BY SensorId ORDER BY id DESC ) AS le ON le.SensorId = s.id GROUP BY g.id"
 };

@@ -49,11 +49,12 @@ const logData = (value, dataType) => {
     // on which Sensor sent the data.
     if (clientReady) {
         globalClient.publish(
-            "log/" + givenOpts.clientId,
+            "log",
             JSON.stringify({
                 value: value,
                 dataType: dataType,
-                timestamp: new Date().getTime()
+                timestamp: new Date().getTime(),
+                sensorId: givenOpts.clientId
             })
         );
     }
