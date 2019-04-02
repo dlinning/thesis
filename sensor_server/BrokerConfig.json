@@ -1,0 +1,5 @@
+{
+    "serverPort": 1883,
+
+    "password": "AUTH_KEY"
+}

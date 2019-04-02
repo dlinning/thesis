@@ -54,12 +54,12 @@ const restart = () => {
 //////////
 
 // Will run the provided flow proper.
-const runFlow = (flow, newValue, atTime) => { 
-    console.log('Time/sensor flow', flow);
+const runFlow = (flow, newValue, atTime) => {
+    console.log("Time/sensor flow", flow);
 };
 
-const runGroupFlow = (flow, aggregateData, atTime) =>{
-    console.log('Group flow', flow);
+const runGroupFlow = (flow, aggregateData, atTime) => {
+    console.log("Group flow", flow);
 };
 
 //////////
@@ -91,7 +91,7 @@ const checkFlows = () => {
 
         if (flow.triggerType === "Time" && flow.triggerId == currentTime) {
             runFlow(flow, currentTime, currentTime);
-        } else{
+        } else {
             // Group flows
             runGroupFlow(flow, groupAggregate[flow.triggerId], currentTime);
         }
@@ -112,5 +112,4 @@ const handleSensorUpdate = (sensorId, newValue) => {
 };
 module.exports.handleSensorUpdate = handleSensorUpdate;
 
-////////////////
-start();
+

@@ -1,0 +1,9 @@
+{
+    "clientId": "TESTCLIENT_TESTCLIENT",
+    "password": "AUTH_KEY",
+
+    "dataType": "float",
+    
+    "serverIp": "localhost",
+    "serverPort": 1883
+}
