@@ -491,11 +491,11 @@ WHERE
 );
 
 // Used by flowRunner
-module.exports.getSensorIdsForAllGroups = () => {
-    return getSensorIdsForAllGroupsStmt.all();
+module.exports.getSensorIdsByGroupId = (groupId) => {
+    return getSensorIdsByGroupIdStmt(groupId).all();
 };
-const getSensorIdsForAllGroupsStmt = db.prepare(
-    "SELECT sg.GroupId, sg.SensorId FROM Groups as g INNER JOIN SensorGroups as sg ON sg.GroupId = g.id"
+const getSensorIdsByGroupIdStmt = db.prepare(
+    "SELECT SensorId FROM SensorGroups WHERE GroupId = ?"
 );
 
 //
@@ -568,7 +568,7 @@ module.exports.getAllFlows = () => {
     }
     return allFlows;
 };
-const getAllFlowsStmt = db.prepare(`SELECT id, name, description, triggerType, triggerId, activationCount FROM Flows`);
+const getAllFlowsStmt = db.prepare(`SELECT * FROM Flows`);
 module.exports.getFlowByName = name => {
     let res = getFlowByNameStmt.get(name);
     if (res) {

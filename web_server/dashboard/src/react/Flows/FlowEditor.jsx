@@ -23,7 +23,7 @@ class FlowEditor extends React.Component {
 
                 stateCopy.sgData = {
                     Sensor: res.sensors.map(s => {
-                        return { value: s.id, display: `${s.name} (${s.dataType})` };
+                        return { value: s.id, display: s.name };
                     }),
                     Group: res.groups.map(g => {
                         return { value: g.id, display: g.name };

@@ -3,6 +3,11 @@ const express = require("express"),
 
 var DBHelper = require("../../../common/helpers/dbhelper");
 
+router.get("/get/group/:name", (req, res) => {
+    var dbResp = DBHelper.getSettingsByGroup(req.params.name);
+    res.status(dbResp.status).send(dbResp.settings);
+});
+
 router.get("/get/:name?", (req, res) => {
     var name = req.params.name;
 

@@ -3,7 +3,7 @@ const mosca = require("mosca");
 const debug = process.env.NODE_ENV != "production";
 
 const DBHelper = require("../common/helpers/dbhelper"),
-    flowRunner = require("../flow_runner/flowRunner");
+    FlowRunner = require("../flow_runner/flowRunner");
 
 const config = require("./BrokerConfig.json"),
     serverOpts = {
@@ -11,20 +11,32 @@ const config = require("./BrokerConfig.json"),
     };
 
 ////
-// Local clients used to recieve process messages
+// Local client used to recieve process messages
 //
-// These act as a way to listen to incoming messages, since
+// This acts as a way to listen to incoming messages, since
 // the broker does not intercept, only pass through.
 ////
 const mqtt = require("mqtt");
 
-const logListener = mqtt.connect("mqtt://localhost", { clientId: "LogListener", username: "logListener", password: config.password });
+// Do this weird random `MQTT_WORKER_ID` so that (in theory) there are no clientId
+// conflicts because of the system.
+const MQTT_WORKER_ID = "MQTT_WORKER_" + Math.random().toString();
+const MQTT_WORKER = mqtt.connect("mqtt://localhost", { clientId: MQTT_WORKER_ID, password: config.password });
 
-// Should only accept `log` messages
-logListener.on("message", (topic, message) => {
-    const data = JSON.parse(message.toString());
+MQTT_WORKER.on("message", (topic, message) => {
+    if (topic === "log") {
+        const data = JSON.parse(message.toString());
 
-    DBHelper.logData(data.value, data.sensorId, data.dataType, data.timeStamp);
+        DBHelper.logData(data.value, data.sensorId, data.dataType, data.timeStamp);
+
+        let sendData = FlowRunner.handleSensorUpdate(data.sensorId, data.value);
+
+        if (sendData.to && sendData.to.length > 0) {
+            for (let i = 0, l = sendData.to.length; i < l; i++) {
+                sendMessageToSensor(sendData.to[i], sendData.payload);
+            }
+        }
+    }
 });
 
 ////
@@ -41,9 +53,11 @@ let sensorIdToClientMap = {},
 broker.on("ready", () => {
     console.log("MQTT Broker initialized on port " + serverOpts.port);
 
-    // Tell the logListener to listen for any
-    // messages on the `log` topic.
-    logListener.subscribe("log");
+    // Tell the MQTT_WORKER to listen for any
+    // messages on the `log` topic. This is
+    // where all incoming data gets sent
+    // by Sensors.
+    MQTT_WORKER.subscribe("log");
 });
 
 broker.on("clientConnected", newClient => {
@@ -70,10 +84,10 @@ broker.authenticate = (client, user, pass, callback) => {
 
         // Used later on to send out appropriate packets
         // based on sensorId.
-        sensorIdToClientMap[user] = client;
-        clientIdToSensorIdMap[client.id] = user;
+        sensorIdToClientMap[client.id] = client;
 
-        if (client.id !== "LogListener") {
+        // Skip registering the current MQTT_WORKER
+        if (client.id !== MQTT_WORKER_ID) {
             DBHelper.addSensor(client.id);
         }
     }
@@ -85,7 +99,8 @@ const sendMessageToSensor = (sensorId, payload) => {
     let client = sensorIdToClientMap[sensorId];
 
     if (client !== undefined) {
-        server.publish({ topic: "flowPub", payload: payload }, client);
+        console.log("Sending a payload to", sensorId);
+        MQTT_WORKER.publish("flowPub/" + sensorId, JSON.stringify(payload));
     }
 };
 module.exports.sendMessageToSensor = sendMessageToSensor;

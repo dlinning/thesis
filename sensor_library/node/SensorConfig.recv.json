@@ -1,0 +1,9 @@
+{
+    "clientId": "RECV_RECV",
+    "password": "AUTH_KEY",
+
+    "dataType": "float",
+    
+    "serverIp": "localhost",
+    "serverPort": 1883
+}

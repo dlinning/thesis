@@ -3,6 +3,7 @@ const mqtt = require("mqtt");
 const debug = process.env.NODE_ENV != "production";
 
 var givenOpts = null,
+    MESSAGE_HANDLER = null,
     globalClient = null,
     clientReady = false;
 
@@ -19,12 +20,12 @@ const connectClient = () => {
     });
 
     globalClient.on("connect", resp => {
-        debug && console.log(resp);
+        //debug && console.log(resp);
 
         clientReady = true;
 
         // Used generally by the Broker for Flows.
-        globalClient.subscribe("flowPub");
+        globalClient.subscribe("flowPub/" + givenOpts.clientId);
     });
 
     // "Handles" connection failures
@@ -36,7 +37,7 @@ const connectClient = () => {
     globalClient.on("message", (topic, message) => {
         content = message.toString();
 
-        debug && console.log(`"${topic}" :: "${content}"`);
+        MESSAGE_HANDLER(topic.replace("/" + givenOpts.clientId, ""), JSON.parse(content));
     });
 };
 
@@ -52,7 +53,7 @@ const logData = (value, dataType) => {
             "log",
             JSON.stringify({
                 value: value,
-                dataType: dataType,
+                dataType: dataType || givenOpts.dataType || "not_set",
                 timestamp: new Date().getTime(),
                 sensorId: givenOpts.clientId
             })
@@ -61,7 +62,7 @@ const logData = (value, dataType) => {
 };
 
 module.exports = {
-    init(opts) {
+    init(opts, messageHandler) {
         if (opts.clientId === undefined || opts.password === undefined || opts.serverIp === undefined || opts.serverPort === undefined) {
             console.error("Must provide `clientId`, `password`, `serverIp`, and `serverPort` options. Exiting.");
             process.exit(1);
@@ -69,6 +70,8 @@ module.exports = {
 
         // Good opts provided
         givenOpts = opts;
+
+        MESSAGE_HANDLER = messageHandler;
 
         connectClient();
     },

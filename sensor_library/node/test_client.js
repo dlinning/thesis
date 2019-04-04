@@ -1,6 +1,6 @@
 const Sensor = require("./Sensor");
 
-const config = require("./SensorConfig.json");
+const config = require("./SensorConfig.send.json");
 
 Sensor.init(config);
 
