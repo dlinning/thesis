@@ -14,7 +14,7 @@ update();
 // A helper function that returns a
 // 24 - hour formatted(ex. "17:04");
 //
-const getCurrentTime = () => {
+function getCurrentTime() {
     let d = new Date();
     return `${d
         .getHours()
@@ -23,18 +23,44 @@ const getCurrentTime = () => {
         .getMinutes()
         .toString()
         .padStart(2, "0")}`;
-};
+}
+
+// A helper function used by Time Flows
+// to see if the current day of week is
+// allowed to run the Flow.
+//
+function dayIsGood(days) {
+    if (days[new Date().getDay()] === true) {
+        return true;
+    }
+}
 
 // Should be called whenever there are changes to either
 // Flow settings, or an individual flow.
 //
 function update() {
+    console.log("UPDATING FLOW RUNNER");
     IS_READY = false;
 
-    SETTINGS = DBHelper.getSettingsByGroup("flows").settings;
-    ALL_FLOWS = organizeFlows(DBHelper.getAllFlows());
+    clearInterval(FLOW_TIMER);
 
-    IS_READY = true;
+    SETTINGS = DBHelper.getSettingsByGroup("flows").settings;
+
+    // Make sure Flows are enabled
+    if (SETTINGS.flowsEnabled === "on") {
+        // Get and organize all Flows.
+        ALL_FLOWS = organizeFlows(DBHelper.getAllFlows());
+
+        // Start `FLOW_TIMER` running at an interval.
+        FLOW_TIMER = setInterval(() => {
+            checkGroupAndTimeFlows();
+        }, SETTINGS.flowsInterval * 1000);
+
+        // Call this once so it is run right away.
+        checkGroupAndTimeFlows();
+
+        IS_READY = true;
+    }
 }
 
 // Called by `update()`, makes (possibly) finding the
@@ -50,7 +76,6 @@ function organizeFlows(flows) {
         // Remove unnecessary properties
         delete flow.name;
         delete flow.description;
-        delete flow.triggerType;
 
         // Add the flow to the correct group
         result[tt].push(flow);
@@ -67,11 +92,13 @@ function findSensorsToSendTo(flow, newValue, currentTime, triggerGroupId) {
         if (flow.config.payload[k] === "%VALUE%") {
             formattedPayload[k] = newValue;
         } else if (flow.config.payload[k] === "%SENSORID%") {
-            formattedPayload[k] = flow.triggerId;
+            // Should be `undefined` unless actually from a Sensor.
+            formattedPayload[k] = flow.triggerType == "Sensor" ? flow.triggerId : undefined;
         } else if (flow.config.payload[k] === "%GROUPID%") {
-            formattedPayload[k] = triggerGroupId || "NOT_FROM_GROUP";
+            // Is `undefined` unless actually from a Group.
+            formattedPayload[k] = triggerGroupId;
         } else if (flow.config.payload[k] === "%TIME%") {
-            formattedPayload[k] = new Date();
+            formattedPayload[k] = currentTime;
         } else {
             formattedPayload[k] = flow.config.payload[k];
         }
@@ -87,10 +114,57 @@ function findSensorsToSendTo(flow, newValue, currentTime, triggerGroupId) {
         // Not the most performant, but doing it
         // here so we don't have to keep track of each Sensor's
         // Group membership all the time.
-        toSensors = DBHelper.getSensorIdsByGroupIdStmt(flow.config.to.id);
+        toSensors = DBHelper.getSensorIdsByGroupId(flow.config.to.id);
     }
 
     return { payload: formattedPayload, to: toSensors };
+}
+
+function checkGroupAndTimeFlows() {
+    const flowsToCheck = ALL_FLOWS["Group"].concat(ALL_FLOWS["Time"]);
+
+    let resp = [];
+
+    //
+    //TODO: Figure out how to have this send out via `broker.js`
+    //
+
+    if (flowsToCheck.length > 0) {
+        const currentTime = getCurrentTime();
+        const groupAggregateData = DBHelper.getLatestGroupSumAndAvg().groups;
+
+        for (let i = 0, l = flowsToCheck.length; i < l; i++) {
+            const f = flowsToCheck[i];
+
+            if (f.triggerType === "Group") {
+                const comparisonValue = groupAggregateData[f.triggerId][f.config.trigger.aggregateType];
+
+                // Yuck. But otherwise how?
+                const isGood = eval(`${comparisonValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
+
+                if (isGood) {
+                    resp = runFlow(f, comparisonValue, currentTime, f.triggerId);
+                    console.log(resp);
+                }
+            } else {
+                // Is a Time trigger
+                if (currentTime == f.config.trigger.value.time && dayIsGood(f.config.trigger.value.days)) {
+                    resp = runFlow(f, currentTime, currentTime);
+                }
+            }
+        }
+    }
+
+    return resp;
+}
+
+function runFlow(flow, value, atTime, groupId) {
+    const resp = findSensorsToSendTo(flow, value, atTime, groupId);
+
+    // Update the flow ActivationCount in the DB
+    DBHelper.increaseFlowRunCount(flow.id);
+
+    return resp;
 }
 
 module.exports.handleSensorUpdate = (sensorId, newValue) => {
@@ -98,24 +172,21 @@ module.exports.handleSensorUpdate = (sensorId, newValue) => {
 
     // Make sure that the system is ready before checking
     // any Flows.
-    if (IS_READY) {
-        let currentTime = getCurrentTime();
-        let flowsToCheck = ALL_FLOWS["Sensor"];
+    if (IS_READY && SETTINGS.flowsEnabled === "on") {
+        const currentTime = getCurrentTime();
+        const flowsToCheck = ALL_FLOWS["Sensor"];
 
         for (let i = 0, l = flowsToCheck.length; i < l; i++) {
             // Check for ID match
             if (flowsToCheck[i].triggerId == sensorId) {
                 // Check for "logic" validation
-                let f = flowsToCheck[i];
+                const f = flowsToCheck[i];
 
                 // Yuck. But otherwise how?
                 const isGood = eval(`${newValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
 
                 if (isGood) {
-                    resp = findSensorsToSendTo(flowsToCheck[i], newValue, currentTime);
-
-                    // Update the flow ActivationCount in the DB
-                    DBHelper.increaseFlowRunCount(flowsToCheck[i].id);
+                    resp = runFlow(flowsToCheck[i], newValue, currentTime);
                 }
             }
         }

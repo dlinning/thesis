@@ -492,7 +492,7 @@ WHERE
 
 // Used by flowRunner
 module.exports.getSensorIdsByGroupId = groupId => {
-    return getSensorIdsByGroupIdStmt(groupId).all();
+    return getSensorIdsByGroupIdStmt.all(groupId);
 };
 const getSensorIdsByGroupIdStmt = db.prepare("SELECT SensorId FROM SensorGroups WHERE GroupId = ?");
 
