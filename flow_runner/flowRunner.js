@@ -48,7 +48,6 @@ function organizeFlows(flows) {
         let tt = flow.triggerType;
 
         // Remove unnecessary properties
-        delete flow.id;
         delete flow.name;
         delete flow.description;
         delete flow.triggerType;
@@ -114,6 +113,9 @@ module.exports.handleSensorUpdate = (sensorId, newValue) => {
 
                 if (isGood) {
                     resp = findSensorsToSendTo(flowsToCheck[i], newValue, currentTime);
+
+                    // Update the flow ActivationCount in the DB
+                    DBHelper.increaseFlowRunCount(flowsToCheck[i].id);
                 }
             }
         }

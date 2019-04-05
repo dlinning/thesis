@@ -491,12 +491,10 @@ WHERE
 );
 
 // Used by flowRunner
-module.exports.getSensorIdsByGroupId = (groupId) => {
+module.exports.getSensorIdsByGroupId = groupId => {
     return getSensorIdsByGroupIdStmt(groupId).all();
 };
-const getSensorIdsByGroupIdStmt = db.prepare(
-    "SELECT SensorId FROM SensorGroups WHERE GroupId = ?"
-);
+const getSensorIdsByGroupIdStmt = db.prepare("SELECT SensorId FROM SensorGroups WHERE GroupId = ?");
 
 //
 //
@@ -662,6 +660,25 @@ const updateFlowStmt = db.prepare(
             triggerType = @triggerType,
             triggerId = @triggerId,
             updatedAt = @updatedAt
+        WHERE id = @id
+    `
+);
+
+module.exports.increaseFlowRunCount = flowId => {
+    // Make sure the flow exists
+    let flow = getFlowByIdStmt.get(flowId);
+    if (flow !== undefined) {
+        // Update the count.
+        let fields = {
+            id: flowId,
+            count: flow.activationCount + 1
+        }
+        increaseFlowRunCountStmt.run(fields);
+    }
+};
+const increaseFlowRunCountStmt = db.prepare(
+    `UPDATE Flows 
+        SET activationCount = @count
         WHERE id = @id
     `
 );

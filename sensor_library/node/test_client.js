@@ -5,7 +5,10 @@ const config = require("./SensorConfig.send.json");
 Sensor.init(config);
 
 const fakeSubmit = () => {
-    Sensor.logData(Math.random() * 100, "float");
+    let val = Math.random() * 100;
+
+    console.log('sending', val);
+    Sensor.logData(val, "float");
     setTimeout(fakeSubmit, Math.random() * 5000);
 };
 
