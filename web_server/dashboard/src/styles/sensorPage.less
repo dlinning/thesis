@@ -109,7 +109,7 @@
         }
 
         &:hover {
-            background: lighten(@primaryLight1, 50);
+            background-color: fadeout(mix(@background, @primaryLight1, 20), 60);
         }
 
         &:not(:first-of-type) {
