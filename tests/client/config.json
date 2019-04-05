@@ -1,6 +1,0 @@
-{
-    "server_port": 3000,
-    "server_ip": "localhost",
-
-    "sensorAuthKey": "1234AUTHKEY4321"
-}
