@@ -110,7 +110,7 @@ class GroupList extends React.Component {
                                         <span title={g.id}>({g.id.substr(0, 6)})</span>
                                     </div>
                                     <div className="content">
-                                        <div className="data-module clickable" onClick={() => this.onGroupLogModal(g.id)}>
+                                        <div className="data-module clickable" title="View logs" onClick={() => this.onGroupLogModal(g.id)}>
                                             <span className="value">{g.logCount}</span>
                                             <span className="label">Log Count</span>
                                         </div>
