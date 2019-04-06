@@ -6,6 +6,8 @@ const gulp = require("gulp"),
     babel = require("gulp-babel"),
     combineMq = require("gulp-combine-mq");
 
+const replace = require("gulp-replace");
+
 const path = require("path");
 
 const minifycss = require("gulp-minify-css"),
@@ -23,6 +25,11 @@ const paths = {
     react: {
         in: path.join(__dirname, "./web_server/dashboard/src/react/**/*.jsx"),
         out: path.join(__dirname, "./web_server/dashboard/dist/react/")
+    },
+
+    // Used by `build-for-release` task
+    build: {
+        views: path.join(__dirname, "./web_server/dashboard/views/**/*.hbs")
     }
 };
 
@@ -97,3 +104,5 @@ gulp.task("default", ["styles", "scripts", "react"], function() {
     gulp.watch(paths.scripts.in, ["scripts"]);
     gulp.watch(paths.react.in, ["react"]);
 });
+
+gulp.task("build-for-release", ["styles", "scripts", "react"]);
