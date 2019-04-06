@@ -14,28 +14,15 @@
 @accentDark: #79b733;
 @accentLight: #9ed164;
 
-@text: mix(#efefef, @primaryLight1, 95);
+@text: #2f2f2f;
 @textLight: lighten(@text, 30);
 
 @buttonText: #f7f8f8;
 
-@background: mix(#424242, @primaryDark1, 98);
-@backgroundBody: mix(#212121, @primaryDark1, 98);
+@background: #f7f8f8;
+@backgroundBody: mix(#f7f8f8, @primary, 99);
 
-@divider: #616161;
+@divider: #999999;
 
 @disabledBackground: lighten(@divider, 25);
 @disabledPlaceholder: @divider;
-
-/* Timing Curves */
-@entranceEase: cubic-bezier(0, 0, 0.2, 1);
-@exitEase: cubic-bezier(0.4, 0, 1, 1);
-@stopToStopEase: cubic-bezier(0.4, 0, 0.2, 1);
-
-/* Fonts */
-.bold() {
-    font-weight: 700;
-}
-.regular() {
-    font-weight: 400;
-}

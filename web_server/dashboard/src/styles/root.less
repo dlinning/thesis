@@ -1,10 +1,12 @@
+@import url("https://rsms.me/inter/inter.css");
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 html {
-    font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+    font-family: "Inter", "Helvetica Neue", Helvetica, sans-serif;
     text-align: center;
 
     background-color: @backgroundBody;
@@ -122,6 +124,11 @@ button {
 
     i + span {
         margin-left: 0.5rem;
+    }
+
+    // Used by the individal Lists
+    &.page-add-btn{
+        margin: 0.5rem auto 1rem 0;
     }
 }
 
@@ -249,16 +256,30 @@ option {
     }
 }
 
-h1 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     text-align: left;
+}
+h1{
+    font-size: 3rem;
+    font-weight: 300;
     margin: 1rem 0;
 }
 h2 {
-    color: lighten(@text, 10);
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: 0.8px;
 }
 h3 {
     margin: 1rem 0;
+    letter-spacing: 1.1px;
+}
+
+p {
+    line-height: 1.5;
 }
 
 .table {

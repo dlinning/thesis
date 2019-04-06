@@ -4,13 +4,12 @@ class Dashboard extends React.Component {
 
         this.state = {
             page: this.props.page || "home",
-            view: "default",
             changing: false
         };
 
         this.setPage = this.setPage.bind(this);
 
-        window.onpopstate = evt => {
+        window.onpopstate = () => {
             var newPage = document.location.pathname.substring(1);
             if (newPage.length === 0) {
                 newPage = "home";
@@ -43,15 +42,34 @@ class Dashboard extends React.Component {
 
     render() {
         var s = this.state;
+        let pageChildren = null,
+            pageId = s.page;
+        if (s.page == "home") {
+            pageId = "home-lists";
+            pageChildren = (
+                <>
+                    <FlowList />
+                    <SensorList />
+                    <GroupList />
+                </>
+            );
+        } else if (s.page == "flows") {
+            pageChildren = <FlowList standalone={true} />;
+        } else if (s.page == "sensors") {
+            pageChildren = <SensorList standalone={true} />;
+        } else if (s.page == "groups") {
+            pageChildren = <GroupList standalone={true} />;
+        } else if (s.page == "settings") {
+            pageChildren = <SettingsPage />;
+        }
+
         return (
             <div id="dashboard" className={this.state.changing === true ? " changing" : ""} data-current-page={this.state.page}>
                 <DashboardSidebar currentPage={s.page} pageChangeFunc={this.setPage} />
                 <div id="dashboard-content" className={`container-${s.page}`}>
-                    {s.page === "home" && <HomePage />}
-                    {s.page === "flows" && <FlowsPage />}
-                    {s.page === "sensors" && <SensorsPage />}
-                    {s.page === "groups" && <GroupsPage />}
-                    {s.page === "settings" && <SettingsPage />}
+                    <DashboardPage title={s.page} pageId={pageId}>
+                        {pageChildren}
+                    </DashboardPage>
                 </div>
                 <Toast />
             </div>

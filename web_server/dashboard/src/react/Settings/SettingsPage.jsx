@@ -91,7 +91,6 @@ class SettingsPage extends React.Component {
 
         return (
             <>
-                <h1>Settings</h1>
                 <div className="list constrain" id="settings-list">
                     <div id="settings-filter-box" className="flex-row aic">
                         <OnChangeInput

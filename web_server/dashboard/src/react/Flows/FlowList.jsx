@@ -71,7 +71,7 @@ class FlowList extends React.Component {
 
         return (
             <>
-                {p.standalone && <button onClick={() => this.openFlowsEditor()}>Create New Flow</button>}
+                {p.standalone && <button className="page-add-btn" onClick={() => this.openFlowsEditor()}>Create New Flow</button>}
                 <div className={p.standalone ? "flex-grid cols-3" : "flex-col"}>
                     {!p.standalone && (
                         <div className="flex-row aic sb title-row">
