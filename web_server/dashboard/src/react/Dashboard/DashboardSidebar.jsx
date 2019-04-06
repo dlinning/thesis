@@ -36,7 +36,7 @@ class DashboardSidebar extends React.Component {
     render() {
         return (
             <aside id="dashboard-sidebar">
-                <img src="./assets/logo.png" alt="" id="logo"/>
+                <img src="./assets/logo.svg" alt="" id="logo"/>
                 <ul>
                     {this.tabsMap.map(tab => {
                         return (

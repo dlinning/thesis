@@ -90,7 +90,8 @@
 }
 #logo {
     width: 4rem;
-    margin: 1rem auto;
+    height: 4rem;
+    margin: 1rem;
 }
 
 #dashboard-content {
@@ -120,6 +121,8 @@
 
 @media (max-width: 768px) {
     #dashboard-sidebar {
+        z-index: 2;
+
         flex-flow: row nowrap;
 
         position: fixed;
@@ -131,8 +134,6 @@
 
         width: 100vw;
         min-width: 360px;
-
-        z-index: 1;
 
         ul {
             display: flex;
@@ -185,6 +186,7 @@
     }
 
     #dashboard-content {
+        z-index: 1;
         display: flex;
         flex-direction: column;
 
