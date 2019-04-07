@@ -9,7 +9,7 @@ class FlowEditor extends React.Component {
             trigger: {},
             payload: {},
             to: {},
-            sgData: { Sensor: [], Group: [] }
+            sgData: undefined
         };
 
         this.formRef = React.createRef();
@@ -168,7 +168,7 @@ class FlowEditor extends React.Component {
         // Not the best way of checking to see if data is all
         // set, but since `trigger.type` is mandatory, this should
         // generall work.
-        if (this.state.id !== undefined && !this.state.trigger.type) {
+        if ((this.state.id !== undefined && !this.state.trigger.type) || !this.state.sgData) {
             return <Loader message="Loading Flow Data..." />;
         }
 
