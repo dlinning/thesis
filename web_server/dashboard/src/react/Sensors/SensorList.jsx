@@ -22,7 +22,7 @@ class SensorList extends React.Component {
         // Set to pull new log counts every 30 seconds
         this.interval = setInterval(() => {
             this.updateLogCounts();
-        }, 30000); //TODO: Add this in to Settings?
+        }, 30000);
     }
     componentWillUnmount() {
         clearInterval(this.interval);

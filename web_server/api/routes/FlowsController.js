@@ -3,7 +3,13 @@ const express = require("express"),
 
 var DBHelper = require("../../../common/helpers/dbhelper");
 
+// Only pulls down what is necessary to show on Flowlist.jsx
 router.get("/list", (req, res) => {
+    res.status(200).send(DBHelper.getAllFlowsSimple());
+});
+
+// Can be used to get all data for every Flow
+router.get("/listWithConfig", (req, res) => {
     res.status(200).send(DBHelper.getAllFlows());
 });
 

@@ -567,6 +567,13 @@ module.exports.getAllFlows = () => {
     return allFlows;
 };
 const getAllFlowsStmt = db.prepare(`SELECT * FROM Flows`);
+
+module.exports.getAllFlowsSimple = () => {
+    return getAllFlowsSimpleStmt.all();;
+};
+const getAllFlowsSimpleStmt = db.prepare(`SELECT id, name, description, activationCount FROM Flows`);
+
+
 module.exports.getFlowByName = name => {
     let res = getFlowByNameStmt.get(name);
     if (res) {
