@@ -10,12 +10,12 @@ const replace = require("gulp-replace");
 
 const path = require("path");
 
-const minifycss = require("gulp-minify-css"),
+const minifycss = require("gulp-clean-css"),
     less = require("gulp-less");
 
 const paths = {
     styles: {
-        in: path.join(__dirname, "./web_server/dashboard/src/styles/**/*.less"),
+        in: path.join(__dirname, "./web_server/dashboard/src/styles/*.less"),
         out: path.join(__dirname, "./web_server/dashboard/dist/styles/")
     },
     scripts: {
@@ -56,10 +56,9 @@ gulp.task("styles", function() {
         )
         .pipe(concat("bundle.css"))
         .pipe(less())
-        .pipe(gulp.dest(paths.styles.out))
-        .pipe(rename({ suffix: ".min" }))
-        .pipe(minifycss())
         .pipe(combineMq())
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(minifycss({ level: 2 }))
         .pipe(gulp.dest(paths.styles.out));
 });
 
