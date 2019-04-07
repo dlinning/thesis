@@ -29,7 +29,7 @@ class Dashboard extends React.Component {
                     this.setState({ page: pageName }, () => {
                         pushHistory && history.pushState({ page: pageName }, pageName, "/" + (pageName === "home" ? "" : pageName));
 
-                        document.title = `IoT Board - ${pageName.capitalize()}`;
+                        document.title = `Simple IoT - ${pageName.capitalize()}`;
 
                         setTimeout(() => {
                             this.setState({ changing: false });

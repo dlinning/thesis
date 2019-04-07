@@ -158,7 +158,11 @@ class SensorList extends React.Component {
 
         return (
             <>
-                {this.props.standalone && <button className="page-add-btn" onClick={this.openAddSensorModal.bind(this)}>Add Sensor</button>}
+                {this.props.standalone && (
+                    <button className="page-add-btn" onClick={this.openAddSensorModal.bind(this)}>
+                        Add Sensor
+                    </button>
+                )}
                 <div className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}>
                     {!this.props.standalone && (
                         <div className="flex-row aic sb title-row">
@@ -202,7 +206,7 @@ class SensorList extends React.Component {
                             <div className="title">No Sensors Added</div>
                             <br />
                             <div className="content">
-                                <p>To begin using IoT Board, please add one or more sensors to the system first.</p>
+                                <p>To begin using Simple IoT, please add one or more sensors to the system first.</p>
                             </div>
                         </div>
                     )}
