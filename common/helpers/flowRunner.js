@@ -1,6 +1,6 @@
 const debug = process.env.NODE_ENV != "production";
 
-const DBHelper = require("../common/helpers/dbhelper");
+const DBHelper = require("./dbhelper");
 
 // Setup default global values
 let FLOW_TIMER = null,
@@ -39,7 +39,6 @@ function dayIsGood(days) {
 // Flow settings, or an individual flow.
 //
 function update() {
-    console.log("UPDATING FLOW RUNNER");
     IS_READY = false;
 
     clearInterval(FLOW_TIMER);
@@ -144,7 +143,6 @@ function checkGroupAndTimeFlows() {
 
                 if (isGood) {
                     resp = runFlow(f, comparisonValue, currentTime, f.triggerId);
-                    console.log(resp);
                 }
             } else {
                 // Is a Time trigger

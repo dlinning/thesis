@@ -4,13 +4,14 @@
     "description": "A Node.js server + C/C++ adapter library for managing remote sensors.",
     "main": "ERROR",
     "scripts": {
-        "start": "node ./web_server/web_server.js",
+        "start": "concurrently \"node ./web_server/web_server.js\"  \"node ./mqtt-broker/broker.js\"",
         "dev": "concurrently --kill-others \"nodemon --config nodemon.json ./web_server/web_server.js\" \"gulp default --silent\""
     },
     "author": "Doug Linning, douglinning@gmail.com",
     "license": "ISC",
     "dependencies": {
         "better-sqlite3": "5.0.1",
+        "concurrently": "^4.1.0",
         "ejs": "^2.6.1",
         "express": "4.16.3",
         "memory-cache": "0.2.0",
@@ -21,7 +22,6 @@
         "@babel/core": "7.1.2",
         "@babel/preset-env": "7.1.0",
         "@babel/preset-react": "^7.0.0",
-        "concurrently": "^4.1.0",
         "gulp": "^3.9.1",
         "gulp-babel": "^8.0.0",
         "gulp-clean-css": "^4.0.0",

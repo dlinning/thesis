@@ -3,7 +3,7 @@ const mosca = require("mosca");
 const debug = process.env.NODE_ENV != "production";
 
 const DBHelper = require("../common/helpers/dbhelper"),
-    FlowRunner = require("../flow_runner/flowRunner");
+    FlowRunner = require("../common/helpers/flowRunner");
 
 const config = require("./BrokerConfig.json"),
     serverOpts = {
@@ -51,7 +51,7 @@ let sensorIdToClientMap = {},
     clientIdToSensorIdMap = {};
 
 broker.on("ready", () => {
-    console.log("MQTT Broker initialized on port " + serverOpts.port);
+    console.log("\nMQTT Broker running on port " + serverOpts.port + "\n");
 
     // Tell the MQTT_WORKER to listen for any
     // messages on the `log` topic. This is
@@ -60,9 +60,9 @@ broker.on("ready", () => {
     MQTT_WORKER.subscribe("log");
 });
 
-broker.on("clientConnected", newClient => {
-    console.log(`${newClient.id} CONNECTED`);
-});
+// broker.on("clientConnected", newClient => {
+//     console.log(`${newClient.id} CONNECTED`);
+// });
 
 broker.on("clientDisconnected", removedClient => {
     // Handle cleaning up old client connections
