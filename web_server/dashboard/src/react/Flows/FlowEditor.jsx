@@ -504,7 +504,7 @@ class FlowEditorJsonBuilder extends React.Component {
                     onChange={evt => this.updateField(key, evt.target.value)}
                 />
                 <button className="round" onClick={() => this.deleteKey(key)}>
-                    <i className="fas fa-times" />
+                    <span>&#10006;</span>
                 </button>
             </div>
         );

@@ -42,7 +42,7 @@ class Toast extends React.Component {
             <div id="toast" className={`${this.state.open ? "open" : ""} ${warnClass}`}>
                 <span dangerouslySetInnerHTML={{ __html: this.state.msg }} />
                 <button id="toast-close" className={`round ${warnClass}`} onClick={this.close.bind(this)}>
-                    <i className="fas fa-times" />
+                    <span>&#10006;</span>
                 </button>
             </div>
         );

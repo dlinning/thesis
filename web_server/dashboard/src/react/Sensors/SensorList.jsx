@@ -168,7 +168,7 @@ class SensorList extends React.Component {
                         <div className="flex-row aic sb title-row">
                             <h2>Sensors</h2>
                             <button className="round" onClick={this.openAddSensorModal.bind(this)}>
-                                <i className="fas fa-plus" />
+                                <span>&#43;</span>
                             </button>
                         </div>
                     )}

@@ -36,8 +36,8 @@ class Modal extends React.Component {
                 <div id="modal" onClick={e => e.stopPropagation()}>
                     <div className="controls">
                         <span className="title">{s.title}</span>
-                        <button title="Close Modal" onClick={() => this.close(true)}>
-                            <i className="fas fa-times" />
+                        <button title="Close Modal" className="round" onClick={() => this.close(true)}>
+                            <span>&#10006;</span>
                         </button>
                     </div>
                     <div id="modal-content">{s.content}</div>

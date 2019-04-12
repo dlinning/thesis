@@ -57,6 +57,7 @@ gulp.task("styles", function() {
         .pipe(concat("bundle.css"))
         .pipe(less())
         .pipe(combineMq())
+        .pipe(gulp.dest(paths.styles.out))
         .pipe(rename({ suffix: ".min" }))
         .pipe(minifycss({ level: 2 }))
         .pipe(gulp.dest(paths.styles.out));

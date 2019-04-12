@@ -76,13 +76,17 @@ class GroupList extends React.Component {
 
         return (
             <>
-                {this.props.standalone && <button className="page-add-btn" onClick={this.openAddGroupModal.bind(this)}>Create New Group</button>}
+                {this.props.standalone && (
+                    <button className="page-add-btn" onClick={this.openAddGroupModal.bind(this)}>
+                        Create New Group
+                    </button>
+                )}
                 <div className={this.props.standalone ? "flex-grid" : "flex-col"}>
                     {!this.props.standalone && (
                         <div className="flex-row aic sb title-row">
                             <h2>Groups</h2>
                             <button className="round" onClick={this.openAddGroupModal.bind(this)}>
-                                <i className="fas fa-plus" />
+                                <span>&#43;</span>
                             </button>
                         </div>
                     )}
@@ -177,7 +181,6 @@ class GroupAddForm extends React.Component {
                 <p>The name of a Group can be changed at any time without removing Sensors from the group.</p>
                 <input type="text" placeholder="Group Name" name="name" />
                 <button>
-                    <i className="fas fa-plus" />
                     <span>Create</span>
                 </button>
             </form>

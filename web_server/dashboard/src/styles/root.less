@@ -43,13 +43,20 @@ button {
     }
 
     &.round {
-        line-height: 2rem;
         width: 2rem;
         height: 2rem;
         padding: 0;
         min-width: 0;
         margin: 0;
-        border-radius: 50%;
+        border-radius: 25%;
+
+        span {
+            height: 100%;
+            width: 100%;
+            display: block;
+            line-height: 2rem;
+            font-size: 1.25rem;
+        }
     }
 
     &.floating {
