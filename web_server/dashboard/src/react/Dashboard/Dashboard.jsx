@@ -18,13 +18,14 @@ class Dashboard extends React.Component {
         };
 
         messenger.subscribe("ChangePage", toPage => {
-            this.setPage(toPage);
+            this._setPage(toPage);
         });
     }
 
-    setPage(pageName, pushHistory = true, viewName = null) {
+    _setPage(pageName, pushHistory = true) {
         if (pageName !== this.state.page) {
             this.setState({ changing: true }, () => {
+                messenger.notify("CloseModal", true);
                 setTimeout(() => {
                     this.setState({ page: pageName }, () => {
                         pushHistory && history.pushState({ page: pageName }, pageName, "/" + (pageName === "home" ? "" : pageName));
@@ -65,7 +66,7 @@ class Dashboard extends React.Component {
 
         return (
             <div id="dashboard" className={this.state.changing === true ? " changing" : ""} data-current-page={this.state.page}>
-                <DashboardSidebar currentPage={s.page} pageChangeFunc={this.setPage} />
+                <DashboardSidebar currentPage={s.page} />
                 <div id="dashboard-content" className={`container-${s.page}`}>
                     <DashboardPage title={s.page} pageId={pageId}>
                         {pageChildren}

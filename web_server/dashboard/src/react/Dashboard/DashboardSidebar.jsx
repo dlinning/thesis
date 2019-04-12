@@ -33,6 +33,10 @@ class DashboardSidebar extends React.Component {
         ];
     }
 
+    changePage(name) {
+        messenger.notify("ChangePage", name);
+    }
+
     render() {
         return (
             <aside id="dashboard-sidebar">
@@ -45,7 +49,7 @@ class DashboardSidebar extends React.Component {
                             <li
                                 key={tab.name}
                                 className={this.props.currentPage === tab.name ? "selected" : ""}
-                                onClick={() => this.props.pageChangeFunc(tab.name)}
+                                onClick={() => this.changePage(tab.name)}
                             >
                                 <i className={"fas fa-" + tab.icon} />
                                 <span>{tab.name}</span>
