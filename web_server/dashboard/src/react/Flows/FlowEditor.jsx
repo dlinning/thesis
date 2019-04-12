@@ -153,6 +153,11 @@ class FlowEditor extends React.Component {
             }
         }
 
+        // There must be a payload
+        if (Object.keys(s.payload).length == 0) {
+            return false;
+        }
+
         // We must define a type and ID to send to.
         if (!s.to.id || !s.to.type) {
             return false;
@@ -503,7 +508,13 @@ class FlowEditorJsonBuilder extends React.Component {
                     title={key != "" ? `Set a value for key ${key}` : ""}
                     onChange={evt => this.updateField(key, evt.target.value)}
                 />
-                <button className="round" onClick={() => this.deleteKey(key)}>
+                <button
+                    className="round"
+                    onClick={evt => {
+                        evt.preventDefault();
+                        this.deleteKey(key);
+                    }}
+                >
                     <span>&#10006;</span>
                 </button>
             </div>

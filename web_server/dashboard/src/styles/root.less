@@ -224,17 +224,17 @@ option {
 
         span {
             user-select: none;
+            padding-left: 0.25rem;
 
             &::before {
                 display: block;
                 content: " ";
-                color: #fff;
                 position: absolute;
                 left: 0.5rem;
-                top: 0.35rem;
+                top: 0.45rem;
                 width: 0.8rem;
-                height: 0.9rem;
-                background: fadeout(@divider, 80);
+                height: 0.8rem;
+                background: fadeout(@divider, 30);
                 border-radius: 50%;
             }
         }
@@ -249,7 +249,7 @@ option {
             border-color: @primary;
 
             span::before {
-                background: @primaryDark1;
+                background: @primaryLight1;
             }
         }
 
