@@ -29,32 +29,11 @@
     display: grid;
     grid-gap: 1rem;
 
-    &.cols-4 {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-
-        .tile {
-            width: 100%;
-            min-width: unset;
-        }
-    }
-    &.cols-3 {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(350px, 400px));
 
     .tile {
         width: auto;
         max-width: initial;
         margin-bottom: 0;
-    }
-
-    @media (max-width: 1062px) {
-        &.cols-3 {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-    @media (max-width: 768px) {
-        &.cols-3 {
-            grid-template-columns: 1fr;
-        }
     }
 }

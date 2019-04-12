@@ -20,6 +20,8 @@
     width: 6rem;
     background: @background;
 
+    z-index: 2;
+
     .md-3();
 
     ul {
@@ -104,11 +106,13 @@
 
     position: absolute;
     top: 0;
+    left: 0;
 
-    right: 6rem;
-    width: calc(100% ~"-" 15rem);
+    max-width: calc(90vw ~"+" 5rem);
+    width: auto;
+    overflow-x: auto;
 
-    padding: 1rem 1rem 5rem 0;
+    padding: 1rem 1rem 5rem 7rem;
 
     opacity: 1;
     transition: opacity 100ms @exitEase;
@@ -117,16 +121,21 @@
         max-width: 50vw;
         margin: 0 auto;
     }
+
+    @media (min-width: 1142px) {
+        right: 0;
+        margin: 0 auto;
+    }
 }
 
 #page-title {
+    position: sticky;
+    left: 0;
     text-transform: capitalize;
 }
 
 @media (max-width: 768px) {
     #dashboard-sidebar {
-        z-index: 2;
-
         flex-flow: row nowrap;
 
         position: fixed;
@@ -135,6 +144,8 @@
         left: 0;
         height: 8vh;
         min-height: 64px;
+
+        border-top: 1px solid @divider;
 
         width: 100vw;
         min-width: 360px;
@@ -197,14 +208,14 @@
         position: absolute;
         top: 0;
 
+        min-width: 360px;
+        width: 90vw;
+
         right: 0;
         left: 0;
         margin: 0 auto;
 
-        min-width: 360px;
-        width: 87.5vw;
-
-        padding: 1rem 1rem 12vh;
+        padding: 1rem 0 12vh;
 
         .constrain {
             max-width: unset;

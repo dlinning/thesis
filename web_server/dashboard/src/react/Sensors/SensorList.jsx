@@ -163,7 +163,7 @@ class SensorList extends React.Component {
                         Add Sensor
                     </button>
                 )}
-                <div className={this.props.standalone ? "flex-grid cols-3" : "flex-col"}>
+                <div className={this.props.standalone ? "flex-grid" : "flex-col"}>
                     {!this.props.standalone && (
                         <div className="flex-row aic sb title-row">
                             <h2>Sensors</h2>
