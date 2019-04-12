@@ -7,14 +7,13 @@ class Dashboard extends React.Component {
             changing: false
         };
 
-        this.setPage = this.setPage.bind(this);
 
         window.onpopstate = () => {
             var newPage = document.location.pathname.substring(1);
             if (newPage.length === 0) {
                 newPage = "home";
             }
-            this.setPage(newPage, false);
+            this._setPage(newPage, false);
         };
 
         messenger.subscribe("ChangePage", toPage => {
