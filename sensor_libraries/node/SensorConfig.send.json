@@ -4,6 +4,6 @@
 
     "dataType": "float",
     
-    "serverIp": "localhost",
+    "serverIp": "mqtt.thesis.dougs.website",
     "serverPort": 1883
 }
