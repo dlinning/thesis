@@ -181,7 +181,7 @@ module.exports.getAllSensorLogCounts = () => {
 // Will return the new sensor's ID if successful or already exists.
 //
 module.exports.addSensor = (id = undefined) => {
-    var d1 = dateAsUnixTimestamp();
+    const d1 = dateAsUnixTimestamp();
 
     // Check to see if it already exists,
     // return early.
@@ -213,7 +213,7 @@ const getSensorByIdStmt = db.prepare("SELECT * FROM Sensors WHERE id = ?");
 // not exist, or a 1 if the changes were a success.
 //
 module.exports.updateSensor = (sensorId, name) => {
-    var d1 = dateAsUnixTimestamp();
+    const d1 = dateAsUnixTimestamp();
 
     var currentSensor = getSensorByIdStmt.get(sensorId);
     if (currentSensor !== undefined) {
@@ -385,7 +385,7 @@ const getGroupByIdStmt = db.prepare("SELECT * FROM GroupListWithSensorAndLogCoun
 // was successful
 //
 updateGroupFunc = (groupId, name) => {
-    var d1 = dateAsUnixTimestamp();
+    const d1 = dateAsUnixTimestamp();
 
     var currentGroup = getGroupByIdStmt.get(groupId);
     if (currentGroup !== undefined) {
@@ -416,7 +416,7 @@ const updateGroupStmt = db.prepare(
 // `id` already exists, will just return the ID.
 //
 const createGroupFunc = (id, name) => {
-    var d1 = dateAsUnixTimestamp();
+    const d1 = dateAsUnixTimestamp();
 
     // Check to see if it already exists,
     // return early.
@@ -597,7 +597,7 @@ module.exports.getFlowById = id => {
 };
 const getFlowByIdStmt = db.prepare(`SELECT * FROM Flows WHERE id = ?`);
 module.exports.createFlow = data => {
-    var d1 = dateAsUnixTimestamp();
+    const d1 = dateAsUnixTimestamp();
 
     const newFlow = {
         id: newUUID(),
@@ -670,6 +670,27 @@ const updateFlowStmt = db.prepare(
         WHERE id = @id
     `
 );
+
+module.exports.duplicateFlow = flowId => {
+    const toCopy = getFlowByIdStmt.get(flowId);
+
+    if (topCopy !== undefined) {
+        // Make a copy
+        let newCopy = toCopy;
+        newCopy.id = newUUID();
+
+        const d1 = dateAsUnixTimestamp();
+        newCopy.createdAt = d1;
+        newCopy.updatedAt = d1;
+
+        if (makeNewFlowStmt.run(newCopy).changes === 1) {
+            return { status: 200, flow: newCopy };
+        } else {
+            return { status: 500, error: `The server was unable to duplicate the flow` };
+        }
+    }
+    return { status: 400, error: `Flow with ID "${name}" does not exist` };
+}
 
 module.exports.increaseFlowRunCount = flowId => {
     // Make sure the flow exists

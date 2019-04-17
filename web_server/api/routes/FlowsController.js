@@ -13,12 +13,17 @@ router.get("/listWithConfig", (req, res) => {
     res.status(200).send(DBHelper.getAllFlows());
 });
 
-router.get("/get/:name?", (req, res) => {
+router.get("/get/:id?", (req, res) => {
+    let data = DBHelper.getFlowById(req.params.id);
+    res.status(data.status).send(data);
+});
+router.get("/getbyname/:name?", (req, res) => {
     let data = DBHelper.getFlowByName(req.params.name);
     res.status(data.status).send(data);
 });
-router.get("/getbyid/:id?", (req, res) => {
-    let data = DBHelper.getFlowById(req.params.id);
+
+router.get("/duplicate/:id?", (req, res) => {
+    let data = DBHelper.duplicateFlow(req.params.id);
     res.status(data.status).send(data);
 });
 
