@@ -60,9 +60,9 @@ broker.on("ready", () => {
     MQTT_WORKER.subscribe("log");
 });
 
-// broker.on("clientConnected", newClient => {
-//     console.log(`${newClient.id} CONNECTED`);
-// });
+broker.on("clientConnected", newClient => {
+    console.log(`${newClient.id} CONNECTED`);
+});
 
 broker.on("clientDisconnected", removedClient => {
     // Handle cleaning up old client connections

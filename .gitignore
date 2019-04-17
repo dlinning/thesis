@@ -3,3 +3,7 @@ node_modules
 /package-lock.json
 yarn.lock
 /web_server/dashboard/dist
+/sensor_libraries/c++/a.out
+/sensor_libraries/c++/main.o
+/sensor_libraries/c++/Sensor.o
+/sensor_libraries/python27/*.pyc
