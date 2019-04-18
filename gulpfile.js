@@ -15,7 +15,7 @@ const minifycss = require("gulp-clean-css"),
 
 const paths = {
     styles: {
-        in: path.join(__dirname, "./web_server/dashboard/src/styles/*.less"),
+        in: path.join(__dirname, "./web_server/dashboard/src/styles/bundles/*.less"),
         out: path.join(__dirname, "./web_server/dashboard/dist/styles/")
     },
     scripts: {
@@ -54,7 +54,6 @@ gulp.task("styles", function() {
                 errorHandler: errorHander
             })
         )
-        .pipe(concat("bundle.css"))
         .pipe(less())
         .pipe(combineMq())
         .pipe(gulp.dest(paths.styles.out))

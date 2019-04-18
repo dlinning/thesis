@@ -48,10 +48,11 @@ class SettingsPage extends React.Component {
             // The change is already reflected client-side, so no change is necessary
             jsonFetch("/api/settings/set/" + key, { value: newValue }, "POST")
                 .then(() => {
+                    messenger.notify("OpenToast", { msg: `Updated "${key}" to "${newValue}".`});
                     this.setState({ error: null });
                 })
                 .catch(err => {
-                    messenger.notify("OpenToast", { msg: `Unable to update Setting ${key} to ${newValue}`, warn: true });
+                    messenger.notify("OpenToast", { msg: `Unable to update Setting ${key} to ${newValue}.`, warn: true });
                     console.error(err);
                 });
         }
