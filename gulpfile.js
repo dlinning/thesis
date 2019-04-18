@@ -16,6 +16,7 @@ const minifycss = require("gulp-clean-css"),
 const paths = {
     styles: {
         in: path.join(__dirname, "./web_server/dashboard/src/styles/bundles/*.less"),
+        watch: path.join(__dirname, "./web_server/dashboard/src/styles/**/*.less"),
         out: path.join(__dirname, "./web_server/dashboard/dist/styles/")
     },
     scripts: {
@@ -99,7 +100,7 @@ gulp.task("react", function() {
 });
 
 gulp.task("default", ["styles", "scripts", "react"], function() {
-    gulp.watch(paths.styles.in, ["styles"]);
+    gulp.watch(paths.styles.watch, ["styles"]);
     gulp.watch(paths.scripts.in, ["scripts"]);
     gulp.watch(paths.react.in, ["react"]);
 });

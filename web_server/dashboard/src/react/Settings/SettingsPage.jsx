@@ -48,7 +48,7 @@ class SettingsPage extends React.Component {
             // The change is already reflected client-side, so no change is necessary
             jsonFetch("/api/settings/set/" + key, { value: newValue }, "POST")
                 .then(() => {
-                    messenger.notify("OpenToast", { msg: `Updated "${key}" to "${newValue}".`});
+                    messenger.notify("OpenToast", { msg: `Updated "${key}" to "${newValue}".` });
                     this.setState({ error: null });
                 })
                 .catch(err => {
@@ -90,6 +90,8 @@ class SettingsPage extends React.Component {
     render() {
         let s = this.state;
 
+        const visible = Object.keys(s.matches);
+
         return (
             <>
                 <div className="list constrain" id="settings-list">
@@ -103,8 +105,8 @@ class SettingsPage extends React.Component {
                             name="settingsSearch"
                         />
                     </div>
-                    {s.matches &&
-                        Object.keys(s.matches).map(key => {
+                    {visible.length > 0 &&
+                        visible.map(key => {
                             return (
                                 <div className="tile settings-group" data-group-name={key} key={key}>
                                     <div className="title">{key}</div>
@@ -126,6 +128,11 @@ class SettingsPage extends React.Component {
                                 </div>
                             );
                         })}
+                    {visible.length == 0 && (
+                        <div className="tile settings-group">
+                            <p>No settings match your search term.</p>
+                        </div>
+                    )}
                 </div>
             </>
         );

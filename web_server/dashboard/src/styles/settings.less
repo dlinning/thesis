@@ -26,7 +26,7 @@
 }
 
 #settings-filter-box {
-    align-self: flex-end;
+    align-self: flex-start;
     position: sticky;
     top: 1rem;
 
@@ -41,14 +41,17 @@
 .settings-group {
     order: 1;
 
+    width: 50vw;
+    max-width: 500px !important;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        max-width: 100% !important;
+    }
+
     .title {
         border-bottom: 2px solid @divider;
         text-transform: capitalize;
-    }
-
-    &.tile {
-        width: 100%;
-        max-width: 100vw;
     }
 }
 
@@ -72,7 +75,7 @@ div[data-group-name="ungrouped"] {
         width: 100%;
         margin: 0 0 2rem;
 
-        input{
+        input {
             width: 100%;
         }
     }
