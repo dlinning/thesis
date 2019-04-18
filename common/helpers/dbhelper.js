@@ -674,11 +674,17 @@ const updateFlowStmt = db.prepare(
 module.exports.duplicateFlow = flowId => {
     const toCopy = getFlowByIdStmt.get(flowId);
 
-    if (topCopy !== undefined) {
+    if (toCopy !== undefined) {
         // Make a copy
         let newCopy = toCopy;
+        // Assign it a new ID
         newCopy.id = newUUID();
 
+        // Change the name
+        newCopy.name += " (Copy)";
+
+        // Wipe out "invalid" data
+        newCopy.activationCount = 0;
         const d1 = dateAsUnixTimestamp();
         newCopy.createdAt = d1;
         newCopy.updatedAt = d1;

@@ -39,6 +39,23 @@ class FlowList extends React.Component {
         });
     }
 
+    duplicateFlow(flowId) {
+        jsonFetch("/api/flows/duplicate/" + flowId)
+            .then(res => {
+                if (res.status === 200) {
+                    let currentFlows = this.state.flows;
+                    currentFlows.push(res.flow);
+                    this.setState({ flows: currentFlows }, () => {
+                        this.openFlowsEditor(res.flow.id);
+                    });
+                }
+            })
+            .catch(err => {
+                messenger.notify("OpenToast", { msg: `Unable to duplicate Flow`, warn: true });
+                console.error(err);
+            });
+    }
+
     removeFlow(flowId, flowName) {
         if (confirm(`Delete flow "${flowName}"?`)) {
             jsonFetch("/api/flows/" + flowId, null, "DELETE")
@@ -103,6 +120,9 @@ class FlowList extends React.Component {
                                         <div className="data-module">
                                             <button className="small" onClick={() => this.openFlowsEditor(flow.id)}>
                                                 Manage
+                                            </button>
+                                            <button className="small" onClick={() => this.duplicateFlow(flow.id)}>
+                                                Duplicate
                                             </button>
                                             <button className="warn overlay small" onClick={() => this.removeFlow(flow.id, flow.name)}>
                                                 Delete

@@ -29,11 +29,12 @@
 }
 
 #modal {
-    max-width: 60vw;
+    min-width: 50ch;
+    max-width: 70vw;
 
     overscroll-behavior: contain;
 
-    @media screen and(max-width:600px) {
+    @media screen and(max-width:768px) {
         position: absolute;
         top: auto;
         left: 2.5vw;
@@ -54,7 +55,8 @@
     > .controls {
         display: flex;
         justify-content: flex-end;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
+        padding-left: 1rem;
 
         border-bottom: 1px solid @divider;
 
@@ -74,13 +76,14 @@
 }
 
 #modal-content {
-    padding: 0 2rem;
-
-    @media screen and(max-width:600px) {
-        padding: 0;
-    }
+    padding: 0 2ch;
 
     min-height: 40vh;
     max-height: 70vh;
     overflow-y: auto;
+
+    @media screen and(max-width:768px) {
+        max-width: 80ch;
+        min-width: 30ch;
+    }
 }

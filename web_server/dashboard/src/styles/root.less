@@ -13,6 +13,12 @@ html {
     color: @text;
 }
 
+main {
+    @media screen and (max-width: 768px) {
+        padding: 0 2.5vw;
+    }
+}
+
 button {
     line-height: 36px;
     padding: 0 16px;
@@ -44,9 +50,9 @@ button {
 
     &.round {
         width: 2rem;
+        min-width: 2rem;
         height: 2rem;
         padding: 0;
-        min-width: 0;
         margin: 0;
         border-radius: 25%;
 
@@ -214,7 +220,9 @@ option {
     .radio-item {
         display: flex;
         align-items: center;
-        margin: 0.125rem 0.5rem 0.125rem 0;
+        height: 2.5rem;
+        line-height: 2.5rem;
+        margin: 0 0.5rem 0 0;
         border: 2px solid @divider;
         border-radius: 0.25rem;
         padding: 0.25rem 0.5rem 0.25rem 1.5rem;
@@ -231,7 +239,7 @@ option {
                 content: " ";
                 position: absolute;
                 left: 0.5rem;
-                top: 0.45rem;
+                top: 0.75rem;
                 width: 0.8rem;
                 height: 0.8rem;
                 background: fadeout(@divider, 30);

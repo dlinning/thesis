@@ -583,7 +583,7 @@ class FlowEditorToBuilder extends React.Component {
 
     render() {
         return (
-            <div className="flex-col">
+            <div className="flex-row">
                 <RadioGroup
                     name="flow-editor-triggerType"
                     classes={["flex-row"]}
@@ -601,8 +601,6 @@ class FlowEditorToBuilder extends React.Component {
                         );
                     })}
                 </RadioGroup>
-
-                <br />
 
                 {this.state.type && this.state.type !== "Email" && (
                     <OnChangeInput
