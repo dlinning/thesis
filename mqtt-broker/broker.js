@@ -5,12 +5,17 @@ const debug = process.env.NODE_ENV != "production";
 const DBHelper = require("../common/helpers/dbhelper"),
     FlowRunner = require("../common/helpers/flowRunner");
 
-const config = require("./BrokerConfig.json"),
-    serverOpts = {
-        port: config.serverPort,
+const config = require("./BrokerConfig.json");
+let serverOpts = {
+    port: config.serverPort
+};
+if (config.webSocketPort !== undefined) {
+    serverOpts.http = {
+        port: config.webSocketPort,
         bundle: true,
         static: "./"
     };
+}
 
 ////
 // Local client used to recieve process messages
@@ -53,7 +58,10 @@ let sensorIdToClientMap = {},
     clientIdToSensorIdMap = {};
 
 broker.on("ready", () => {
-    console.log("\nMQTT Broker running on port " + serverOpts.port + "\n");
+    console.log("\nMQTT Broker running on port " + serverOpts.port);
+    if (config.webSocketPort !== undefined) {
+        console.log("MQTT WebSocket Broker running on port " + serverOpts.http.port + "\n");
+    }
 
     // Tell the MQTT_WORKER to listen for any
     // messages on the `log` topic. This is

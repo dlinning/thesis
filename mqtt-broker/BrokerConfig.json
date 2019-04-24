@@ -1,5 +1,6 @@
 {
     "serverPort": 1883,
+    "webSocketPort": 2883,
 
     "password": "AUTH_KEY"
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+        <script src="https://unpkg.com/mqtt@2.18.8/dist/mqtt.min.js"></script>
+        <title>Example Web MQTT Client</title>
+        <style>
+            .flex-row {
+                display: flex;
+                margin: 1rem 0;
+            }
+            .flex-col {
+                display: flex;
+                flex-flow: column;
+            }
+            #messages {
+                height: 20vh;
+                width: 35vw;
+                word-wrap: break-word;
+                overflow-y: auto;
+                border: 1px solid #666;
+                padding: 0.5rem;
+                margin: 1rem 0;
+            }
+            input,
+            button {
+                margin-right: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="flex-col">
+            <div class="flex-row">
+                <input type="text" id="host" placeholder="Host / IP" value="localhost" />
+                <input type="number" id="port" placeholder="Port" value="2883" min="0" max="65535" step="1" />
+            </div>
+            <div class="flex-row">
+                <input type="text" id="clientId" placeholder="Client ID" value="WEB_CLIENT" />
+                <input type="text" id="pw" placeholder="Password" value="AUTH_KEY" />
+            </div>
+            <div class="flex-row">
+                <button id="connBtn">Connect</button>
+                <button id="disconnBtn">Disconnect</button>
+            </div>
+        </div>
+        <hr />
+        <div class="flex-col">
+            <div class="flex-row">
+                <input type="text" id="sendTopic" placeholder="Topic" />
+                <input type="text" id="sendMessage" placeholder="Message" />
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+
+        <hr />
+
+        <button id="clearMessages">Clear Messages</button>
+        <div id="messages" class="flex-col"></div>
+
+        <script src="./client.js"></script>
+    </body>
+</html>
