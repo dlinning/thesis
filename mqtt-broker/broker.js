@@ -7,7 +7,9 @@ const DBHelper = require("../common/helpers/dbhelper"),
 
 const config = require("./BrokerConfig.json"),
     serverOpts = {
-        port: config.serverPort
+        port: config.serverPort,
+        bundle: true,
+        static: "./"
     };
 
 ////
