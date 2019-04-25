@@ -56,7 +56,11 @@ const logData = (value, dataType) => {
                 dataType: dataType || givenOpts.dataType || "not_set",
                 timestamp: new Date().getTime(),
                 sensorId: givenOpts.clientId
-            })
+            }),
+            {
+                // The packet _should_ get there
+                qos: 1
+            }
         );
     }
 };
