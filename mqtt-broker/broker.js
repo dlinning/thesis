@@ -32,16 +32,22 @@ const MQTT_WORKER = mqtt.connect("mqtt://localhost", { clientId: MQTT_WORKER_ID,
 
 MQTT_WORKER.on("message", (topic, message) => {
     if (topic === "log") {
-        const data = JSON.parse(message.toString());
+        // Need to catch this whole thing, so that we don't crash
+        // the entire broker because of a bad message.
+        try {
+            const data = JSON.parse(message.toString());
 
-        DBHelper.logData(data.value, data.sensorId, data.dataType, data.timeStamp);
+            DBHelper.logData(data.value, data.sensorId, data.dataType, data.timeStamp);
 
-        let sendData = FlowRunner.handleSensorUpdate(data.sensorId, data.value);
+            let sendData = FlowRunner.handleSensorUpdate(data.sensorId, data.value);
 
-        if (sendData.to && sendData.to.length > 0) {
-            for (let i = 0, l = sendData.to.length; i < l; i++) {
-                sendMessageToSensor(sendData.to[i], sendData.payload);
+            if (sendData.to && sendData.to.length > 0) {
+                for (let i = 0, l = sendData.to.length; i < l; i++) {
+                    sendMessageToSensor(sendData.to[i], sendData.payload);
+                }
             }
+        } catch (err) {
+            console.error(err);
         }
     }
 });
