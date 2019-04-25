@@ -34,7 +34,7 @@ class FlowList extends React.Component {
 
     openFlowsEditor(flowId = undefined) {
         messenger.notify("OpenModal", {
-            title: `Create New Flow`,
+            title: `Create a New Flow`,
             content: <FlowEditor flowId={flowId} />
         });
     }

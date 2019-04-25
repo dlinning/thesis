@@ -145,7 +145,39 @@ class SensorList extends React.Component {
 
     openAddSensorModal() {
         //TODO: This
-        alert("Message about how to add a sensor into the system");
+
+        jsonFetch("/api/settings/get/group/mqtt")
+            .then(res => {
+                const domain = res.domainName;
+
+                messenger.notify("OpenModal", {
+                    title: `Add a New Sensor`,
+                    content: (
+                        <div className="addSensorModal">
+                            <p>Point the Sensor towards:</p>
+                            <p className="center">
+                                <code>{domain}</code>
+                            </p>
+                            <p>
+                                Manually configure the MQTT "clientId" value as a unique identifier in order to recognize the Sensor within
+                                the system.
+                            </p>
+                            <p>
+                                Set the Sensor's MQTT "password" to the password value defined in the <code>BrokerConfig.json</code> file on
+                                the server.
+                            </p>
+                            <p>
+                                New Sensors will appear in the system as soon as they are connected, and can be added to Groups or used in
+                                Flows after the initial connection.
+                            </p>
+                        </div>
+                    )
+                });
+            })
+            .catch(err => {
+                messenger.notify("OpenToast", { msg: `Unable to fetch MQTT Settings data.`, warn: true });
+                console.error(err);
+            });
     }
 
     //
@@ -177,7 +209,7 @@ class SensorList extends React.Component {
                             <div className="tile" key={s.id}>
                                 <div className="title">{s.name}</div>
                                 <div className="desc">
-                                    <span title={s.id}>({s.id.substr(0, 6)})</span>
+                                    <span title={s.id}>{s.id.substr(0, 25)}</span>
                                     <span>{s.dataType}</span>
                                 </div>
                                 <div className="content">

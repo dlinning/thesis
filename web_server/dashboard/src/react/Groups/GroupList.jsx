@@ -48,7 +48,7 @@ class GroupList extends React.Component {
 
     openAddGroupModal() {
         messenger.notify("OpenModal", {
-            title: `Create Group`,
+            title: `Make a New Group`,
             content: <GroupAddForm groupAddCallback={this.updateGroups.bind(this)} />
         });
     }
@@ -174,15 +174,16 @@ class GroupAddForm extends React.Component {
     }
     render() {
         return (
-            <form className="flex-col aic group-add-form" onSubmit={this.createGroup.bind(this)}>
-                <h3>Create New Group</h3>
+            <form className="flex-col group-add-form" onSubmit={this.createGroup.bind(this)}>
                 <p>Groups are used as logical organizers for Sensors.</p>
                 <p>A Sensor can belong to zero or more Groups. There is no extra setup needed on the individual Sensors.</p>
                 <p>The name of a Group can be changed at any time without removing Sensors from the group.</p>
-                <input type="text" placeholder="Group Name" name="name" />
-                <button>
-                    <span>Create</span>
-                </button>
+                <div className="flex-col aic">
+                    <input type="text" placeholder="Group Name" name="name" />
+                    <button>
+                        <span>Create</span>
+                    </button>
+                </div>
             </form>
         );
     }
