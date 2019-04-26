@@ -13,7 +13,7 @@
 
     const mqttConnect = () => {
         if (canConnect) {
-            mqttClient = new Paho.MQTT.Client("mqtt.thesis.dougs.website/ws", 80, "DRUM_KIT");
+            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website/wss", "DRUM_KIT");
 
             mqttClient.onMessageArrived = handleMessage;
 

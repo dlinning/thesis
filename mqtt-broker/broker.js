@@ -13,19 +13,21 @@ let serverOpts = {
 if (config.wsPort !== undefined) {
     serverOpts.interfaces.push({ type: "http", port: config.wsPort, bundle: true });
 }
-if (config.wssPort !== undefined && config.certPath !== undefined && config.keyPath !== undefined) {
-    serverOpts.interfaces.push({
-        type: "https",
-        port: config.wssPort,
-        bundle: true,
-        credentials: { keyPath: config.keyPath, certPath: config.certPath }
-    });
-    serverOpts.secure = {
-        port: config.wssPort,
-        keyPath: config.keyPath,
-        certPath: config.certPath
-    };
-}
+
+// Only necessary if nginx isn't handling SSL Certs
+// if (config.wssPort !== undefined && config.certPath !== undefined && config.keyPath !== undefined) {
+//     serverOpts.interfaces.push({
+//         type: "https",
+//         port: config.wssPort,
+//         bundle: true,
+//         credentials: { keyPath: config.keyPath, certPath: config.certPath }
+//     });
+//     serverOpts.secure = {
+//         port: config.wssPort,
+//         keyPath: config.keyPath,
+//         certPath: config.certPath
+//     };
+// }
 
 ////
 // Local client used to recieve process messages
