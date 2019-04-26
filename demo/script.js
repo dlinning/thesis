@@ -13,7 +13,7 @@
 
     const mqttConnect = () => {
         if (canConnect) {
-            mqttClient = new Paho.MQTT.Client("mqtt.thesis.dougs.website", 2883, "DRUM_KIT");
+            mqttClient = new Paho.MQTT.Client("mqtt.thesis.dougs.website/ws", 80, "DRUM_KIT");
 
             mqttClient.onMessageArrived = handleMessage;
 
@@ -35,7 +35,6 @@
         playDrum(msg.payloadString);
     };
 })();
-
 
 // Actually handles drum callbacks
 (() => {

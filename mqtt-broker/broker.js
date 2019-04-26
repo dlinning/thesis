@@ -20,6 +20,11 @@ if (config.wssPort !== undefined && config.certPath !== undefined && config.keyP
         bundle: true,
         credentials: { keyPath: config.keyPath, certPath: config.certPath }
     });
+    serverOpts.secure = {
+        port: config.wssPort,
+        keyPath: config.keyPath,
+        certPath: config.certPath
+    };
 }
 
 ////
@@ -73,7 +78,7 @@ broker.on("ready", () => {
     serverOpts.interfaces.forEach(iface => {
         console.log(`${iface.type} Broker running on port ${iface.port}`);
     });
-    console.log("-----------------------------");
+    console.log("----------------------------");
 
     // Tell the MQTT_WORKER to listen for any
     // messages on the `log` topic. This is
