@@ -1,6 +1,11 @@
 {
     "serverPort": 1883,
-    "webSocketPort": 2883,
+
+    "wsPort": 2883,
+
+    "wssPort": 2884,
+    "certPath": "/etc/letsencrypt/live/mqtt.thesis.dougs.website/cert.pem",
+    "keyPath": "/etc/letsencrypt/live/mqtt.thesis.dougs.website/privkey.pem",
 
     "password": "AUTH_KEY"
 }

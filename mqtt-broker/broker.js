@@ -6,15 +6,20 @@ const DBHelper = require("../common/helpers/dbhelper"),
     FlowRunner = require("../common/helpers/flowRunner");
 
 const config = require("./BrokerConfig.json");
+
 let serverOpts = {
-    port: config.serverPort
+    interfaces: [{ type: "mqtt", port: config.serverPort }]
 };
-if (config.webSocketPort !== undefined) {
-    serverOpts.http = {
-        port: config.webSocketPort,
+if (config.wsPort !== undefined) {
+    serverOpts.interfaces.push({ type: "http", port: config.wsPort, bundle: true });
+}
+if (config.wssPort !== undefined && config.certPath !== undefined && config.keyPath !== undefined) {
+    serverOpts.interfaces.push({
+        type: "https",
+        port: config.wssPort,
         bundle: true,
-        static: "./"
-    };
+        credentials: { keyPath: config.keyPath, certPath: config.certPath }
+    });
 }
 
 ////
@@ -64,10 +69,11 @@ let sensorIdToClientMap = {},
     clientIdToSensorIdMap = {};
 
 broker.on("ready", () => {
-    console.log("\nMQTT Broker running on port " + serverOpts.port);
-    if (config.webSocketPort !== undefined) {
-        console.log("MQTT WebSocket Broker running on port " + serverOpts.http.port + "\n");
-    }
+    console.log("-- MQTT Broker Initialized--");
+    serverOpts.interfaces.forEach(iface => {
+        console.log(`${iface.type} Broker running on port ${iface.port}`);
+    });
+    console.log("-----------------------------");
 
     // Tell the MQTT_WORKER to listen for any
     // messages on the `log` topic. This is
