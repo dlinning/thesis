@@ -6,14 +6,16 @@
         console.error("Be sure to include https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js");
     }
 
+    const MQTT_CLIENT_ID = "DEMO_OUT";
     //
     let mqttClient = null;
+    let isConnected = false;
     let connMsgDiv = document.getElementById("connMsg");
     //
 
     const mqttConnect = () => {
         if (canConnect) {
-            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website/wss", "DRUM_KIT");
+            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website", MQTT_CLIENT_ID);
 
             mqttClient.onMessageArrived = handleMessage;
 
@@ -23,7 +25,10 @@
                 onSuccess: () => {
                     console.log("CONNECTED");
                     connMsgDiv.innerText = "Connected";
-                    mqttClient.subscribe("drumkit");
+
+                    mqttClient.subscribe(`flowPub/${MQTT_CLIENT_ID}`);
+
+                    isConnected = true;
                 }
             });
         }
@@ -32,8 +37,22 @@
 
     const handleMessage = msg => {
         console.log(`${msg.destinationName} : ${msg.payloadString}`);
-        playDrum(msg.payloadString);
+        let payload = JSON.parse(msg.payloadString);
+        playDrum(payload["play"]);
     };
+
+    const logData = (value, dataType) => {
+        if (isConnected) {
+            const payload = {
+                value: value,
+                dataType: dataType,
+                timestamp: new Date().getTime(),
+                sensorId: MQTT_CLIENT_ID
+            };
+            mqttClient.send("log", JSON.stringify(payload), 1);
+        }
+    };
+    window.logSensorData = logData;
 })();
 
 // Actually handles drum callbacks

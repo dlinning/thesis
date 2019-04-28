@@ -53,7 +53,7 @@ MQTT_WORKER.on("message", (topic, message) => {
 
             let sendData = FlowRunner.handleSensorUpdate(data.sensorId, data.value);
 
-            if (sendData.to.length > 0) {
+            if (sendData.to && sendData.to.length > 0) {
                 for (let i = 0, l = sendData.to.length; i < l; i++) {
                     sendMessageToSensor(sendData.to[i], sendData.payload);
                 }

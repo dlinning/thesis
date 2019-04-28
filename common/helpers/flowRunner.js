@@ -177,7 +177,7 @@ function runFlow(flow, value, atTime, groupId) {
 }
 
 module.exports.handleSensorUpdate = (sensorId, newValue) => {
-    let resp = [];
+    let resp = {};
 
     // Make sure that the system is ready before checking
     // any Flows.
