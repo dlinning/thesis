@@ -1,14 +1,17 @@
 const debug = process.env.NODE_ENV != "production";
 
-const DBHelper = require("./dbhelper");
+const DBHelper = require("./dbhelper"),
+    mqttBroker = require("../../mqtt-broker/broker");
 
 // Setup default global values
 let FLOW_TIMER = null,
     IS_READY = false,
     SETTINGS = null,
-    ALL_FLOWS = null;
+    ALL_FLOWS = null,
+    SEND_TO_SENSOR_FUNC = null;
 
 // Will get the latest SETTINGS and ALL_FLOWS data
+// when the FlowRunner first starts.
 update();
 
 // A helper function that returns a
@@ -61,10 +64,11 @@ function update() {
         IS_READY = true;
     }
 }
+// Expose the update function globally
+module.exports.update = update;
 
-// Called by `update()`, makes (possibly) finding the
-// correct flow much faster by only iterating
-// over related flows.
+// Called by `update()`, makes finding the correct flow
+// much faster by only iterating over related flows.
 //
 function organizeFlows(flows) {
     let result = { Sensor: [], Group: [], Time: [] };
@@ -113,7 +117,7 @@ function findSensorsToSendTo(flow, newValue, currentTime, triggerGroupId) {
         // Not the most performant, but doing it
         // here so we don't have to keep track of each Sensor's
         // Group membership all the time.
-        toSensors = DBHelper.getSensorIdsByGroupId(flow.config.to.id);
+        toSensors = DBHelper.getSensorIdsByGroupId(flow.config.to.id).map(s => s.SensorId);
     }
 
     return { payload: formattedPayload, to: toSensors };
@@ -122,11 +126,7 @@ function findSensorsToSendTo(flow, newValue, currentTime, triggerGroupId) {
 function checkGroupAndTimeFlows() {
     const flowsToCheck = ALL_FLOWS["Group"].concat(ALL_FLOWS["Time"]);
 
-    let resp = [];
-
-    //
-    //TODO: Figure out how to have this send out via `broker.js`
-    //
+    let sends = [];
 
     if (flowsToCheck.length > 0) {
         const currentTime = getCurrentTime();
@@ -139,21 +139,32 @@ function checkGroupAndTimeFlows() {
                 const comparisonValue = groupAggregateData[f.triggerId][f.config.trigger.aggregateType];
 
                 // Yuck. But otherwise how?
-                const isGood = f.config.trigger.comparison == "any" || eval(`${comparisonValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
+                const isGood =
+                    f.config.trigger.comparison == "any" ||
+                    eval(`${comparisonValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
 
                 if (isGood) {
-                    resp = runFlow(f, comparisonValue, currentTime, f.triggerId);
+                    sends.push(runFlow(f, comparisonValue, currentTime, f.triggerId));
                 }
             } else {
                 // Is a Time trigger
                 if (currentTime == f.config.trigger.value.time && dayIsGood(f.config.trigger.value.days)) {
-                    resp = runFlow(f, currentTime, currentTime);
+                    sends.push(runFlow(f, currentTime, currentTime));
                 }
             }
         }
     }
 
-    return resp;
+    // Send out the message to the necessary sensors
+    if (SEND_TO_SENSOR_FUNC !== null && sends.length > 0) {
+        for (let sendIdx = 0; sendIdx < sends.length; sendIdx++) {
+            if (sends[sendIdx].to && sends[sendIdx].to.length > 0) {
+                for (let i = 0, l = sends[sendIdx].to.length; i < l; i++) {
+                    SEND_TO_SENSOR_FUNC(sends[sendIdx].to[i], sends[sendIdx].payload);
+                }
+            }
+        }
+    }
 }
 
 function runFlow(flow, value, atTime, groupId) {
@@ -181,7 +192,8 @@ module.exports.handleSensorUpdate = (sensorId, newValue) => {
                 const f = flowsToCheck[i];
 
                 // Yuck. But otherwise how?
-                const isGood = f.config.trigger.comparison == "any" || eval(`${newValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
+                const isGood =
+                    f.config.trigger.comparison == "any" || eval(`${newValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
 
                 if (isGood) {
                     resp = runFlow(flowsToCheck[i], newValue, currentTime);
@@ -191,4 +203,8 @@ module.exports.handleSensorUpdate = (sensorId, newValue) => {
     }
 
     return resp;
+};
+
+module.exports.setSendMessageFunction = callback => {
+    SEND_TO_SENSOR_FUNC = callback;
 };
