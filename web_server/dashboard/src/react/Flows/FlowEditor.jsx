@@ -138,7 +138,7 @@ class FlowEditor extends React.Component {
             }
         } else {
             // "Sensor" and "Group" types must have both of these.
-            if (!s.trigger.comparison || !s.trigger.value) {
+            if (!s.trigger.comparison || (s.trigger.comparison != "any" && !s.trigger.value)) {
                 return false;
             }
         }
@@ -257,7 +257,7 @@ class FlowEditorTriggerBuilder extends React.Component {
 
             // Set to `true` in `updateRootField()` when choosing
             // the "any" comparison option.
-            hideValueField: false
+            hideValueField: p.triggerData.comparison && p.triggerData.comparison == "any" ? true : false
         };
 
         this.triggerComparisons = {
@@ -287,6 +287,8 @@ class FlowEditorTriggerBuilder extends React.Component {
             delete s["value"];
             delete s["comparison"];
             delete s["aggregateType"];
+
+            s.hideValueField = false;
         }
 
         if (key == ["comparison"]) {
@@ -517,6 +519,7 @@ class FlowEditorJsonBuilder extends React.Component {
                 <input
                     placeholder="Value"
                     key={index + "_v"}
+                    disabled={key == ""}
                     value={this.state.data[key] || ""}
                     required={key != ""}
                     title={key != "" ? `Set a value for key ${key}` : ""}
