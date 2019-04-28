@@ -29,7 +29,14 @@
     display: grid;
     grid-gap: 1rem;
 
+    width: calc(100vw - 15rem);
+
     grid-template-columns: repeat(auto-fill, minmax(350px, 400px));
+
+    @media (max-width: 768px) {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
 
     .tile {
         width: auto;

@@ -66,6 +66,10 @@ class GroupList extends React.Component {
             });
     }
 
+    goToGroupsPage() {
+        messenger.notify("ChangePage", "groups");
+    }
+
     //
 
     render() {
@@ -81,7 +85,7 @@ class GroupList extends React.Component {
                         Create New Group
                     </button>
                 )}
-                <div className={this.props.standalone ? "flex-grid" : "flex-col"}>
+                <div className={this.props.standalone ? "flex-grid" : "flex-col list-homepage"}>
                     {!this.props.standalone && (
                         <div className="flex-row aic sb title-row">
                             <h2>Groups</h2>
@@ -92,45 +96,61 @@ class GroupList extends React.Component {
                     )}
                     {groups &&
                         groups.length > 0 &&
-                        groups.map(group => {
-                            let g = group;
-                            return (
-                                <div className="tile" key={`group_${g.id}`}>
-                                    <OnChangeInput
-                                        value={g.name}
-                                        classes={["g-name"]}
-                                        callback={newValue => {
-                                            if (newValue.length > 0) {
-                                                // No .then(), since the change is already reflected client-side
-                                                jsonFetch("/api/groups/createorupdate", { groupName: newValue, uuid: g.id }, "POST").catch(
-                                                    err => {
+                        groups.map((g, idx) => {
+                            if (this.props.standalone || idx < 10) {
+                                return (
+                                    <div className="tile" key={`group_${g.id}`}>
+                                        <OnChangeInput
+                                            value={g.name}
+                                            classes={["g-name"]}
+                                            callback={newValue => {
+                                                if (newValue.length > 0) {
+                                                    // No .then(), since the change is already reflected client-side
+                                                    jsonFetch(
+                                                        "/api/groups/createorupdate",
+                                                        { groupName: newValue, uuid: g.id },
+                                                        "POST"
+                                                    ).catch(err => {
                                                         console.error(err);
-                                                    }
-                                                );
-                                            }
-                                        }}
-                                    />
-                                    <div className="desc">
-                                        <span title={g.id}>({g.id.substr(0, 6)})</span>
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                        {this.props.standalone && (
+                                            <div className="desc">
+                                                <span title={g.id}>({g.id.substr(0, 6)})</span>
+                                            </div>
+                                        )}
+                                        <div className="content">
+                                            <div
+                                                className="data-module clickable"
+                                                title="View logs"
+                                                onClick={() => this.onGroupLogModal(g.id)}
+                                            >
+                                                <span className="value">{g.logCount}</span>
+                                                <span className="label">Log Count</span>
+                                            </div>
+                                            <div className="data-module">
+                                                <span className="value">{g.sensorCount}</span>
+                                                <span className="label">Sensors</span>
+                                            </div>
+                                            {this.props.standalone && (
+                                                <div className="data-module">
+                                                    <button className="warn overlay small" onClick={() => this.removeGroup(g.id)}>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="content">
-                                        <div className="data-module clickable" title="View logs" onClick={() => this.onGroupLogModal(g.id)}>
-                                            <span className="value">{g.logCount}</span>
-                                            <span className="label">Log Count</span>
-                                        </div>
-                                        <div className="data-module">
-                                            <span className="value">{g.sensorCount}</span>
-                                            <span className="label">Sensors</span>
-                                        </div>
-                                        <div className="data-module">
-                                            <button className="warn overlay small" onClick={() => this.removeGroup(g.id)}>
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
+                                );
+                            } else {
+                                return null;
+                            }
                         })}
+                    {!this.props.standalone && groups && groups.length > 10 && (
+                        <button onClick={this.goToGroupsPage}>View All Groups</button>
+                    )}
                     {groups.length === 0 && (
                         <div className="tile">
                             <div className="title">No Groups Created</div>

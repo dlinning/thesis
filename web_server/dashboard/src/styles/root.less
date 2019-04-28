@@ -78,8 +78,8 @@ button {
     }
 
     &.overlay {
-        color: @buttonText;
-        background: fadeout(@primaryDark1, 90);
+        color: @text;
+        background: fadeout(@primaryLight1, 90);
 
         &:hover {
             background-color: fadeout(@primaryLight1, 70);
@@ -90,6 +90,7 @@ button {
     }
 
     &.warn {
+        color: @warnButtonText;
         background-color: @warnLight;
         border-color: @warn;
 
@@ -101,13 +102,14 @@ button {
         }
 
         &.overlay {
-            color: @buttonText;
-            background-color: fadeout(saturate(@warn, 20), 70);
+            background-color: fadeout(@warnLight, 95);
 
             &:hover {
+                color: @buttonText;
                 background-color: @warnLight;
             }
             &:active {
+                color: @buttonText;
                 background-color: @warn;
             }
         }
@@ -297,15 +299,15 @@ p {
     line-height: 1.5;
     text-align: left;
 
-    &.center{
+    &.center {
         text-align: center;
     }
 }
 
 code {
     border-radius: 0.25rem;
-    padding: 0.25rem;
-    background: fadeout(@primary,80);
+    padding: 0.35rem 0.45rem;
+    background: fadeout(@primary, 70);
 }
 
 .table {

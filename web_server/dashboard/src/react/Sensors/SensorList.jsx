@@ -180,6 +180,10 @@ class SensorList extends React.Component {
             });
     }
 
+    goToSensorsPage() {
+        messenger.notify("ChangePage", "sensors");
+    }
+
     //
 
     render() {
@@ -195,7 +199,7 @@ class SensorList extends React.Component {
                         Add Sensor
                     </button>
                 )}
-                <div className={this.props.standalone ? "flex-grid" : "flex-col"}>
+                <div className={this.props.standalone ? "flex-grid" : "flex-col list-homepage"}>
                     {!this.props.standalone && (
                         <div className="flex-row aic sb title-row">
                             <h2>Sensors</h2>
@@ -204,35 +208,51 @@ class SensorList extends React.Component {
                             </button>
                         </div>
                     )}
-                    {sensors.map(s => {
-                        return (
-                            <div className="tile" key={s.id}>
-                                <div className="title">{s.name}</div>
-                                <div className="desc">
-                                    <span title={s.id}>{s.id.substr(0, 25)}</span>
-                                    <span>{s.dataType}</span>
+                    {sensors.map((s, idx) => {
+                        if (this.props.standalone || idx < 10) {
+                            return (
+                                <div className="tile" key={s.id}>
+                                    <div className="title">{s.name}</div>
+                                    {this.props.standalone && (
+                                        <div className="desc">
+                                            <span title={s.id}>{s.id.substr(0, 25)}</span>
+                                        </div>
+                                    )}
+                                    <div className="content">
+                                        <div
+                                            className="data-module clickable"
+                                            title="View logs"
+                                            onClick={() => this.openSensorLogModal(s.id)}
+                                        >
+                                            <span className="value">
+                                                {s.logCount > 999000 ? "999k+" : Number(s.logCount).toLocaleString()}
+                                            </span>
+                                            <span className="label">Log Count</span>
+                                        </div>
+                                        <div className="data-module">
+                                            <span className="value">{s.groups.length}</span>
+                                            <span className="label">In Groups</span>
+                                        </div>
+                                        <div className="data-module">
+                                            <button className="small" onClick={() => this.openSensorSettingsModal(s.id)}>
+                                                Manage
+                                            </button>
+                                            {this.props.standalone && (
+                                                <button className="warn overlay small" onClick={() => this.removeSensor(s.id)}>
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    <div className="data-module clickable" title="View logs" onClick={() => this.openSensorLogModal(s.id)}>
-                                        <span className="value">{s.logCount > 999000 ? "999k+" : Number(s.logCount).toLocaleString()}</span>
-                                        <span className="label">Log Count</span>
-                                    </div>
-                                    <div className="data-module">
-                                        <span className="value">{s.groups.length}</span>
-                                        <span className="label">In Groups</span>
-                                    </div>
-                                    <div className="data-module">
-                                        <button className="small" onClick={() => this.openSensorSettingsModal(s.id)}>
-                                            Manage
-                                        </button>
-                                        <button className="warn overlay small" onClick={() => this.removeSensor(s.id)}>
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
+                            );
+                        } else {
+                            return null;
+                        }
                     })}
+                    {!this.props.standalone && sensors && sensors.length > 10 && (
+                        <button onClick={this.goToSensorsPage}>View All Sensors</button>
+                    )}
                     {sensors.length === 0 && (
                         <div className="tile">
                             <div className="title">No Sensors Added</div>
