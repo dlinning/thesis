@@ -209,7 +209,7 @@ class FlowEditor extends React.Component {
 
                 <div className="config flex-col">
                     <div className="section flex-col">
-                        <span className="title">When</span>
+                        <span className="title">When...</span>
                         <FlowEditorTriggerBuilder
                             triggerData={this.state.trigger}
                             sensorGroupData={this.state.sgData}
@@ -218,12 +218,12 @@ class FlowEditor extends React.Component {
                     </div>
 
                     <div className="section flex-col">
-                        <span className="title">Send</span>
+                        <span className="title">Send..</span>
                         <FlowEditorJsonBuilder payloadData={this.state.payload} updateFunc={this.updatePayloadData.bind(this)} />
                     </div>
 
                     <div className="section flex-col">
-                        <span className="title">To</span>
+                        <span className="title">To...</span>
                         <FlowEditorToBuilder
                             toData={this.state.to}
                             sensorGroupData={this.state.sgData}
@@ -327,7 +327,7 @@ class FlowEditorTriggerBuilder extends React.Component {
                     </RadioGroup>
                 </div>
                 <br />
-
+                {this.state.type && <span className="title">Is...</span>}
                 {this.state.type && this.state.type !== "Time" && (
                     <div className="flex-row aic">
                         <div className="flex-col sensor-data-col">
