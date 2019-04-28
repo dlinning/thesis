@@ -139,7 +139,7 @@ function checkGroupAndTimeFlows() {
                 const comparisonValue = groupAggregateData[f.triggerId][f.config.trigger.aggregateType];
 
                 // Yuck. But otherwise how?
-                const isGood = eval(`${comparisonValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
+                const isGood = f.config.trigger.comparison == "any" || eval(`${comparisonValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
 
                 if (isGood) {
                     resp = runFlow(f, comparisonValue, currentTime, f.triggerId);
@@ -181,7 +181,7 @@ module.exports.handleSensorUpdate = (sensorId, newValue) => {
                 const f = flowsToCheck[i];
 
                 // Yuck. But otherwise how?
-                const isGood = eval(`${newValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
+                const isGood = f.config.trigger.comparison == "any" || eval(`${newValue} ${f.config.trigger.comparison} ${f.config.trigger.value}`);
 
                 if (isGood) {
                     resp = runFlow(flowsToCheck[i], newValue, currentTime);

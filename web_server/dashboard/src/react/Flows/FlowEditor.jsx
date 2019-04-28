@@ -253,7 +253,11 @@ class FlowEditorTriggerBuilder extends React.Component {
 
             // Only used for "Group" `type`'d Flows,
             // still needs to be set though.
-            aggregateType: p.triggerData.aggregateType || undefined
+            aggregateType: p.triggerData.aggregateType || undefined,
+
+            // Set to `true` in `updateRootField()` when choosing
+            // the "any" comparison option.
+            hideValueField: false
         };
 
         this.triggerComparisons = {
@@ -263,7 +267,8 @@ class FlowEditorTriggerBuilder extends React.Component {
                 { value: ">", display: ">" },
                 { value: ">=", display: ">=" },
                 { value: "<", display: "<" },
-                { value: "<=", display: "<=" }
+                { value: "<=", display: "<=" },
+                { value: "any", display: "Any" }
             ],
 
             Group: [{ value: "avg", display: "Average" }, { value: "sum", display: "Sum" }],
@@ -282,6 +287,14 @@ class FlowEditorTriggerBuilder extends React.Component {
             delete s["value"];
             delete s["comparison"];
             delete s["aggregateType"];
+        }
+
+        if (key == ["comparison"]) {
+            if (val == "any") {
+                s.hideValueField = true;
+            } else {
+                s.hideValueField = false;
+            }
         }
 
         this.setState(s, () => {
@@ -345,7 +358,6 @@ class FlowEditorTriggerBuilder extends React.Component {
                                 required
                             />
                         </div>
-                        <span>Is</span>
                         {this.state.type === "Group" && (
                             <OnChangeInput
                                 key={`groupAggType_${this.state.type}`}
@@ -368,16 +380,18 @@ class FlowEditorTriggerBuilder extends React.Component {
                             delay={0}
                             required
                         />
-                        <OnChangeInput
-                            key={`triggerValue_${this.state.type}`}
-                            placeholder="Value"
-                            value={this.state.value}
-                            required
-                            type="text"
-                            callback={val => this.updateRootField("value", val)}
-                            delay={0}
-                            required
-                        />
+                        {!this.state.hideValueField && (
+                            <OnChangeInput
+                                key={`triggerValue_${this.state.type}`}
+                                placeholder="Value"
+                                value={this.state.value}
+                                required
+                                type="text"
+                                callback={val => this.updateRootField("value", val)}
+                                delay={0}
+                                required
+                            />
+                        )}
                     </div>
                 )}
 

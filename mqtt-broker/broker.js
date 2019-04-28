@@ -14,7 +14,7 @@ if (config.wsPort !== undefined) {
     serverOpts.interfaces.push({ type: "http", port: config.wsPort, bundle: true });
 }
 
-// Only necessary if nginx isn't handling SSL Certs
+// Only necessary if nginx (or other reverse proxy) isn't handling SSL Certs.
 // if (config.wssPort !== undefined && config.certPath !== undefined && config.keyPath !== undefined) {
 //     serverOpts.interfaces.push({
 //         type: "https",
@@ -128,7 +128,7 @@ const sendMessageToSensor = (sensorId, payload) => {
     let client = sensorIdToClientMap[sensorId];
 
     if (client !== undefined) {
-        console.log("Sending a payload to", sensorId);
+        debug && console.log("Sending a payload to", sensorId);
         MQTT_WORKER.publish("flowPub/" + sensorId, JSON.stringify(payload));
     }
 };
