@@ -15,7 +15,7 @@
 
     const mqttConnect = () => {
         if (canConnect) {
-            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website", MQTT_CLIENT_ID);
+            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website/ws", MQTT_CLIENT_ID);
 
             mqttClient.onMessageArrived = handleMessage;
 
