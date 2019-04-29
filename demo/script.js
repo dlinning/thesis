@@ -1,3 +1,10 @@
+// Ugh
+navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for (let registration of registrations) {
+        registration.unregister();
+    }
+});
+// Actual code
 (() => {
     let canConnect = false;
     if (Paho.MQTT !== undefined) {
