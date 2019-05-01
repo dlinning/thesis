@@ -1,10 +1,5 @@
-// Ugh
-navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for (let registration of registrations) {
-        registration.unregister();
-    }
-});
 // Actual code
+let MQTT_CLIENT_ID = null;
 (() => {
     let canConnect = false;
     if (Paho.MQTT !== undefined) {
@@ -13,7 +8,6 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
         console.error("Be sure to include https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js");
     }
 
-    const MQTT_CLIENT_ID = "DEMO_OUT";
     //
     let mqttClient = null;
     let isConnected = false;
@@ -31,11 +25,14 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
 
                 onSuccess: () => {
                     console.log("CONNECTED");
-                    connMsgDiv.innerText = "Connected";
 
                     mqttClient.subscribe(`flowPub/${MQTT_CLIENT_ID}`);
 
                     isConnected = true;
+
+                    // Hide the button, show connected message
+                    document.getElementById('connect-button').hidden = true;
+                    connMsgDiv.innerText = "Connected";
                 }
             });
         }
@@ -63,8 +60,10 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
 })();
 
 // Actually handles drum callbacks
-(() => {
+const setupHostView = () => {
     const drums = document.querySelectorAll(".drum");
+
+    document.getElementById('host').style.display = 'block';
 
     const sounds = {
         snare: { audio: new Audio("./sounds/snare.opus"), timer: null, played: false },
@@ -114,4 +113,38 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
 
     // Expose `playDrum()` globally.
     window.playDrum = playDrum;
+};
+
+const setupClientView = () => {
+    document.getElementById('client').style.display = 'flex';
+
+    mqttConnect();
+
+    const select = document.getElementById('client-select');
+    var opts = select.getElementsByTagName('option');
+    select.selectedIndex = Math.floor(Math.random() * opts.length);
+
+
+    document.getElementById('client-play').addEventListener('click', evt => {
+        evt.preventDefault();
+
+        let value = select.value;
+        logSensorData(value, 'string');
+    });
+};
+
+// Make the current view the "host" of the demo
+function setHost() {
+    window.localStorage.setItem("type", "host");
+}
+
+(() => {
+    if (window.localStorage.getItem("type") === "host") {
+        console.log("SETTING UP HOST");
+        MQTT_CLIENT_ID = "DEMO_OUT";
+        setupHostView();
+    } else {
+        MQTT_CLIENT_ID = "DEMO_IN";
+        setupClientView();
+    }
 })();

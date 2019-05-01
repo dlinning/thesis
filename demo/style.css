@@ -20,6 +20,11 @@ button {
     cursor: pointer;
 }
 
+#client,
+#host {
+    display: none;
+}
+
 #kit {
     position: relative;
     border: 2px solid #666;
@@ -116,4 +121,42 @@ button {
     top: 250px;
     left: 200px;
     border-width: 3px;
+}
+
+#client {
+    flex-flow: column;
+}
+
+button {
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: #008db9;
+    border-radius: 0.25rem;
+    color: #fff;
+    cursor: pointer;
+}
+select{
+    padding: 1rem 2rem;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+#conn-div {
+    display: flex;
+    flex-flow: column;
+    position: fixed;
+    align-items: center;
+
+    font-size: 1.5rem;
+    text-align: center;
+    border-top: 1px solid #666;
+    width: 100vw;
+    height: 15vh;
+    bottom: 0;
+    padding-top: 2vh;
+}
+#connect-button {
+    width: 80vw;
+    max-width: 400px;
 }

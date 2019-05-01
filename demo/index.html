@@ -10,19 +10,36 @@
         <title>MQTT DrumKit</title>
     </head>
     <body>
-        <div id="kit">
-            <h1>MQTT Enabled Drum Kit</h1>
-            <div id="hihatC" class="drum cymbal"><span>Hi-hat Closed</span></div>
-            <div id="hihatO" class="drum cymbal"><span>Hi-hat Open</span></div>
-            <div id="crash" class="drum cymbal"><span>Crash</span></div>
-            <div id="kick" class="drum round"><span>Kick</span></div>
-            <div id="hitom" class="drum round"><span>Hi Tom</span></div>
-            <div id="medtom" class="drum round"><span>Med Tom</span></div>
-            <div id="snare" class="drum"><span>Snare</span></div>
-            <div id="lowtom" class="drum"><span>Low Tom</span></div>
+        <div id="host">
+            <div id="kit">
+                <h1>MQTT Enabled Drum Kit</h1>
+                <div id="hihatC" class="drum cymbal"><span>Hi-hat Closed</span></div>
+                <div id="hihatO" class="drum cymbal"><span>Hi-hat Open</span></div>
+                <div id="crash" class="drum cymbal"><span>Crash</span></div>
+                <div id="kick" class="drum round"><span>Kick</span></div>
+                <div id="hitom" class="drum round"><span>Hi Tom</span></div>
+                <div id="medtom" class="drum round"><span>Med Tom</span></div>
+                <div id="snare" class="drum"><span>Snare</span></div>
+                <div id="lowtom" class="drum"><span>Low Tom</span></div>
+            </div>
         </div>
-        <button onclick="mqttConnect()">Connect</button>
-        <span id="connMsg"></span>
+        <div id="client">
+            <select name="client-select" id="client-select">
+                <option value="hihatC">Hi-hat Closed</option>
+                <option value="hihatO">Hi-hat Open</option>
+                <option value="crash">Crash</option>
+                <option value="kick">Kick</option>
+                <option value="hitom">Hi Tom</option>
+                <option value="medtom">Med Tom</option>
+                <option value="snare">Snare</option>
+                <option value="lowtom">Low Tom</option>
+            </select>
+            <button id="client-play">Send</button>
+        </div>
+        <div id="conn-div">
+            <button onclick="mqttConnect()" id="connect-button">Connect</button>
+            <span id="connMsg"></span>
+        </div>
 
         <script src="./script.js"></script>
     </body>
