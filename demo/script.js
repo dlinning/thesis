@@ -31,7 +31,7 @@ let MQTT_CLIENT_ID = null;
                     isConnected = true;
 
                     // Hide the button, show connected message
-                    document.getElementById('connect-button').hidden = true;
+                    document.getElementById("connect-button").hidden = true;
                     connMsgDiv.innerText = "Connected";
                 }
             });
@@ -63,7 +63,7 @@ let MQTT_CLIENT_ID = null;
 const setupHostView = () => {
     const drums = document.querySelectorAll(".drum");
 
-    document.getElementById('host').style.display = 'block';
+    document.getElementById("host").style.display = "block";
 
     const sounds = {
         snare: { audio: new Audio("./sounds/snare.opus"), timer: null, played: false },
@@ -116,20 +116,38 @@ const setupHostView = () => {
 };
 
 const setupClientView = () => {
-    document.getElementById('client').style.display = 'flex';
+    document.getElementById("client").style.display = "flex";
 
+    let canPlay = true;
+
+    // Auto connect
     mqttConnect();
 
-    const select = document.getElementById('client-select');
-    var opts = select.getElementsByTagName('option');
+    // Put everyone on a random drum to start off
+    const select = document.getElementById("client-select");
+    var opts = select.getElementsByTagName("option");
     select.selectedIndex = Math.floor(Math.random() * opts.length);
 
+    const countdownEl = document.getElementById('countdown');
 
-    document.getElementById('client-play').addEventListener('click', evt => {
+    // Setup click listeners
+    document.getElementById("client-play").addEventListener("click", evt => {
         evt.preventDefault();
 
-        let value = select.value;
-        logSensorData(value, 'string');
+        if (canPlay) {
+            let value = select.value;
+            logSensorData(value, "string");
+
+            canPlay = false;
+            countdownEl.classList.add('play');
+
+            setTimeout(() => {
+                canPlay = true;
+            }, 750);
+            setTimeout(() => {
+                countdownEl.classList.remove('play');
+            }, 250);
+        }
     });
 };
 

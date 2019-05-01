@@ -126,6 +126,12 @@ button {
 #client {
     flex-flow: column;
 }
+@media screen and (max-width: 768px) {
+    #client {
+        height: 90vh;
+        justify-content: center;
+    }
+}
 
 button {
     border: none;
@@ -136,7 +142,7 @@ button {
     color: #fff;
     cursor: pointer;
 }
-select{
+select {
     padding: 1rem 2rem;
     font-size: 2rem;
     margin-bottom: 2rem;
@@ -159,4 +165,31 @@ select{
 #connect-button {
     width: 80vw;
     max-width: 400px;
+}
+
+#countdown {
+    background: #ddd;
+    border-radius: 50%;
+    min-width: 60px;
+    min-height: 60px;
+    margin: 2rem auto 0;
+    position: relative;
+}
+#countdown::after {
+    position: absolute;
+    background-color: #008db9;
+    border-radius: 50%;
+    content: " ";
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 100%;
+    transform: scale(1);
+    transition: transform 250ms ease-in, background-color 250ms 0ms ease-in;
+}
+
+#countdown.play::after {
+    transform: scale(0.1);
+    background-color: #ba3f3f;
+    transition: transform 60ms linear, background-color 50ms ease;
 }
