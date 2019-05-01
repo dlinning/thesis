@@ -185,7 +185,7 @@ select {
     top: 0;
     height: 100%;
     transform: scale(1);
-    transition: transform 250ms ease-in, background-color 250ms 0ms ease-in;
+    transition: transform 500ms ease-in, background-color 500ms 0ms ease-in;
 }
 
 #countdown.play::after {
