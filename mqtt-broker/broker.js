@@ -72,9 +72,6 @@ MQTT_WORKER.on("message", (topic, message) => {
 ////
 const broker = new mosca.Server(serverOpts);
 
-let sensorIdToClientMap = {},
-    clientIdToSensorIdMap = {};
-
 broker.on("ready", () => {
     console.log("-- MQTT Broker Initialized--");
     serverOpts.interfaces.forEach(iface => {
@@ -95,12 +92,7 @@ broker.on("clientConnected", newClient => {
 
 broker.on("clientDisconnected", removedClient => {
     // Handle cleaning up old client connections
-    let sensorId = clientIdToSensorIdMap[removedClient.id];
-
-    if (sensorId !== undefined) {
-        delete sensorIdToClientMap[sensorId];
-        delete clientIdToSensorIdMap[removedClient.id];
-    }
+    console.log(`CLIENT DISCONNECTED: ${removedClient.id}`);
 });
 
 broker.authenticate = (client, user, pass, callback) => {
@@ -111,9 +103,7 @@ broker.authenticate = (client, user, pass, callback) => {
     if (pass != undefined && pass != null && pass.toString() === config.password) {
         accept = true;
 
-        // Used later on to send out appropriate packets
-        // based on sensorId.
-        sensorIdToClientMap[client.id] = client;
+        console.log(`CLIENT CONNECTED: ${client.id}`);
 
         // Skip registering the current MQTT_WORKER
         if (client.id !== MQTT_WORKER_ID) {
@@ -125,15 +115,12 @@ broker.authenticate = (client, user, pass, callback) => {
 };
 
 const sendMessageToSensor = (sensorId, payload) => {
-    let client = sensorIdToClientMap[sensorId];
-
-    if (client !== undefined) {
-        debug && console.log("Sending a payload to", sensorId);
-        MQTT_WORKER.publish("flowPub/" + sensorId, JSON.stringify(payload));
-    }
+    // Just kind of hope the sensor exists.
+    // Otherwise, send it into the void.
+    MQTT_WORKER.publish("flowPub/" + sensorId, JSON.stringify(payload));
 };
 module.exports.sendMessageToSensor = sendMessageToSensor;
 
-// Let the FlowRunner know what function to call when it needs to 
+// Let the FlowRunner know what function to call when it needs to
 // send data out to a specific sensor.
 FlowRunner.setSendMessageFunction(sendMessageToSensor);
