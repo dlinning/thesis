@@ -1,5 +1,6 @@
 // Actual code
 let MQTT_CLIENT_ID = null;
+var IS_INPUT = false;
 (() => {
     let canConnect = false;
     if (Paho.MQTT !== undefined) {
@@ -16,7 +17,10 @@ let MQTT_CLIENT_ID = null;
 
     const mqttConnect = () => {
         if (canConnect) {
-            mqttClient = new Paho.MQTT.Client("wss://mqtt.thesis.dougs.website/ws", MQTT_CLIENT_ID);
+            mqttClient = new Paho.MQTT.Client(
+                "wss://mqtt.thesis.dougs.website/ws",
+                IS_INPUT == true ? "DEMO_" + Math.random() : MQTT_CLIENT_ID
+            );
 
             mqttClient.onMessageArrived = handleMessage;
 
@@ -120,6 +124,8 @@ const setupClientView = () => {
 
     let canPlay = true;
 
+    IS_INPUT = true;
+
     // Auto connect
     mqttConnect();
 
@@ -128,10 +134,11 @@ const setupClientView = () => {
     var opts = select.getElementsByTagName("option");
     select.selectedIndex = Math.floor(Math.random() * opts.length);
 
-    const countdownEl = document.getElementById('countdown');
+    const countdownEl = document.getElementById("countdown");
 
     // Setup click listeners
-    document.getElementById("client-play").addEventListener("click", evt => {
+    const playButton = document.getElementById("client-play");
+    playButton.addEventListener("click", evt => {
         evt.preventDefault();
 
         if (canPlay) {
@@ -139,13 +146,16 @@ const setupClientView = () => {
             logSensorData(value, "string");
 
             canPlay = false;
-            countdownEl.classList.add('play');
+            countdownEl.classList.add("play");
+
+            playButton.disabled = true;
 
             setTimeout(() => {
                 canPlay = true;
+                playButton.disabled = false;
             }, 750);
             setTimeout(() => {
-                countdownEl.classList.remove('play');
+                countdownEl.classList.remove("play");
             }, 250);
         }
     });
