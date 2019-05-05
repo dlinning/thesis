@@ -112,7 +112,7 @@ module.exports.logCountAndGroupsForAllSensors = () => {
     return sensors;
 };
 const getAllSensorsMetadataStmt = db.prepare(`SELECT id, name, updatedAt FROM Sensors ORDER BY Sensors.createdAt`);
-const getLogCountsForSensorsStmt = db.prepare(`SELECT count(id) as count,SensorId FROM LogEntries GROUP BY SensorId`);
+const getLogCountsForSensorsStmt = db.prepare(`SELECT count(id) as count, SensorId FROM LogEntries GROUP BY SensorId ORDER BY timestamp DESC`);
 const getSensorsForGroupsStmt = db.prepare(
     `SELECT Sensors.id as SensorId, Groups.id as GroupId, Groups.name as GroupName
     FROM Sensors
@@ -148,8 +148,9 @@ const getGroupsforSensorStmt = db.prepare(
 );
 const getMetadataForSensorStmt = db.prepare(`SELECT name, updatedAt FROM Sensors WHERE id = ?`);
 const getLogsForSensorStmt = db.prepare(
-    `SELECT * FROM LogEntries
-    WHERE SensorId = ?`
+    `SELECT value,dataType,timestamp FROM LogEntries
+    WHERE SensorId = ?
+    ORDER BY timestamp DESC`
 );
 
 // Simple wrapper around `getGroupsforSensor` query above.
@@ -476,14 +477,14 @@ module.exports.getLogsForGroup = groupId => {
 };
 const getLogsForGroupStmt = db.prepare(
     `SELECT
-    le.id as logId,
     le.SensorId as sensorId,
-	le.value as value,
-	le.timestamp as timestamp
+    le.value as value,
+    le.dataType as dataType,
+    le.timestamp as timestamp
 FROM
 	Sensors s,
 	SensorGroups sg,
-	(SELECT * FROM LogEntries) le
+	(SELECT * FROM LogEntries ORDER BY timestamp DESC) le
 WHERE
 	sg.GroupId = ? AND
 	sg.SensorId = le.SensorId AND
