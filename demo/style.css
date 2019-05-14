@@ -25,102 +25,45 @@ button {
     display: none;
 }
 
-#kit {
-    position: relative;
-    border: 2px solid #666;
-    padding: 1rem;
-    border-radius: 1rem;
-    height: 500px;
-    width: 600px;
-    margin: 0 auto;
-}
-
-.drum {
-    position: absolute;
-
-    border: 2px solid #666;
-    background: #fff;
-    border-radius: 0.25rem;
-
-    cursor: pointer;
-    user-select: none;
-
+#lightdump {
     display: flex;
-    justify-content: center;
-    align-items: center;
-
-    transition: background 1s ease;
+    flex-flow: row wrap;
+    padding: 5vh 5vw;
+    margin: 0 auto;
+    max-height: 85vh;
+    overflow-y: auto;
 }
-.drum.cymbal {
-    border-width: 1px;
-    border-radius: 0;
+.light {
+    width: 8rem;
+    height: 15rem;
+    font-weight: bold;
+    margin: 1rem;
+    position: relative;
+    background-image: url(./bulb-min.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    text-align: center;
+    font-size: 1.2rem;
 }
-.drum.round {
-    border-radius: 50%;
+.light::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
-
-.drum span {
-    pointer-events: none;
-    user-select: none;
+.light::before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 69%;
+    width: 100%;
+    display: none;
 }
-
-.drum.play {
-    background: #0f0;
-}
-
-@keyframes playFlash {
-    50% {
-    }
-}
-
-#hihatC {
-    width: 135px;
-    height: 40px;
-    top: 190px;
-    left: 45px;
-}
-#hihatO {
-    width: 135px;
-    height: 40px;
-    top: 150px;
-    left: 45px;
-}
-#crash {
-    width: 167px;
-    height: 45px;
-    top: 100px;
-    left: 382px;
-}
-#snare {
-    width: 135px;
-    height: 60px;
-    top: 265px;
-    left: 100px;
-}
-#hitom {
-    left: 210px;
-    top: 177px;
-    height: 75px;
-    width: 75px;
-}
-#medtom {
-    left: 324px;
-    top: 165px;
-    height: 100px;
-    width: 100px;
-}
-#lowtom {
-    left: 374px;
-    top: 275px;
-    height: 173px;
-    width: 133px;
-}
-#kick {
-    width: 200px;
-    height: 200px;
-    top: 250px;
-    left: 200px;
-    border-width: 3px;
+.light.on::before{
+    display: block;
+    background: radial-gradient(ellipse, var(--color) 0%, rgba(255, 255, 255, 0) 66%);
 }
 
 #client {
@@ -171,29 +114,44 @@ select {
     max-width: 400px;
 }
 
-#countdown {
-    background: #ddd;
-    border-radius: 50%;
-    min-width: 60px;
-    min-height: 60px;
-    margin: 2rem auto 0;
+#cli-bulb {
+    --color: #ff0;
     position: relative;
-}
-#countdown::after {
-    position: absolute;
-    background-color: #008db9;
-    border-radius: 50%;
-    content: " ";
-    width: 100%;
-    left: 0;
-    top: 0;
-    height: 100%;
-    transform: scale(1);
-    transition: transform 500ms ease-in, background-color 500ms 0ms ease-in;
-}
+    width: 75vw;
+    height: 60vh;
+    margin: 0 auto;
+    max-width: 300px;
+    max-height: 500px;
 
-#countdown.play::after {
-    transform: scale(0.1);
-    background-color: #ba3f3f;
-    transition: transform 60ms linear, background-color 50ms ease;
+    background: #666;
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+}
+#cli-bulb.on {
+    background: #eee;
+}
+#cli-bulb img {
+    z-index: 2;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    margin: 0 auto;
+    display: block;
+    user-select: none;
+    cursor: pointer;
+}
+#cli-bulb.on::after {
+    display: block;
+    content: " ";
+    position: absolute;
+    top: 0;
+    width: calc(100% - 2rem);
+    height: 70%;
+    background: radial-gradient(ellipse, var(--color) 0%, rgba(255, 255, 255, 0) 72%);
+    z-index: 1;
+}
+#color-selector {
+    margin-top: 1rem;
+    width: 100%;
+    height: 3rem;
 }

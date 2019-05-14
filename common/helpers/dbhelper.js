@@ -315,7 +315,7 @@ module.exports.deleteSensor = (sensorId, deleteWithLogs = false) => {
             return { status: 200, sensor: currentSensor };
         }
     } else {
-        return { status: 400, error: `Sensor does not exist with ID ${id}` };
+        return { status: 400, error: `Sensor does not exist with ID ${sensorId}` };
     }
 };
 const deleteSensorStmt = db.prepare(`DELETE FROM Sensors WHERE id = ?`);

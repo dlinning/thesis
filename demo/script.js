@@ -17,9 +17,11 @@ var IS_INPUT = false;
 
     const mqttConnect = () => {
         if (canConnect) {
+            MQTT_CLIENT_ID = IS_INPUT == true ? "BULB_" + Math.floor(Math.random() * new Date().getTime()).toString(16) : MQTT_CLIENT_ID;
             mqttClient = new Paho.MQTT.Client(
-                "wss://mqtt.thesis.dougs.website/ws",
-                IS_INPUT == true ? "DEMO_" + Math.random() : MQTT_CLIENT_ID
+                //"wss://mqtt.thesis.dougs.website/ws",
+                "ws://localhost:2883/",
+                MQTT_CLIENT_ID
             );
 
             mqttClient.onMessageArrived = handleMessage;
@@ -36,7 +38,7 @@ var IS_INPUT = false;
 
                     // Hide the button, show connected message
                     document.getElementById("connect-button").hidden = true;
-                    connMsgDiv.innerText = "Connected";
+                    connMsgDiv.innerText = IS_INPUT ? MQTT_CLIENT_ID.replace("BULB_", "") : "Connected";
                 }
             });
         }
@@ -44,9 +46,8 @@ var IS_INPUT = false;
     window.mqttConnect = mqttConnect;
 
     const handleMessage = msg => {
-        console.log(`${msg.destinationName} : ${msg.payloadString}`);
         let payload = JSON.parse(msg.payloadString);
-        playDrum(payload["play"]);
+        updateLight(payload["data"]);
     };
 
     const logData = (value, dataType) => {
@@ -55,7 +56,7 @@ var IS_INPUT = false;
                 value: value,
                 dataType: dataType,
                 timestamp: new Date().getTime(),
-                sensorId: MQTT_CLIENT_ID
+                sensorId: IS_INPUT ? "DEMO_IN" : MQTT_CLIENT_ID
             };
             mqttClient.send("log", JSON.stringify(payload), 1);
         }
@@ -63,66 +64,37 @@ var IS_INPUT = false;
     window.logSensorData = logData;
 })();
 
-// Actually handles drum callbacks
 const setupHostView = () => {
-    const drums = document.querySelectorAll(".drum");
+    document.getElementById("host").style.display = "flex";
 
-    document.getElementById("host").style.display = "block";
+    const lightDump = document.getElementById("lightdump");
 
-    const sounds = {
-        snare: { audio: new Audio("./sounds/snare.opus"), timer: null, played: false },
-        crash: { audio: new Audio("./sounds/crash.opus"), timer: null, played: false },
-        hihatO: { audio: new Audio("./sounds/hihatO.opus"), timer: null, played: false },
-        hihatC: { audio: new Audio("./sounds/hihatC.opus"), timer: null, played: false },
-        kick: { audio: new Audio("./sounds/kick.opus"), timer: null, played: false },
-        lowtom: { audio: new Audio("./sounds/lowtom.opus"), timer: null, played: false },
-        medtom: { audio: new Audio("./sounds/medtom.opus"), timer: null, played: false },
-        hitom: { audio: new Audio("./sounds/hitom.opus"), timer: null, played: false }
-    };
+    const handleLightUpdate = data => {
+        data = data.split("|");
+        if (data.length === 3) {
+            let light = document.getElementById(`b_${data[0]}`);
+            if (light == undefined) {
+                light = document.createElement("div");
+                light.id = `b_${data[0]}`;
+                light.classList.add("light");
 
-    // Setup click listeners
-    drums.forEach(drum => {
-        drum.addEventListener("click", evt => {
-            evt.preventDefault();
-            playDrum(drum.id);
-        });
-    });
+                light.dataset.name = data[0];
 
-    // Checks that the drum exists,
-    // then plays sound/adds class.
-    function playDrum(drumName) {
-        const drumEl = document.getElementById(drumName);
-
-        if (drumEl) {
-            let sound = sounds[drumName];
-
-            if (!sound.played) {
-                sound.played = true;
-                drumEl.style.transitionDuration = sound.audio.duration / 3 + "s";
+                lightDump.appendChild(light);
             }
-
-            if (sound.audio.paused) {
-                sound.audio.play();
+            light.style.setProperty("--color", data[1]);
+            if (data[2] == "false") {
+                light.classList.remove("on");
             } else {
-                sound.audio.currentTime = 0;
+                light.classList.add("on");
             }
-            drumEl.classList.add("play");
-
-            clearTimeout(sound.timer);
-            sound.timer = setTimeout(() => {
-                drumEl.classList.remove("play");
-            }, sound.audio.duration * 1000);
         }
-    }
-
-    // Expose `playDrum()` globally.
-    window.playDrum = playDrum;
+    };
+    window.updateLight = handleLightUpdate;
 };
 
 const setupClientView = () => {
     document.getElementById("client").style.display = "flex";
-
-    let canPlay = true;
 
     IS_INPUT = true;
 
@@ -130,34 +102,34 @@ const setupClientView = () => {
     mqttConnect();
 
     // Put everyone on a random drum to start off
-    const select = document.getElementById("client-select");
-    var opts = select.getElementsByTagName("option");
-    select.selectedIndex = Math.floor(Math.random() * opts.length);
+    const bulb = document.getElementById("cli-bulb");
 
-    const countdownEl = document.getElementById("countdown");
+    let on = false;
+    let currentColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+
+    bulb.addEventListener("click", evt => {
+        evt.preventDefault();
+        on = !on;
+        if (on) {
+            bulb.classList.add("on");
+        } else {
+            bulb.classList.remove("on");
+        }
+        logSensorData(`${MQTT_CLIENT_ID.replace("BULB_", "")}|${currentColor}|${on}`, "bulb|color|state");
+    });
 
     // Setup click listeners
-    const playButton = document.getElementById("client-play");
-    playButton.addEventListener("click", evt => {
+    const colorSelector = document.getElementById("color-selector");
+    colorSelector.value = currentColor;
+    bulb.style.setProperty("--color", currentColor);
+
+    colorSelector.addEventListener("change", evt => {
         evt.preventDefault();
+        currentColor = colorSelector.value;
+        bulb.style.setProperty("--color", currentColor);
 
-        if (canPlay) {
-            let value = select.value;
-            logSensorData(value, "string");
-
-            canPlay = false;
-            countdownEl.classList.add("play");
-
-            playButton.disabled = true;
-
-            setTimeout(() => {
-                canPlay = true;
-                playButton.disabled = false;
-            }, 750);
-            setTimeout(() => {
-                countdownEl.classList.remove("play");
-            }, 250);
-        }
+        // Update the color right away
+        logSensorData(`${MQTT_CLIENT_ID.replace("BULB_", "")}|${currentColor}|${on}`, "bulb|color|state");
     });
 };
 
@@ -172,7 +144,6 @@ function setHost() {
         MQTT_CLIENT_ID = "DEMO_OUT";
         setupHostView();
     } else {
-        MQTT_CLIENT_ID = "DEMO_IN";
         setupClientView();
     }
 })();
