@@ -19,8 +19,8 @@ var IS_INPUT = false;
         if (canConnect) {
             MQTT_CLIENT_ID = IS_INPUT == true ? "BULB_" + Math.floor(Math.random() * new Date().getTime()).toString(16) : MQTT_CLIENT_ID;
             mqttClient = new Paho.MQTT.Client(
-                //"wss://mqtt.thesis.dougs.website/ws",
-                "ws://localhost:2883/",
+                "wss://mqtt.thesis.dougs.website/ws",
+                //"ws://localhost:2883/",
                 MQTT_CLIENT_ID
             );
 
